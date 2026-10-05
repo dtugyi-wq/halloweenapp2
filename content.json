@@ -190,5 +190,55 @@
    "a": "138d9e809e386a7b800791d1f664f56d1c55f3d1ba411b950862729bc486c5ce"
   }
  ],
- "bonusEssay": null
+ "bonusEssay": null,
+ "hints": {
+  "1": [
+   "Mindig a legnagyobb host-igényű hálózattal kezdd a kiosztást, utána haladj csökkenő sorrendben.",
+   "A /30-as linkeknél csak 2 használható cím kell, ne pazarolj rájuk nagyobb blokkot.",
+   "Az IPv6-nál minden alhálózat kaphat egységesen /64-et, itt nem kell VLSM-logikával számolnod.",
+   "Ellenőrizd: a kiosztott hálózatok összmérete nem lépheti túl a rendelkezésre álló 172.16.0.0/22 blokkot."
+  ],
+  "2": [
+   "Az SSH-hoz előbb domain nevet és RSA kulcsot kell beállítani, csak utána engedélyezhető a 2-es verzió.",
+   "A VTY vonalakon a 'transport input ssh' beállítás nélkül a Telnet is nyitva maradhat.",
+   "A jelszó-titkosításhoz ne felejtsd el a globális 'service password-encryption' parancsot.",
+   "Az enable secret és a helyi felhasználó jelszava két különböző beállítás, mindkettő kell."
+  ],
+  "3": [
+   "A natív VLAN-nak egyeznie kell a trunk mindkét végén, különben VLAN-szivárgás léphet fel.",
+   "A port security 'sticky' móddal megjegyzi az első MAC-címet, nem kell kézzel beírni.",
+   "A router-on-a-stick subinterfészein az encapsulation parancs előzze meg az IP-cím beállítását.",
+   "Ellenőrizd a 'show vlan brief' kimenetét: minden port a megfelelő VLAN-ban van-e."
+  ],
+  "4": [
+   "A LACP módja 'active', a PAgP módja 'desirable' – ha a két oldal módja nem passzol, nem jön létre a csatorna.",
+   "A Port-channel interfészt ugyanúgy trunkölni kell, mint egy sima portot.",
+   "A root bridge priority-t VLAN-onként külön lehet beállítani.",
+   "A 'show etherchannel summary' SU jelzése mutatja, hogy a csatorna valóban működik-e."
+  ],
+  "5": [
+   "Ne felejtsd el kizárni a gateway címét és az első néhány címet a DHCP poolból.",
+   "Az IPv6 stateless DHCPv6-nál az 'other-config-flag'-et kell beállítani, nem a 'managed-config-flag'-et.",
+   "Ha a DHCP szerver más alhálózatban van, az 'ip helper-address' nélkül a kérés nem jut el hozzá.",
+   "A stateful DHCPv6-hoz az RA-ban az M-bitet (managed) kell bekapcsolni."
+  ],
+  "6": [
+   "A passive-interface-t a LAN felé állítsd be, a router-router linkeken ne.",
+   "A point-to-point hálózattípus gyorsabb konvergenciát ad, mint a broadcast típus soros linkeken.",
+   "Az OSPF költség a sávszélességből számolódik; ha átállítod a referencia-sávszélességet, mindenhol állítsd át.",
+   "A 'show ip ospf neighbor' FULL állapot hiánya gyakran hello/dead timer eltérésre utal."
+  ],
+  "7": [
+   "Az azonos csoportszám (standby csoport) legyen minden VLAN-on következetes mindkét routeren.",
+   "A 'preempt' nélkül az elsődleges router visszatérésekor nem veszi vissza az active szerepet.",
+   "A virtuális IP-nek a VLAN hálózatán belül kell lennie, de nem lehet már használt cím.",
+   "A HSRP 2-es verziója más multicast címet használ, mint az 1-es, ne keverd őket."
+  ],
+  "8": [
+   "A floating static route csak akkor kerül be a táblába, ha nincs jobb (kisebb AD-jű) útvonal ugyanarra a célra.",
+   "Ha mindkét oldal OSPF-ben hirdeti a default route-ot, figyelj a metrikára, különben hurok alakulhat ki.",
+   "A link-local next-hopos IPv6 route-nál meg kell adni a kimenő interfészt is, különben nem egyértelmű.",
+   "Teszteld a floating route-ot úgy, hogy ténylegesen kihúzod az elsődleges linket, ne csak elméletben gondold végig."
+  ]
+ }
 }

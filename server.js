@@ -49,10 +49,14 @@ CREATE TABLE IF NOT EXISTS point_adj(id INTEGER PRIMARY KEY, user_id INTEGER NOT
 CREATE INDEX IF NOT EXISTS idx_padj_user ON point_adj(user_id);
 CREATE TABLE IF NOT EXISTS bonus_math(user_id INTEGER NOT NULL, qid TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(user_id,qid));
 CREATE TABLE IF NOT EXISTS bonus_essay(user_id INTEGER PRIMARY KEY, text TEXT NOT NULL, submitted_at INTEGER NOT NULL, score INTEGER, feedback TEXT, graded_at INTEGER);
+CREATE TABLE IF NOT EXISTS wheel_spins(user_id INTEGER NOT NULL, milestone INTEGER NOT NULL, prize INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(user_id,milestone));
+CREATE TABLE IF NOT EXISTS bet_log(user_id INTEGER NOT NULL, task INTEGER NOT NULL, stake INTEGER NOT NULL, win INTEGER NOT NULL, payout INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(user_id,task));
+CREATE TABLE IF NOT EXISTS hint_buys(user_id INTEGER NOT NULL, task INTEGER NOT NULL, hint TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(user_id,task));
+CREATE TABLE IF NOT EXISTS addr_buys(user_id INTEGER PRIMARY KEY, at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS shots(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, at INTEGER NOT NULL, data BLOB NOT NULL, enc INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS idx_shots_user ON shots(user_id);
 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, at INTEGER, user TEXT, action TEXT, detail TEXT, ip TEXT);`);
-for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN hash TEXT', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
+for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN hash TEXT', 'ALTER TABLE users ADD COLUMN coins INTEGER NOT NULL DEFAULT 10', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
   try { db.exec(sql); } catch (e) { /* már létezik */ }
 }
 
@@ -70,6 +74,15 @@ const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u03
 const total = content.tasks.length;
 const BONUS_MATH = content.bonusMath || [];
 const BONUS_ESSAY = content.bonusEssay || null;
+const WHEEL_MILESTONES = [3, 6, 8];   // ennyi fő feladat megoldása után jár egy-egy ingyenes pörgetés
+const WHEEL_PRIZES = [[40,0],[25,2],[15,5],[10,10],[7,15],[3,25]];   // [súly, pont] – csak nyeremény, veszteség soha
+const HINTS = content.hints || {};
+const COIN_START = +process.env.COIN_START || 10;     // csak erre a mellékjátékra költhető induló egyenleg
+const BET_STAKE = +process.env.BET_STAKE || 5;         // tét fogadásonként (az induló egyenleg fele – szándékosan drága)
+const BET_WIN_CHANCE = +process.env.BET_WIN_CHANCE || 0.3;  // nyerési esély (nehezített, nem 50/50)
+const COIN_CAP = +process.env.COIN_CAP || 25;          // az érmeegyenleg soha nem mehet e fölé
+const HINT_COST = +process.env.HINT_COST || 4;         // egy hint ára érmében
+const ADDR_PRICE = +process.env.ADDR_PRICE || 15;      // a címzési tábla ára VALÓDI pontban – ebbe bele lehet menni mínuszba
 const sha = x => crypto.createHash('sha256').update(x).digest('hex');
 const pktHeuristic = size => size < 2000 ? { label: 'Gyanúsan kicsi (lehet, hogy üres vagy az alap fájl)', cls: 'warn' }
   : size < 20000 ? { label: 'Kicsi fájl – egyszerű topológia is lehet', cls: '' }
@@ -85,14 +98,20 @@ const audit = (user, action, detail = '', ip = '') => {
 };
 const wipeActivity = id => {
   db.prepare("DELETE FROM bonus_math WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
-  db.prepare("DELETE FROM bonus_essay WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);   // egy diák tevékenységi adatainak törlése (reset / törlés)
+  db.prepare("DELETE FROM bonus_essay WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM wheel_spins WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);   // egy diák tevékenységi adatainak törlése (reset / törlés)
   db.prepare("DELETE FROM help_messages WHERE request_id IN (SELECT id FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student'))").run(id);
   db.prepare("DELETE FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
   db.prepare("DELETE FROM progress WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
   db.prepare("DELETE FROM shots WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
   db.prepare("DELETE FROM away_log WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
   db.prepare("DELETE FROM point_adj WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM bet_log WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM hint_buys WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM addr_buys WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("UPDATE users SET coins=? WHERE id=?").run(COIN_START, id);
 };
+const getAddrForce = () => { const r = db.prepare("SELECT v FROM settings WHERE k='addr_force'").get(); return r ? r.v === '1' : false; };
 const cleanName = n => path.basename(Buffer.from(String(n), 'latin1').toString('utf8').replace(/\\/g, '/')).replace(/[\x00-\x1f"<>|:*?]/g, '_').slice(0, 150);
 const encBuf = b => { const iv = crypto.randomBytes(12); const c = crypto.createCipheriv('aes-256-gcm', DATA_KEY, iv); const d = Buffer.concat([c.update(b), c.final()]); return Buffer.concat([iv, c.getAuthTag(), d]); };
 const decBuf = b => { const d = crypto.createDecipheriv('aes-256-gcm', DATA_KEY, b.subarray(0, 12)); d.setAuthTag(b.subarray(12, 28)); return Buffer.concat([d.update(b.subarray(28)), d.final()]); };
@@ -204,6 +223,12 @@ function stateOf(u) {
     progress: db.prepare('SELECT solved,at FROM progress WHERE user_id=? ORDER BY id').all(u.id),
     bonusMath: BONUS_MATH.map(q => ({ id: q.id, q: q.q, pts: q.pts, solved: !!db.prepare('SELECT 1 FROM bonus_math WHERE user_id=? AND qid=?').get(u.id, q.id) })),
     bonusEssay: BONUS_ESSAY ? { q: BONUS_ESSAY.q, maxPts: BONUS_ESSAY.maxPts, mine: db.prepare('SELECT text,submitted_at,score,feedback,graded_at FROM bonus_essay WHERE user_id=?').get(u.id) || null } : null,
+    wheel: (() => { const done = db.prepare('SELECT milestone,prize,at FROM wheel_spins WHERE user_id=? ORDER BY milestone').all(u.id); const doneMs = done.map(x => x.milestone);
+      return { available: WHEEL_MILESTONES.filter(m => u.solved >= m && !doneMs.includes(m)), history: done }; })(),
+    coins: u.coins, betStake: BET_STAKE, hintCost: HINT_COST,
+    bets: db.prepare('SELECT task,stake,win,payout,at FROM bet_log WHERE user_id=? ORDER BY task').all(u.id),
+    hints: db.prepare('SELECT task,hint,at FROM hint_buys WHERE user_id=? ORDER BY task').all(u.id),
+    addrBought: !!db.prepare('SELECT 1 FROM addr_buys WHERE user_id=?').get(u.id), addrForce: getAddrForce(), addrPrice: ADDR_PRICE,
     help: helpOf(u.id), helpCost: HELP_COST, shotReq: !!u.shot_req, requireShare: REQUIRE_SHARE,
     shared: u.start_at ? db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files WHERE task IS NULL OR task<=? ORDER BY id DESC').all(u.solved) : [],
     scoreAdj: u.score_adj || 0, adjustments: db.prepare('SELECT delta,reason,at FROM point_adj WHERE user_id=? ORDER BY id DESC').all(u.id)
@@ -264,6 +289,56 @@ app.post('/api/bonus-essay', auth, student, (req, res) => {
   if (ex && ex.graded_at) return res.status(409).json({ error: 'Ezt már kiértékelte a tanár, nem módosítható.' });
   db.prepare('INSERT INTO bonus_essay(user_id,text,submitted_at) VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET text=excluded.text, submitted_at=excluded.submitted_at').run(u.id, text, Date.now());
   audit(u.username, 'bonus-essay-submit', '', clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/wheel', auth, student, (req, res) => {
+  const u = req.u, ms = Math.floor(+((req.body || {}).milestone));
+  if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem pörgethetsz.' });
+  if (!WHEEL_MILESTONES.includes(ms) || u.solved < ms) return res.status(400).json({ error: 'Ehhez még nem jutottál el.' });
+  if (db.prepare('SELECT 1 FROM wheel_spins WHERE user_id=? AND milestone=?').get(u.id, ms)) return res.status(409).json({ error: 'Ezt a pörgetést már elhasználtad.' });
+  let r = Math.random() * 100, prize = 0;
+  for (const [w, p] of WHEEL_PRIZES) { if (r < w) { prize = p; break; } r -= w; }
+  db.prepare('INSERT INTO wheel_spins(user_id,milestone,prize,at) VALUES(?,?,?,?)').run(u.id, ms, prize, Date.now());
+  if (prize) { db.prepare('UPDATE users SET score_adj=score_adj+? WHERE id=?').run(prize, u.id); db.prepare('INSERT INTO point_adj(user_id,delta,reason,at) VALUES(?,?,?,?)').run(u.id, prize, 'Sors Kereke – ' + ms + '. feladat után', Date.now()); }
+  audit(u.username, 'wheel', ms + ':' + prize, clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/bet', auth, student, (req, res) => {
+  const u = req.u, task = Math.floor(+((req.body || {}).task));
+  if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem fogadhatsz.' });
+  if (!Number.isInteger(task) || task < 1 || task > 8 || u.solved < task) return res.status(400).json({ error: 'Ehhez a feladathoz még nem fogadhatsz.' });
+  if (db.prepare('SELECT 1 FROM bet_log WHERE user_id=? AND task=?').get(u.id, task)) return res.status(409).json({ error: 'Ennél a feladatnál már fogadtál.' });
+  if (u.coins < BET_STAKE) return res.status(400).json({ error: 'Nincs elég érméd a fogadáshoz.' });
+  const win = Math.random() < BET_WIN_CHANCE, payout = win ? BET_STAKE * 2 : 0;
+  let coins = u.coins - BET_STAKE + payout;
+  if (coins > COIN_CAP) coins = COIN_CAP;
+  if (coins < 0) coins = 0;
+  db.prepare('UPDATE users SET coins=? WHERE id=?').run(coins, u.id);
+  db.prepare('INSERT INTO bet_log(user_id,task,stake,win,payout,at) VALUES(?,?,?,?,?,?)').run(u.id, task, BET_STAKE, win ? 1 : 0, payout, Date.now());
+  audit(u.username, 'bet', task + ':' + (win ? 'nyert' : 'vesztett'), clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/hint', auth, student, (req, res) => {
+  const u = req.u, task = Math.floor(+((req.body || {}).task)), pool = HINTS[String(task)];
+  if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem vehetsz hintet.' });
+  if (!pool || !pool.length || u.solved < task) return res.status(400).json({ error: 'Ehhez a feladathoz nincs hint, vagy még nem jutottál el odáig.' });
+  if (db.prepare('SELECT 1 FROM hint_buys WHERE user_id=? AND task=?').get(u.id, task)) return res.status(409).json({ error: 'Ehhez a feladathoz már vettél hintet.' });
+  if (u.coins < HINT_COST) return res.status(400).json({ error: 'Nincs elég érméd a hinthez.' });
+  const hint = pool[Math.floor(Math.random() * pool.length)];
+  db.prepare('UPDATE users SET coins=coins-? WHERE id=?').run(HINT_COST, u.id);
+  db.prepare('INSERT INTO hint_buys(user_id,task,hint,at) VALUES(?,?,?,?)').run(u.id, task, hint, Date.now());
+  audit(u.username, 'hint', 'feladat ' + task, clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/addr-buy', auth, student, (req, res) => {
+  const u = req.u;
+  if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem vásárolhatsz.' });
+  if (getAddrForce()) return res.status(400).json({ error: 'A címzési tábla jelenleg mindenki számára ingyenesen elérhető.' });
+  if (db.prepare('SELECT 1 FROM addr_buys WHERE user_id=?').get(u.id)) return res.status(409).json({ error: 'Már megvetted.' });
+  db.prepare('INSERT INTO addr_buys(user_id,at) VALUES(?,?)').run(u.id, Date.now());
+  db.prepare('UPDATE users SET score_adj=score_adj-? WHERE id=?').run(ADDR_PRICE, u.id);
+  db.prepare('INSERT INTO point_adj(user_id,delta,reason,at) VALUES(?,?,?,?)').run(u.id, -ADDR_PRICE, 'Címzési tábla megvásárolva', Date.now());
+  audit(u.username, 'addr-buy', '', clientIp(req));
   res.json(stateOf(fresh(u.id)));
 });
 app.post('/api/finish', auth, student, (req, res) => {
@@ -338,6 +413,10 @@ app.get('/api/admin/overview', auth, teacher, (req, res) => {
     shared: db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files ORDER BY id DESC').all(),
     bonusEssays: BONUS_ESSAY ? db.prepare('SELECT user_id,text,submitted_at,score,feedback,graded_at FROM bonus_essay ORDER BY submitted_at DESC').all() : [],
     bonusMathSolved: db.prepare('SELECT user_id,qid,at FROM bonus_math').all(), bonusMathDefs: BONUS_MATH.map(q => ({ id: q.id, pts: q.pts })), essayMaxPts: BONUS_ESSAY ? BONUS_ESSAY.maxPts : 0,
+    wheelSpins: db.prepare('SELECT user_id,milestone,prize,at FROM wheel_spins').all(),
+    bets: db.prepare('SELECT user_id,task,stake,win,payout,at FROM bet_log').all(),
+    hintBuys: db.prepare('SELECT user_id,task,at FROM hint_buys').all(),
+    addrBuys: db.prepare('SELECT user_id,at FROM addr_buys').all(), addrForce: getAddrForce(), addrPrice: ADDR_PRICE,
     adjustments: db.prepare('SELECT user_id,delta,reason,at FROM point_adj ORDER BY id DESC LIMIT 300').all(),
     users: users.map(u => ({ ...u, files: files.filter(f => f.user_id === u.id).map(f => ({ ...f, dupWith: (dup[f.id] || null) ? dup[f.id].map(x => ({ ...x, username: usersById[x.user_id] ? usersById[x.user_id].username : '?' })) : null })) })) });
 });
@@ -402,6 +481,11 @@ app.post('/api/admin/help-message', auth, teacher, (req, res) => {   // tanári 
   const h = db.prepare('SELECT id FROM help_requests WHERE id=? AND handled_at IS NULL').get(+b.id);
   if (!h) return res.status(404).json({ error: 'A beszélgetés már le van zárva.' });
   db.prepare('INSERT INTO help_messages(request_id,sender,text,at) VALUES(?,?,?,?)').run(h.id, 'teacher', text, Date.now());
+  res.json({ ok: true });
+});
+app.post('/api/admin/addr-force', auth, teacher, (req, res) => {
+  db.prepare("INSERT OR REPLACE INTO settings(k,v) VALUES('addr_force',?)").run((req.body || {}).on ? '1' : '0');
+  audit(req.u.username, 'addr-force', (req.body || {}).on ? 'on' : 'off', clientIp(req));
   res.json({ ok: true });
 });
 app.post('/api/admin/grade-essay', auth, teacher, (req, res) => {
