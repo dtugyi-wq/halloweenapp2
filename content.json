@@ -129,39 +129,39 @@
  "puzzles": [
   {
    "q": "A boszorkány üstjében 3 béka van. Minden órában a békák száma megkétszereződik, majd 1 béka kiugrik az üstből. Hány béka van az üstben 4 óra múlva?",
-   "a": "33"
+   "a": "c6f3ac57944a531490cd39902d0f777715fd005efac9a30622d5f5205e7f6894"
   },
   {
    "q": "Fejtsd meg a sorozatot: 2, 6, 12, 20, 30, ? Mi a következő szám?",
-   "a": "42"
+   "a": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049"
   },
   {
    "q": "Dracula, Mumus, a Boszorkány és a Mumia sorban áll. Mumus az első, a Mumia az utolsó. A Boszorkány közvetlenül Dracula előtt áll. Ki áll a második helyen?",
-   "a": "boszorkany"
+   "a": "90615302a881fbbe94af95fa6a5a8111649475f67b928bf23a055932bed15283"
   },
   {
    "q": "Egy szellem az első éjjel 1 láncot vesz fel, és minden következő éjjel kétszer annyit, mint az előzőn. Hányadik éjjel lesz először 100-nál több láncot a nyakában az aznapi darabszám?",
-   "a": "8"
+   "a": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
   },
   {
    "q": "Három dobozon ez áll: CUKOR, TRÜKK, VEGYES. Mindhárom felirat HAMIS. A VEGYES feliratú dobozból cukrot húzol. Mi van valójában a TRÜKK feliratú dobozban? (cukor / trükk / vegyes)",
-   "a": "vegyes"
+   "a": "ee5b5ce2d6ae37c8c8d0adf3b38e50662c63b8ffcf565881b4ff7ca9f036d4c6"
   },
   {
    "q": "3 szellem 3 perc alatt 3 ablakot ijeszt meg. Hány perc alatt ijeszt meg 100 szellem 100 ablakot?",
-   "a": "3"
+   "a": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
   },
   {
    "q": "Fejtsd meg a kódot: minden betűt az angol ábécében eggyel előrébb léptettünk. A titkos szó: IBMMPXFFO",
-   "a": "halloween"
+   "a": "9eb7ee7f551d2f0ac684981bd1f1e2fa4a37590199636753efe614d4db30e8e1"
   },
   {
    "q": "Egy tök egy kilogrammból és még a saját tömegének feléből áll. Hány kilogramm a tök?",
-   "a": "2"
+   "a": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
   },
   {
    "q": "2 vámpírnak 2-2, 3 zombinak 2-2, egy pókszörnynek pedig 8 lába van. Hány lábuk van összesen?",
-   "a": "18"
+   "a": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a"
   }
  ]
 }

@@ -69,11 +69,38 @@ textarea{width:100%;min-height:90px;background:#0f0a1a;color:var(--tx);border:2p
 .msg.ok{color:var(--ok)}
 a{color:var(--or)}
 #who{color:var(--mut);font-size:.9rem;display:flex;gap:10px;align-items:center}
+.wide{max-width:1300px!important}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:10px 0}
+.tile{background:linear-gradient(135deg,#2b1d44,#150e22);border:1px solid #4a3470;border-radius:14px;padding:12px;text-align:center;box-shadow:0 0 18px rgba(155,92,255,.18)}
+.tile span{font-size:1.4rem}.tile b{display:block;font-family:'Creepster',serif;font-size:2.2rem;color:var(--or);line-height:1.1}.tile small{color:var(--mut)}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tools input[type=text]{width:220px}.tools select{background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:8px;font-family:inherit}
+.sp{flex:1}.auto{color:var(--mut);font-size:.85rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:#2b1d44;color:var(--tx);border:1px solid #4a3470;border-radius:20px;padding:4px 12px;font-family:inherit}.chip.on{background:var(--or);color:#1a0a00;border-color:var(--or)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin:14px 0}
+.ucard{background:var(--card);border:1px solid #3a2a58;border-left:5px solid #5a4a78;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.ucard.run{border-left-color:var(--or);box-shadow:0 0 18px rgba(255,122,26,.18)}.ucard.done{border-left-color:var(--ok)}.ucard.expired{border-left-color:var(--red);opacity:.85}
+.uh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.badge{font-size:.78rem;padding:3px 10px;border-radius:20px;background:#2b1d44;white-space:nowrap}.badge.run{background:#5a2e00;color:#ffb36b}.badge.done{background:#0d4a2a;color:var(--ok)}.badge.expired{background:#5a0f0f;color:#ff8a8a}
+.cd{font-family:'Creepster',serif;font-size:2.6rem;letter-spacing:3px;color:var(--or);text-align:center;line-height:1}.ucard.idle .cd{color:#5a4a78}.ucard.done .cd{color:var(--ok)}.ucard.expired .cd{color:var(--red)}.cd.low{color:var(--red)!important;animation:pulse 1s infinite}
+.dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.dot{width:16px;height:16px;border-radius:50%;background:#2b1d44;border:1px solid #4a3470;display:inline-block}.dot.on{background:var(--or);box-shadow:0 0 8px var(--or);border-color:var(--or)}.dot.cur{border-color:var(--pu);box-shadow:0 0 8px var(--pu);animation:pulse 1.2s infinite}
+.files{display:flex;flex-direction:column;gap:2px;font-size:.88rem}.btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto}
+#ann{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:50;max-width:min(640px,94vw);background:#3b1d00;border:2px solid var(--or);color:#fff;padding:12px 18px;border-radius:14px;box-shadow:0 0 30px rgba(255,122,26,.6);font-size:1.05rem}
+#ann button{margin-left:10px;background:none;border:0;color:#fff;font-size:1.1rem}
+.card.note{border:2px solid var(--or);box-shadow:0 0 22px rgba(255,122,26,.35)}
+.bad td{color:#ff8a8a}
+select.jump{background:#0f0a1a;color:var(--tx);border:1px solid var(--pu);border-radius:8px;padding:4px;font-family:inherit}
+.pts.bad{color:#ff8a8a}
+.helpcard{border:2px solid var(--red);box-shadow:0 0 24px rgba(255,59,59,.35)}.hreq{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #3a2a58}
+.ucard.hopen{border-left-color:var(--red);box-shadow:0 0 20px rgba(255,59,59,.45)}
+.help{margin-top:10px}.hmsg{background:#2b1d44;border-radius:10px;padding:8px 12px;margin:6px 0}.hmsg.wait{border:1px dashed var(--or)}
 </style>
 </head>
 <body>
 <div id="bar" style="display:none"></div>
 <div class="wrap" id="app"></div>
+<div id="ann"></div>
 <div id="scare"><video id="vid" playsinline preload="auto"></video><div id="verr"></div></div>
 <div id="end"><h1>Az átok győzött…</h1><p>Lejárt az idő. A Kastély örökre sötétben maradt.</p><button class="big" id="replay" style="margin-top:20px">Újranézem</button></div>
 
@@ -162,7 +189,7 @@ async function api(url,body){
   return j;
 }
 async function boot(){try{ST=await api('/api/state')}catch(e){ST=null} apply()}
-function apply(){if(ST)off=ST.now-Date.now();render()}
+function apply(){if(ST){off=ST.now-Date.now();showAnn(ST.announce)}render()}
 
 /* ===== Időzítő ===== */
 setInterval(()=>{
@@ -174,23 +201,40 @@ setInterval(()=>{
   }
 },250);
 
+/* ===== Üzenet és állapot-szinkron (diákoknál) ===== */
+let closedAt=0;
+function showAnn(a){
+  const b=$('#ann'); if(!a||!a.text){b.style.display='none';closedAt=0;return}
+  if(a.at===closedAt) return;
+  b.innerHTML='📢 '+esc(a.text)+'<button id="annx">✕</button>'; b.style.display='block';
+  $('#annx').onclick=()=>{closedAt=a.at;b.style.display='none'};
+}
+setInterval(async()=>{
+  if(!ST||ST.user.role!=='student'||$('#scare').style.display==='flex') return;
+  try{
+    const s=await api('/api/state'); showAnn(s.announce);
+    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||JSON.stringify(s.help)!==JSON.stringify(ST.help)){ST=s;apply()} else {ST.start=s.start;off=s.now-Date.now()}
+  }catch(e){if(e.status===401){ST=null;render()}}
+},10000);
+
 /* ===== Nézetek ===== */
 const hero=inner=>`<div class="hero"><span class="bat" style="top:30px">🦇</span><span class="bat" style="top:110px;animation-delay:-6s">🦇</span><span class="bat" style="top:200px;animation-delay:-10s">🦇</span>
 <div class="moon"></div><h1>A Boszorkányhegyi<br>Hálózat átka</h1>
 <div><span class="pump">🎃</span> <span class="pump" style="animation-delay:-1s">👻</span> <span class="pump" style="animation-delay:-2s">🎃</span></div>${inner}</div>`;
 function setBar(timer){
   const b=$('#bar'); b.style.display='flex';
-  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who"><span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total):''}</span><button class="sm" id="out">Kilépés</button></div>`;
+  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who"><span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total)+(ST.help&&ST.help.length?' · 🆘 '+ST.help.length+' (−'+ST.help.length*ST.helpCost+' pont)':''):''}</span><button class="sm" id="out">Kilépés</button></div>`;
   $('#out').onclick=async()=>{try{await api('/api/logout',{})}catch(e){} ST=null;refHtml=null;$('#end').style.display='none';render()};
 }
 function render(){
+  $('#app').classList.toggle('wide',!!ST&&ST.user.role==='teacher');
   if(!ST) return viewLogin();
   if(ST.user.role==='teacher') return viewTeacher();
   if(!ST.start) return viewIntro();
   viewStudent();
 }
 function viewLogin(){
-  $('#bar').style.display='none';
+  $('#bar').style.display='none'; $('#ann').style.display='none';
   $('#app').innerHTML=hero(`<p>${STORY}</p><div class="ans" style="justify-content:center;flex-direction:column;align-items:center"><input type="text" id="lu" placeholder="Felhasználónév" autocomplete="username"><input type="password" id="lp" placeholder="Jelszó" autocomplete="current-password"><button class="big" id="lgo" style="font-size:1.3rem;padding:12px 30px">🕯️ Belépés</button></div><div class="msg" id="lmsg"></div>`);
   const go=async()=>{
     try{await api('/api/login',{username:$('#lu').value,password:$('#lp').value});await boot()}
@@ -203,10 +247,18 @@ function viewIntro(){
   $('#app').innerHTML=hero(`<p>${STORY}</p><p>Időtök: <strong>${Math.round(ST.durationMs/60000)} perc</strong>. Minden feladat előtt egy logikai rejtvényt kell megfejtenetek, a végén pedig fel kell töltenetek a Packet Tracer munkafájlotokat. Vigyázzatok: a sötétben bármi előugorhat…</p><button class="big" id="go">🕯️ Kezdődjön az éjszaka</button>`);
   $('#go').onclick=async()=>{ST=await api('/api/start',{});apply();vid.load()};
 }
+function helpBlock(n){
+  const hs=(ST.help||[]).filter(x=>x.task===n), open=hs.find(x=>!x.handled_at);
+  let h='<div class="help">';
+  hs.filter(x=>x.handled_at).forEach(x=>{h+=x.reply?`<div class="hmsg">💬 <b>Tanári válasz:</b> ${esc(x.reply).replace(/\n/g,'<br>')}</div>`:'<div class="hmsg">✔ A tanár megnézte a kérésedet.</div>'});
+  if(open) h+=`<div class="hmsg wait">⏳ Segítséget kértél (${dt(open.created_at)}). A tanár hamarosan válaszol.</div>`;
+  else if(!ST.end&&remaining()>0) h+=`<button class="sm helpbtn" data-task="${n}">🆘 Segítség kérése (−${ST.helpCost} pont)</button>`;
+  return h+'</div>';
+}
 function viewStudent(){
   setBar(true);
   if(refHtml===null) refHtml=ref();
-  let h=refHtml;
+  let h=refHtml+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
   h+=`<div class="card"><h2>📦 Packet Tracer fájl feltöltése</h2><p class="pts">Tallózd ki a .pkt fájlodat, a feltöltés a szerver adatbázisába kerül. Többször is feltölthetsz, a legutóbbit értékeljük.</p>
   <div class="ans"><input type="file" id="pktfile" accept=".pkt,.pka"><button id="ubtn" disabled>Feltöltés</button></div>
   <progress id="uprog" max="100" value="0" style="width:100%;display:none"></progress><div class="msg" id="umsg"></div>
@@ -214,7 +266,7 @@ function viewStudent(){
   for(let i=0;i<ST.total;i++){
     const k=ST.tasks[i], last=i===ST.total-1;
     if(k){
-      h+=`<div class="card"><h2>${last?'🏁 ':(i+1)+'. feladat – '}${k.title}</h2><div class="pts">${k.pts}</div><ul>${k.items.map(x=>`<li>${x}</li>`).join('')}</ul>${k.ol.length?`<strong>${k.olt}:</strong><ol>${k.ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${k.note?`<p>${k.note}</p>`:''}</div>`;
+      h+=`<div class="card"><h2>${last?'🏁 ':(i+1)+'. feladat – '}${k.title}</h2><div class="pts">${k.pts}</div><ul>${k.items.map(x=>`<li>${x}</li>`).join('')}</ul>${k.ol.length?`<strong>${k.olt}:</strong><ol>${k.ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${k.note?`<p>${k.note}</p>`:''}${helpBlock(i+1)}</div>`;
     } else if(i===ST.solved&&ST.puzzle){
       h+=`<div class="card puz" id="puz"><h2>🔮 Rejtvény a(z) ${i+1}. ${last?'ellenőrzés':'feladat'} feloldásához</h2><p style="font-size:1.1rem">${esc(ST.puzzle.q)}</p>
       <div class="ans"><input type="text" id="ain" autocomplete="off" placeholder="A válaszod"><button id="abtn">Feloldás</button></div><div class="msg" id="amsg"></div></div>`;
@@ -226,6 +278,11 @@ function viewStudent(){
   const b=$('#abtn'); if(b){b.onclick=check;$('#ain').onkeydown=e=>{if(e.key==='Enter')check()}}
   const f=$('#fin'); if(f) f.onclick=async()=>{ST=await api('/api/finish',{});apply()};
   setupUpload();
+  document.querySelectorAll('.helpbtn').forEach(b=>b.onclick=async()=>{
+    const n=+b.dataset.task;
+    if(!confirm(`Biztosan segítséget kérsz a(z) ${n}. feladathoz? Ez ${ST.helpCost} pontba kerül.`)) return;
+    try{ST=await api('/api/help',{task:n});apply()}catch(e){alert(e.message)}
+  });
   if(FLASH){const m=$('#umsg');m.className='msg ok';m.textContent=FLASH;FLASH=''}
 }
 async function check(){
@@ -261,23 +318,121 @@ function setupUpload(){
 }
 
 /* ===== Tanári felület ===== */
-async function viewTeacher(){
-  setBar(false);
-  $('#app').innerHTML=`<div class="card"><h2>👥 Diákok</h2><div id="adm">Betöltés…</div><button class="sm" id="refr" style="margin-top:8px">Frissítés</button></div>
-  <div class="card"><h2>➕ Új diákok</h2><p class="pts">Soronként: <code>felhasználónév;jelszó;név</code> (a név elhagyható, a jelszó legalább 4 karakter)</p><textarea id="nu" placeholder="csapat1;Dracula123;Vámpírok&#10;csapat2;Mumus456;Mumiák"></textarea><button class="sm" id="mk" style="margin-top:8px">Létrehozás</button><div class="msg" id="mkm"></div></div>`;
-  $('#refr').onclick=loadAdmin;
+let ADM=null, AF={q:'',f:'all',s:'prog',auto:true}, admN=0;
+const admNow=()=>ADM.d.now+(Date.now()-ADM.at);
+const stOf=(u,n)=>!u.start?'idle':u.end?'done':(n>u.start+ADM.d.durationMs?'expired':'run');
+const remOf=(u,n)=>!u.start?ADM.d.durationMs:(u.end?u.start+ADM.d.durationMs-u.end:u.start+ADM.d.durationMs-n);
+const ST_LABEL={idle:'⏸ Nem kezdte',run:'⏳ Fut',done:'✅ Kész',expired:'💀 Lejárt'};
+async function adm(url,body){try{await api(url,body||{});await loadAdmin()}catch(e){alert(e.message)}}
+
+function viewTeacher(){
+  setBar(false); ADM=null; admN=0;
+  $('#app').innerHTML=`<div class="tiles" id="tiles"></div>
+  <div class="card tools"><input type="text" id="aq" placeholder="🔎 Keresés névre…" value="${esc(AF.q)}">
+    <div class="chips" id="chips">${[['all','Mind'],['idle','Nem kezdte'],['run','Fut'],['done','Kész'],['expired','Lejárt']].map(([k,l])=>`<button class="chip${AF.f===k?' on':''}" data-f="${k}">${l}</button>`).join('')}</div>
+    <select id="asort"><option value="prog">Sorrend: haladás (rangsor)</option><option value="time">Sorrend: maradék idő</option><option value="name">Sorrend: név</option></select>
+    <span class="sp"></span><button class="sm" id="astart">▶ Mindenki indítása</button><button class="sm" id="acsv">⬇ CSV</button>
+    <label class="auto"><input type="checkbox" id="aauto" ${AF.auto?'checked':''}> auto frissítés</label></div>
+  <div class="card"><h3>📢 Üzenet a diákoknak</h3><div class="ans"><input type="text" id="amsgt" placeholder="pl. Még 10 perc van hátra!" style="flex:1;min-width:220px"><button class="sm" id="asend">Küldés</button><button class="sm red" id="aclr">Üzenet törlése</button></div></div>
+  <div id="hlp"></div>
+  <div class="grid" id="grid">Betöltés…</div>
+  <div class="card"><h2>➕ Új diákok</h2><p class="pts">Soronként: <code>felhasználónév;jelszó;név</code> (a név elhagyható, a jelszó legalább 4 karakter)</p><textarea id="nu" placeholder="csapat1;Dracula123;Vámpírok&#10;csapat2;Mumus456;Mumiák"></textarea><button class="sm" id="mk" style="margin-top:8px">Létrehozás</button><div class="msg" id="mkm"></div></div>
+  <details class="card" id="audd"><summary>🛡️ Biztonsági napló (belépések, feltöltések, tanári műveletek)</summary><div id="aud" class="tw">Betöltés…</div></details>`;
+  $('#asort').value=AF.s;
+  $('#aq').oninput=e=>{AF.q=e.target.value;if(ADM)drawGrid()};
+  $('#chips').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;AF.f=b.dataset.f;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));if(ADM)drawGrid()};
+  $('#asort').onchange=e=>{AF.s=e.target.value;if(ADM)drawGrid()};
+  $('#aauto').onchange=e=>{AF.auto=e.target.checked};
+  $('#astart').onclick=()=>{if(confirm('Elindítod az órát mindenkinek, aki még nem kezdte el?'))adm('/api/admin/start-all')};
+  $('#acsv').onclick=csvExport;
+  $('#asend').onclick=async()=>{const t=$('#amsgt').value.trim();if(!t)return;await adm('/api/admin/announce',{text:t});$('#amsgt').value=''};
+  $('#aclr').onclick=()=>adm('/api/admin/announce',{text:''});
   $('#mk').onclick=async()=>{try{const r=await api('/api/admin/users',{text:$('#nu').value});const m=$('#mkm');m.className='msg ok';m.textContent=`Létrehozva: ${r.created}`+(r.skipped.length?` · kihagyva (hibás vagy már létezik): ${r.skipped.join(', ')}`:'');if(r.created)$('#nu').value='';loadAdmin()}catch(e){$('#mkm').textContent=e.message}};
+  $('#grid').onclick=e=>{
+    const b=e.target.closest('[data-a]'); if(!b||!ADM) return;
+    const id=+b.dataset.id,a=b.dataset.a,u=ADM.map[id];
+    if(a==='t5')adm('/api/admin/time',{id,minutes:5});
+    else if(a==='t15')adm('/api/admin/time',{id,minutes:15});
+    else if(a==='tm5')adm('/api/admin/time',{id,minutes:-5});
+    else if(a==='skip')adm('/api/admin/solved',{id,solved:u.solved+1});
+    else if(a==='back')adm('/api/admin/solved',{id,solved:u.solved-1});
+    else if(a==='note'){const t=prompt('Egyéni megjegyzés / feladat a diáknak (üres = törlés):',u.note||'');if(t!==null)adm('/api/admin/note',{id,text:t})}
+    else if(a==='pw'){const p=prompt('Új jelszó (min. 4 karakter):');if(p)adm('/api/admin/password',{id,password:p})}
+    else if(a==='reset'){if(confirm('Nullázod a diák állását? (A feltöltött fájlok megmaradnak.)'))adm('/api/admin/reset',{id})}
+    else if(a==='del'){if(confirm('Véglegesen törlöd a diákot és a fájljait?'))adm('/api/admin/delete',{id})}
+  };
+  $('#grid').onchange=e=>{const sel=e.target.closest('select.jump');if(!sel||sel.value==='')return;const id=+sel.dataset.id,v=+sel.value,u=ADM.map[id];
+    if(confirm(`${u.name||u.username}: ugrás a(z) ${v===0?'kezdetre':v+'. feladatra'} a rejtvények megoldása nélkül?`))adm('/api/admin/solved',{id,solved:v});else sel.value=''};
+  $('#hlp').onclick=e=>{
+    const r=e.target.closest('[data-hr]'),d=e.target.closest('[data-hd]');
+    if(r){const t=prompt('Válasz a diáknak (a feladat mellett jelenik meg nála):');if(t!==null)adm('/api/admin/help-reply',{id:+r.dataset.hr,reply:t})}
+    else if(d)adm('/api/admin/help-reply',{id:+d.dataset.hd,reply:''});
+  };
+  $('#audd').ontoggle=()=>{if($('#audd').open)loadAudit()};
   loadAdmin();
+}
+let lastOpen=-1;
+function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.setValueAtTime(.2,c.currentTime);o.start();o.stop(c.currentTime+.3)}catch(e){}}
+function drawHelp(){
+  const H=ADM.d.help.filter(h=>!h.handled_at).reverse(),el=$('#hlp');
+  if(lastOpen>=0&&H.length>lastOpen) beep(); lastOpen=H.length;
+  if(!H.length){el.innerHTML='';return}
+  el.innerHTML=`<div class="card helpcard"><h2>🆘 Segítségkérések (${H.length})</h2>`+H.map(h=>{const u=ADM.map[h.user_id]||{};
+    return `<div class="hreq"><div><b>${esc(u.name||u.username||'?')}</b> – ${h.task}. feladat: ${esc(ADM.d.taskTitles[h.task-1]||'')}<div class="pts">${dt(h.created_at)}</div></div><div class="btns"><button class="sm" data-hr="${h.id}">💬 Válasz</button><button class="sm" data-hd="${h.id}">✔ Kész</button></div></div>`}).join('')+'</div>';
+}
+async function loadAudit(){
+  try{const r=await api('/api/admin/audit');$('#aud').innerHTML='<table><tr><th>Idő</th><th>Felhasználó</th><th>Esemény</th><th>Részlet</th><th>IP</th></tr>'+r.map(x=>`<tr class="${/fail|denied|blocked/.test(x.action)?'bad':''}"><td>${dt(x.at)}</td><td>${esc(x.user)}</td><td>${esc(x.action)}</td><td>${esc(x.detail)}</td><td>${esc(x.ip)}</td></tr>`).join('')+'</table>'}catch(e){$('#aud').textContent=e.message}
 }
 async function loadAdmin(){
   try{
     const d=await api('/api/admin/overview');
-    $('#adm').innerHTML=d.users.length?`<div class="tw"><table><tr><th>Felhasználó</th><th>Név</th><th>Feladat</th><th>Kezdés</th><th>Hátralévő idő</th><th>Fájlok</th><th></th></tr>${d.users.map(u=>{
-      const r=u.start?(u.end?'✅ kész':fmt(u.start+d.durationMs-d.now)):'–';
-      return `<tr><td>${esc(u.username)}</td><td>${esc(u.name||'')}</td><td>${u.solved}/${d.total}</td><td>${dt(u.start)}</td><td>${r}</td><td>${u.files.map(f=>`<a href="/api/files/${f.id}" title="${dt(f.uploaded_at)} · ${mb(f.size)}">${esc(f.filename)}</a>`).join('<br>')||'–'}</td><td><button class="sm red" data-r="${u.id}">Reset</button></td></tr>`}).join('')}</table></div>`:'Még nincs diák. Hozz létre néhányat lent.';
-    document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{if(confirm('Biztosan nullázod a diák állását? (A feltöltött fájlok megmaradnak.)')){await api('/api/admin/reset',{id:+b.dataset.r});loadAdmin()}});
-  }catch(e){$('#adm').textContent=e.message}
+    ADM={d,at:Date.now(),map:Object.fromEntries(d.users.map(u=>[u.id,u]))};
+    if(!$('#grid')) return;
+    if(document.activeElement&&document.activeElement.matches('select.jump')) return;
+    drawTiles(); drawGrid(); drawHelp();
+    if($('#audd')&&$('#audd').open) loadAudit();
+  }catch(e){const g=$('#grid');if(g)g.textContent=e.message}
 }
+function drawTiles(){
+  const n=admNow(),U=ADM.d.users,c=k=>U.filter(u=>stOf(u,n)===k).length;
+  const t=[['👥',U.length,'diák'],['🟢',U.filter(u=>u.last_seen&&n-u.last_seen<30000).length,'online'],['⏳',c('run'),'fut'],['✅',c('done'),'kész'],['💀',c('expired'),'lejárt'],['📦',U.reduce((s,u)=>s+u.files.length,0),'fájl'],['🆘',ADM.d.help.filter(h=>!h.handled_at).length,'nyitott segítség']];
+  $('#tiles').innerHTML=t.map(([i,v,l])=>`<div class="tile"><span>${i}</span><b>${v}</b><small>${l}</small></div>`).join('');
+}
+function drawGrid(){
+  const n=admNow(),T=ADM.d.total; let L=ADM.d.users.slice();
+  const q=AF.q.toLowerCase();
+  L=L.filter(u=>(AF.f==='all'||stOf(u,n)===AF.f)&&(!q||(u.username+' '+(u.name||'')).toLowerCase().includes(q)));
+  L.sort(AF.s==='name'?(a,b)=>a.username.localeCompare(b.username):AF.s==='time'?(a,b)=>remOf(a,n)-remOf(b,n):(a,b)=>b.solved-a.solved||(a.end||Infinity)-(b.end||Infinity)||a.username.localeCompare(b.username));
+  $('#grid').innerHTML=L.length?L.map((u,i)=>ucard(u,n,T,AF.s==='prog'&&AF.f==='all'&&u.solved>0?i:-1)).join(''):'<div class="card">Nincs találat.</div>';
+}
+function ucard(u,n,T,rank){
+  const s=stOf(u,n),rem=remOf(u,n),on=u.last_seen&&n-u.last_seen<30000;
+  const medal=rank>=0&&rank<3?['🥇','🥈','🥉'][rank]+' ':'';
+  const dots=Array.from({length:T},(_,k)=>`<i class="dot${k<u.solved?' on':k===u.solved&&s==='run'?' cur':''}"></i>`).join('');
+  const fl=u.files.slice(0,3).map(f=>`<a href="/api/files/${f.id}" title="${dt(f.uploaded_at)} · ${mb(f.size)}">📦 ${esc(f.filename)}</a>`).join('')+(u.files.length>3?`<span class="pts"> +${u.files.length-3} további</span>`:'');
+  const b=(a,l,c)=>`<button class="sm ${c||''}" data-a="${a}" data-id="${u.id}">${l}</button>`;
+  const hs=ADM.d.help.filter(h=>h.user_id===u.id),ho=hs.filter(h=>!h.handled_at);
+  const prog=s==='idle'?'Még nem kezdte el':`Feladat: ${s==='done'?T:Math.min(u.solved+1,T)} / ${T} · ${u.solved} megoldva`;
+  return `<div class="ucard ${s}${ho.length?' hopen':''}"><div class="uh"><div><b>${medal}${esc(u.name||u.username)}</b><div class="pts">${esc(u.username)}</div></div><span class="badge ${s}">${ST_LABEL[s]}</span></div>
+  <div class="cd${s==='run'&&rem<600000?' low':''}" data-id="${u.id}">${fmt(rem)}</div>
+  <div class="dots">${dots}</div>
+  <div class="pts">${prog} · ❌ ${u.wrong||0} hibás válasz${hs.length?` · 🆘 ${hs.length} kérés (−${hs.length*ADM.d.helpCost} pont)`:''}<br>${on?'<span class="ok">● online</span>':'○ '+(u.last_seen?'utoljára: '+dt(u.last_seen):'még nem lépett be')}</div>
+  <div class="files">${fl||'<span class="pts">Nincs feltöltött fájl</span>'}</div>
+  ${ho.length?`<div class="pts bad">🆘 Kér segítséget: ${ho.map(h=>h.task+'. feladat').join(', ')}</div>`:''}${u.note?`<div class="pts">📌 ${esc(u.note)}</div>`:''}<div class="btns"><select class="jump" data-id="${u.id}"><option value="">↪ Ugrás…</option>${Array.from({length:T+1},(_,k)=>`<option value="${k}">${k===0?'Újrakezdés (0)':k+'. feladat'+(k===T?' (vége)':'')}</option>`).join('')}</select>${b('t5','+5 p')}${b('t15','+15 p')}${b('tm5','−5 p')}${b('back','◀')}${b('skip','▶')}${b('note','📝')}${b('pw','🔑')}${b('reset','Reset','red')}${b('del','🗑','red')}</div></div>`;
+}
+function csvExport(){
+  const n=admNow();
+  const rows=[['Felhasználó','Név','Megoldott','Státusz','Kezdés','Befejezés','Maradék idő','Hibás válaszok','Segítségkérések','Levont pont','Fájlok']];
+  ADM.d.users.forEach(u=>rows.push([u.username,u.name||'',u.solved+'/'+ADM.d.total,ST_LABEL[stOf(u,n)].replace(/^\S+\s/,''),dt(u.start),dt(u.end),u.start?fmt(remOf(u,n)):'',u.wrong||0,ADM.d.help.filter(h=>h.user_id===u.id).length,ADM.d.help.filter(h=>h.user_id===u.id).length*ADM.d.helpCost,u.files.map(f=>f.filename).join(' | ')]));
+  const t='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='eredmenyek.csv';a.click();
+}
+setInterval(()=>{
+  if(!ADM||!$('#grid')) return;
+  const n=admNow();
+  document.querySelectorAll('.cd[data-id]').forEach(el=>{const u=ADM.map[el.dataset.id];if(!u)return;const r=remOf(u,n);el.textContent=fmt(r);el.classList.toggle('low',stOf(u,n)==='run'&&r<600000)});
+  if(AF.auto&&++admN%5===0) loadAdmin();
+},1000);
 
 function ref(){return `
 <details open><summary>🗺️ Térkép</summary><div class="tw">${mapSvg()}</div></details>
