@@ -216,6 +216,7 @@ function unmuteLater(){
     setTimeout(()=>{if(vid.paused&&!vid.ended){vid.muted=true;vid.play().catch(()=>{})}},400);
   },SOUND_DELAY_MS);
 }
+function showEnd(){ const e=$('#end'); if(e) e.style.display='flex'; }
 async function playScare(final,done){
   const box=$('#scare'); $('#verr').style.display='none';
   const src=await pickVideo();
@@ -403,6 +404,14 @@ function wheelCard(){
   ST.wheel.history.forEach(x=>{h+=`<div class="bq solved">✅ ${x.milestone}. feladat után: ${x.prize>0?`🎁 +${x.prize} pont`:'üres – nem történt semmi'} <span class="pts">(${dt(x.at)})</span></div>`});
   ST.wheel.available.forEach(m=>{h+=`<div class="bq"><button class="sm wheelbtn" data-ms="${m}">🎡 Pörgetés (${m}. feladat után jár)</button><span class="msg wheelmsg" data-ms="${m}"></span></div>`});
   return h+'</div>';
+}
+function addrCard(){
+  if(ST.addrForce) return refHtml;   // admin mindenkinek bekapcsolta – a normál, nyitott nézet
+  const locked = `<details><summary>📋 Címzési táblázat 🔒</summary><div class="card">
+    <p>A táblázat megvásárolható a <b>valódi versenypontjaid terhére</b> (ez negatívba is viheti a pontszámod): <b>${ST.addrPrice} pont</b>.</p>
+    ${ST.addrBought?'<p class="ok">✅ Megvetted, de valamiért mégsem látszik – frissíts.</p>':'<button class="sm" id="addrbuy">📋 Megveszem</button><div class="msg" id="addrmsg"></div>'}
+  </div></details>`;
+  return ST.addrBought ? refHtml : refHtml.replace(/<details><summary>📋 Címzési táblázat<\/summary>[\s\S]*?<\/details>/, locked);
 }
 function gambleMini(tI){
   if(!ST.bets||tI>8) return '';
