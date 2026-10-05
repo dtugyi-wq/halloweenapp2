@@ -14,6 +14,7 @@ const MAX_MB = +process.env.MAX_MB || 30;                  // max .pkt méret
 const MAX_FILES = 20;                                      // max fájl / felhasználó (a régebbiek törlődnek)
 const SESSION_MS = 12 * 3600000;
 const STUDENT_SESSION_LIMIT = Math.max(1, +process.env.STUDENT_SESSION_LIMIT || 1);   // hány eszközről lehet egyszerre bejelentkezve egy diák
+const STUDENT_IDLE_MS = Math.max(30000, +process.env.STUDENT_IDLE_MS || 4 * 60000);     // ha ennyi ideig nincs életjel (lap bezárva/összeomlott), a munkamenet automatikusan lezár
 const REQUIRE_SHARE = process.env.REQUIRE_SHARE === '0' ? false : true;   // alapértelmezetten kötelező; REQUIRE_SHARE=0 kikapcsolja
 const HELP_COST = +process.env.HELP_COST || 5;      // egy segítségkérés ára (pont)
 const HELP_COOLDOWN = 20000;                        // két kérés között min. ennyi ms
@@ -110,6 +111,11 @@ const auth = (req, res, next) => {
   const m = /(?:^|;\s*)sid=([a-f0-9]{64})/.exec(req.headers.cookie || '');
   const u = m && db.prepare('SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=? AND s.expires>?').get(m[1], Date.now());
   if (!u) return res.status(401).json({ error: 'Nincs bejelentkezve' });
+  if (u.role === 'student' && u.last_seen && Date.now() - u.last_seen > STUDENT_IDLE_MS) {
+    db.prepare('DELETE FROM sessions WHERE token=?').run(m[1]);
+    audit(u.username, 'idle-logout', '', clientIp(req));
+    return res.status(401).json({ error: 'A munkamenet hosszabb inaktivitás (bezárt böngésző) után lezárult. Jelentkezz be újra.', reason: 'idle' });
+  }
   if (!u.last_seen || Date.now() - u.last_seen > 5000) db.prepare('UPDATE users SET last_seen=? WHERE id=?').run(Date.now(), u.id);
   req.u = u; next();
 };
@@ -162,6 +168,11 @@ app.post('/api/login', (req, res) => {
   res.setHeader('Set-Cookie', `sid=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_MS / 1000}${(COOKIE_SECURE || req.secure) ? '; Secure' : ''}`);
   audit(un, 'login', '', ip);
   res.json({ ok: true });
+});
+app.post('/api/close', (req, res) => {           // sendBeacon hívja böngészőbezáráskor/elnavigáláskor; nincs válasz-feldolgozás a kliensen
+  const m = /(?:^|;\s*)sid=([a-f0-9]{64})/.exec(req.headers.cookie || '');
+  if (m) { const u = db.prepare('SELECT u.username FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?').get(m[1]); db.prepare('DELETE FROM sessions WHERE token=?').run(m[1]); if (u) audit(u.username, 'browser-close', '', clientIp(req)); }
+  res.status(204).end();
 });
 app.post('/api/logout', auth, (req, res) => {
   db.prepare('DELETE FROM sessions WHERE user_id=?').run(req.u.id);
