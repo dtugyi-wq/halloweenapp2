@@ -13,6 +13,7 @@ const GRACE = 5 * 60000;                                   // feltöltés még e
 const MAX_MB = +process.env.MAX_MB || 30;                  // max .pkt méret
 const MAX_FILES = 20;                                      // max fájl / felhasználó (a régebbiek törlődnek)
 const SESSION_MS = 12 * 3600000;
+const REQUIRE_SHARE = !!process.env.REQUIRE_SHARE;   // 1: a diák csak képernyőmegosztással látja a feladatokat
 const HELP_COST = +process.env.HELP_COST || 5;      // egy segítségkérés ára (pont)
 const HELP_COOLDOWN = 20000;                        // két kérés között min. ennyi ms
 // Biztonság
@@ -35,8 +36,19 @@ CREATE INDEX IF NOT EXISTS idx_files_user ON files(user_id);
 CREATE TABLE IF NOT EXISTS settings(k TEXT PRIMARY KEY, v TEXT);
 CREATE TABLE IF NOT EXISTS help_requests(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, task INTEGER NOT NULL, created_at INTEGER NOT NULL, handled_at INTEGER, reply TEXT);
 CREATE INDEX IF NOT EXISTS idx_help_user ON help_requests(user_id);
+CREATE TABLE IF NOT EXISTS help_messages(id INTEGER PRIMARY KEY, request_id INTEGER NOT NULL, sender TEXT NOT NULL, text TEXT NOT NULL, at INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_hm_req ON help_messages(request_id);
+CREATE TABLE IF NOT EXISTS shared_files(id INTEGER PRIMARY KEY, filename TEXT NOT NULL, size INTEGER NOT NULL, data BLOB NOT NULL, enc INTEGER NOT NULL DEFAULT 0, task INTEGER, uploaded_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS progress(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, solved INTEGER NOT NULL, at INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_prog_user ON progress(user_id);
+CREATE TABLE IF NOT EXISTS away_log(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, start_at INTEGER NOT NULL, dur INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_away_user ON away_log(user_id);
+CREATE TABLE IF NOT EXISTS point_adj(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, delta INTEGER NOT NULL, reason TEXT, at INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_padj_user ON point_adj(user_id);
+CREATE TABLE IF NOT EXISTS shots(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, at INTEGER NOT NULL, data BLOB NOT NULL, enc INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX IF NOT EXISTS idx_shots_user ON shots(user_id);
 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, at INTEGER, user TEXT, action TEXT, detail TEXT, ip TEXT);`);
-for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
+for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
   try { db.exec(sql); } catch (e) { /* már létezik */ }
 }
 
@@ -60,6 +72,15 @@ const audit = (user, action, detail = '', ip = '') => {
     if (Math.random() < 0.02) db.prepare('DELETE FROM audit WHERE id < (SELECT MAX(id)-2000 FROM audit)').run();
   } catch (e) {}
 };
+const wipeActivity = id => {   // egy diák tevékenységi adatainak törlése (reset / törlés)
+  db.prepare("DELETE FROM help_messages WHERE request_id IN (SELECT id FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student'))").run(id);
+  db.prepare("DELETE FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM progress WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM shots WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM away_log WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM point_adj WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+};
+const cleanName = n => path.basename(Buffer.from(String(n), 'latin1').toString('utf8').replace(/\\/g, '/')).replace(/[\x00-\x1f"<>|:*?]/g, '_').slice(0, 150);
 const encBuf = b => { const iv = crypto.randomBytes(12); const c = crypto.createCipheriv('aes-256-gcm', DATA_KEY, iv); const d = Buffer.concat([c.update(b), c.final()]); return Buffer.concat([iv, c.getAuthTag(), d]); };
 const decBuf = b => { const d = crypto.createDecipheriv('aes-256-gcm', DATA_KEY, b.subarray(0, 12)); d.setAuthTag(b.subarray(12, 28)); return Buffer.concat([d.update(b.subarray(28)), d.final()]); };
 
@@ -85,7 +106,8 @@ const teacher = (req, res, next) => req.u.role === 'teacher' ? next() : res.stat
 const app = express();
 app.disable('x-powered-by');
 if (process.env.TRUST_PROXY) app.set('trust proxy', 1);   // reverse proxy (HTTPS) mögött állítsd be
-app.use(express.json({ limit: '100kb' }));
+const jsonSmall = express.json({ limit: '100kb' });
+app.use((req, res, next) => req.path === '/api/shot' ? next() : jsonSmall(req, res, next));   // a képernyőkép útvonal saját, nagyobb limitet kap
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
@@ -132,6 +154,17 @@ app.post('/api/logout', auth, (req, res) => {
 
 /* ---------- diák ---------- */
 const getAnn = () => { const r = db.prepare("SELECT v FROM settings WHERE k='announce'").get(); return r ? JSON.parse(r.v) : null; };
+const msgsOf = (sql, id) => db.prepare(sql).all(id).map(m => ({ from: m.sender, text: m.text, at: m.at, request_id: m.request_id }));
+function helpOf(uid) {
+  const hs = db.prepare('SELECT id,task,created_at,handled_at FROM help_requests WHERE user_id=? ORDER BY id').all(uid);
+  const ms = msgsOf('SELECT request_id,sender,text,at FROM help_messages WHERE request_id IN (SELECT id FROM help_requests WHERE user_id=?) ORDER BY id', uid);
+  return hs.map(h => ({ ...h, msgs: ms.filter(m => m.request_id === h.id).map(m => ({ from: m.from, text: m.text, at: m.at })) }));
+}
+const allHelp = () => {
+  const hs = db.prepare('SELECT id,user_id,task,created_at,handled_at FROM help_requests ORDER BY id DESC LIMIT 300').all();
+  const ms = db.prepare('SELECT request_id,sender,text,at FROM help_messages WHERE request_id IN (SELECT id FROM help_requests ORDER BY id DESC LIMIT 300) ORDER BY id').all();
+  return hs.map(h => ({ ...h, msgs: ms.filter(m => m.request_id === h.id).map(m => ({ from: m.sender, text: m.text, at: m.at })) }));
+};
 function stateOf(u) {
   const files = db.prepare('SELECT id,filename,size,uploaded_at FROM files WHERE user_id=? ORDER BY id DESC').all(u.id);
   const running = u.start_at && !u.end_at;
@@ -141,7 +174,9 @@ function stateOf(u) {
     tasks: content.tasks.slice(0, u.solved),                       // csak a feloldott feladatok mennek ki
     puzzle: running && u.solved < total ? { q: content.puzzles[u.solved].q } : null,
     files, announce: getAnn(), note: u.note || null,
-    help: db.prepare('SELECT task,created_at,handled_at,reply FROM help_requests WHERE user_id=? ORDER BY id').all(u.id), helpCost: HELP_COST
+    help: helpOf(u.id), helpCost: HELP_COST, shotReq: !!u.shot_req, requireShare: REQUIRE_SHARE,
+    shared: u.start_at ? db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files WHERE task IS NULL OR task<=? ORDER BY id DESC').all(u.solved) : [],
+    scoreAdj: u.score_adj || 0, adjustments: db.prepare('SELECT delta,reason,at FROM point_adj WHERE user_id=? ORDER BY id DESC').all(u.id)
   };
 }
 const fresh = id => db.prepare('SELECT * FROM users WHERE id=?').get(id);
@@ -150,7 +185,7 @@ const expired = u => u.start_at && Date.now() > u.start_at + DUR;
 
 app.get('/api/state', auth, (req, res) => res.json(stateOf(req.u)));
 app.post('/api/start', auth, student, (req, res) => {
-  if (!req.u.start_at) db.prepare('UPDATE users SET start_at=? WHERE id=?').run(Date.now(), req.u.id);
+  if (!req.u.start_at) { db.prepare('UPDATE users SET start_at=? WHERE id=?').run(Date.now(), req.u.id); db.prepare('INSERT INTO progress(user_id,solved,at) VALUES(?,?,?)').run(req.u.id, 0, Date.now()); }
   res.json(stateOf(fresh(req.u.id)));
 });
 app.post('/api/puzzle', auth, student, (req, res) => {
@@ -161,6 +196,7 @@ app.post('/api/puzzle', auth, student, (req, res) => {
   if (wait > 0) return res.status(429).json({ error: 'Várj még', wait });
   if (sha(norm((req.body || {}).answer || '')) === content.puzzles[u.solved].a) {
     db.prepare('UPDATE users SET solved=solved+1 WHERE id=? AND solved=?').run(u.id, u.solved);
+    db.prepare('INSERT INTO progress(user_id,solved,at) VALUES(?,?,?)').run(u.id, u.solved + 1, Date.now());
     return res.json({ ok: true, scare: Math.random() < SCARE_CHANCE });
   }
   db.prepare('UPDATE users SET last_wrong=?, wrong_count=wrong_count+1 WHERE id=?').run(Date.now(), u.id);
@@ -235,10 +271,16 @@ app.post('/api/admin/note', auth, teacher, (req, res) => {          // egyéni m
 });
 app.get('/api/admin/audit', auth, teacher, (req, res) => res.json(db.prepare('SELECT at,user,action,detail,ip FROM audit ORDER BY id DESC LIMIT 100').all()));
 app.get('/api/admin/overview', auth, teacher, (req, res) => {
-  const users = db.prepare("SELECT id,username,name,start_at AS start,end_at AS \"end\",solved,wrong_count AS wrong,last_seen,note FROM users WHERE role='student' ORDER BY username").all();
+  const users = db.prepare(`SELECT id,username,name,start_at AS start,end_at AS "end",solved,wrong_count AS wrong,last_seen,note,away_count,away_ms,share_on,score_adj,
+    (SELECT id FROM shots WHERE user_id=users.id ORDER BY id DESC LIMIT 1) AS shot_id,
+    (SELECT at FROM shots WHERE user_id=users.id ORDER BY id DESC LIMIT 1) AS shot_at,
+    (SELECT MAX(at) FROM progress WHERE user_id=users.id) AS since
+    FROM users WHERE role='student' ORDER BY username`).all();
   const files = db.prepare('SELECT id,user_id,filename,size,uploaded_at FROM files ORDER BY id DESC').all();
   res.json({ now: Date.now(), durationMs: DUR, total, helpCost: HELP_COST, taskTitles: content.tasks.map(t => t.title),
-    help: db.prepare('SELECT id,user_id,task,created_at,handled_at,reply FROM help_requests ORDER BY id DESC LIMIT 500').all(), users: users.map(u => ({ ...u, files: files.filter(f => f.user_id === u.id) })) });
+    help: allHelp(), progress: db.prepare('SELECT user_id,solved,at FROM progress ORDER BY id').all(),
+    shared: db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files ORDER BY id DESC').all(),
+    adjustments: db.prepare('SELECT user_id,delta,reason,at FROM point_adj ORDER BY id DESC LIMIT 300').all(), users: users.map(u => ({ ...u, files: files.filter(f => f.user_id === u.id) })) });
 });
 app.post('/api/admin/users', auth, teacher, (req, res) => {
   let created = 0; const skipped = [];
@@ -250,8 +292,8 @@ app.post('/api/admin/users', auth, teacher, (req, res) => {
   res.json({ created, skipped });
 });
 app.post('/api/admin/reset', auth, teacher, (req, res) => {
-  db.prepare("UPDATE users SET start_at=NULL,end_at=NULL,solved=0,expired_seen=0,last_wrong=0,wrong_count=0 WHERE id=? AND role='student'").run(+(req.body || {}).id);
-  db.prepare("DELETE FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(+(req.body || {}).id);
+  db.prepare("UPDATE users SET start_at=NULL,end_at=NULL,solved=0,expired_seen=0,last_wrong=0,wrong_count=0,away_count=0,away_ms=0,shot_req=0,share_on=0 WHERE id=? AND role='student'").run(+(req.body || {}).id);
+  wipeActivity(+(req.body || {}).id);
   res.json({ ok: true });
 });
 
@@ -267,6 +309,7 @@ app.post('/api/admin/solved', auth, teacher, (req, res) => {        // feladat �
   if (!u) return res.status(404).json({ error: 'Nincs ilyen diák.' });
   const startAt = u.start_at || (s > 0 ? Date.now() : null);        // ha még nem indult, az ugrással elindul az órája
   db.prepare('UPDATE users SET solved=?, start_at=?, end_at=CASE WHEN ?<? THEN NULL ELSE end_at END WHERE id=?').run(s, startAt, s, total, uid(req));
+  db.prepare('INSERT INTO progress(user_id,solved,at) VALUES(?,?,?)').run(uid(req), s, Date.now());
   res.json({ ok: true });
 });
 app.post('/api/admin/password', auth, teacher, (req, res) => {
@@ -278,7 +321,7 @@ app.post('/api/admin/password', auth, teacher, (req, res) => {
   res.json({ ok: true });
 });
 app.post('/api/admin/delete', auth, teacher, (req, res) => {
-  db.prepare("DELETE FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(uid(req));
+  wipeActivity(uid(req));
   db.prepare("DELETE FROM files WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(uid(req));
   db.prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(uid(req));
   db.prepare("DELETE FROM users WHERE id=? AND role='student'").run(uid(req));
@@ -294,12 +337,116 @@ app.post('/api/admin/announce', auth, teacher, (req, res) => {      // üzenet a
   else db.prepare("DELETE FROM settings WHERE k='announce'").run();
   res.json({ ok: true });
 });
-app.post('/api/admin/help-reply', auth, teacher, (req, res) => {   // válasz a segítségkérésre / lezárás
-  const b = req.body || {};
-  db.prepare('UPDATE help_requests SET handled_at=?, reply=? WHERE id=? AND handled_at IS NULL').run(Date.now(), String(b.reply || '').trim().slice(0, 500) || null, +b.id);
+app.post('/api/admin/help-message', auth, teacher, (req, res) => {   // tanári üzenet a segítség-chatben
+  const b = req.body || {}, text = String(b.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Üres üzenet' });
+  const h = db.prepare('SELECT id FROM help_requests WHERE id=? AND handled_at IS NULL').get(+b.id);
+  if (!h) return res.status(404).json({ error: 'A beszélgetés már le van zárva.' });
+  db.prepare('INSERT INTO help_messages(request_id,sender,text,at) VALUES(?,?,?,?)').run(h.id, 'teacher', text, Date.now());
+  res.json({ ok: true });
+});
+app.post('/api/admin/help-close', auth, teacher, (req, res) => {        // lezárás: a diák újra kérhet (újabb HELP_COST pontért)
+  db.prepare('UPDATE help_requests SET handled_at=? WHERE id=? AND handled_at IS NULL').run(Date.now(), +((req.body || {}).id));
   res.json({ ok: true });
 });
 app.get('/api/announce', auth, (req, res) => res.json(getAnn() || {}));
+
+app.post('/api/help/message', auth, student, (req, res) => {        // diák üzenete a nyitott segítség-chatben
+  const b = req.body || {}, text = String(b.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Üres üzenet' });
+  const h = db.prepare('SELECT id FROM help_requests WHERE id=? AND user_id=? AND handled_at IS NULL').get(+b.id, req.u.id);
+  if (!h) return res.status(404).json({ error: 'Ez a beszélgetés már le van zárva.' });
+  if (db.prepare('SELECT COUNT(*) AS c FROM help_messages WHERE request_id=?').get(h.id).c >= 200) return res.status(429).json({ error: 'Túl sok üzenet ebben a beszélgetésben.' });
+  db.prepare('INSERT INTO help_messages(request_id,sender,text,at) VALUES(?,?,?,?)').run(h.id, 'student', text, Date.now());
+  res.json(stateOf(fresh(req.u.id)));
+});
+
+/* ---------- megosztott (tanári) fájlok: a diákok ezeket töltik le ---------- */
+const sendBlob = (res, f) => {
+  let buf = Buffer.from(f.data);
+  if (f.enc) {
+    if (!DATA_KEY) return res.status(500).json({ error: 'A fájl titkosított, de a DATA_KEY nincs beállítva.' });
+    try { buf = decBuf(buf); } catch (e) { return res.status(500).json({ error: 'A fájl nem fejthető vissza (rossz DATA_KEY?).' }); }
+  }
+  res.setHeader('Content-Type', f.mime || 'application/octet-stream');
+  if (f.filename) res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(f.filename)}`);
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.send(buf);
+};
+const sharedUp = multer({
+  storage: multer.memoryStorage(), limits: { fileSize: MAX_MB * 1048576, files: 1 },
+  fileFilter: (req, f, cb) => /\.(pkt|pka|zip)$/i.test(f.originalname) ? cb(null, true) : cb(new Error('Csak .pkt, .pka vagy .zip fájl tölthető fel.'))
+}).single('file');
+app.post('/api/admin/shared', auth, teacher, (req, res) => {
+  sharedUp(req, res, err => {
+    if (err) return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? `A fájl túl nagy (max ${MAX_MB} MB).` : err.message });
+    if (!req.file) return res.status(400).json({ error: 'Nincs kiválasztott fájl.' });
+    const t = Math.floor(+(req.body || {}).task), task = t >= 1 && t <= total ? t : null;
+    const name = cleanName(req.file.originalname), blob = DATA_KEY ? encBuf(req.file.buffer) : req.file.buffer;
+    db.prepare('INSERT INTO shared_files(filename,size,data,enc,task,uploaded_at) VALUES(?,?,?,?,?,?)').run(name, req.file.size, blob, DATA_KEY ? 1 : 0, task, Date.now());
+    audit(req.u.username, 'shared-upload', name + (task ? ' (feladat ' + task + ')' : ''), clientIp(req));
+    res.json({ ok: true });
+  });
+});
+app.post('/api/admin/shared-delete', auth, teacher, (req, res) => {
+  db.prepare('DELETE FROM shared_files WHERE id=?').run(+((req.body || {}).id)); res.json({ ok: true });
+});
+app.get('/api/shared/:id', auth, (req, res) => {
+  const f = db.prepare('SELECT * FROM shared_files WHERE id=?').get(+req.params.id);
+  if (!f) return res.status(404).json({ error: 'Nincs ilyen fájl' });
+  if (req.u.role !== 'teacher' && (!req.u.start_at || (f.task && f.task > req.u.solved))) return res.status(403).json({ error: 'Ez a fájl még nem érhető el.' });
+  sendBlob(res, f);
+});
+
+/* ---------- megfigyelés (átlátható, a diák beleegyezésével): oldalelhagyás + képernyőmegosztás ---------- */
+app.post('/api/away', auth, student, (req, res) => {                   // a diák visszatért az oldalra (ms = ennyi ideig volt máshol a lap tudta szerint)
+  const ms = Math.floor(+((req.body || {}).ms)), now = Date.now();
+  if (req.u.start_at && !req.u.end_at && ms > 0) {
+    const capped = Math.min(ms, 3600000);
+    db.prepare('UPDATE users SET away_count=away_count+1, away_ms=away_ms+? WHERE id=?').run(capped, req.u.id);
+    db.prepare('INSERT INTO away_log(user_id,start_at,dur) VALUES(?,?,?)').run(req.u.id, now - capped, capped);
+    db.prepare('DELETE FROM away_log WHERE user_id=? AND id NOT IN (SELECT id FROM away_log WHERE user_id=? ORDER BY id DESC LIMIT 300)').run(req.u.id, req.u.id);
+  }
+  res.json({ ok: true });
+});
+app.post('/api/share-state', auth, student, (req, res) => {
+  db.prepare('UPDATE users SET share_on=? WHERE id=?').run((req.body || {}).on ? 1 : 0, req.u.id); res.json({ ok: true });
+});
+app.post('/api/shot', auth, student, express.json({ limit: '700kb' }), (req, res) => {   // a diák böngészője által készített (megosztott képernyő) pillanatkép
+  const u = req.u;
+  if (!u.start_at || u.end_at) return res.status(403).json({ error: 'Most nem fogadunk képet.' });
+  const m = /^data:image\/jpeg;base64,([A-Za-z0-9+\/=]+)$/.exec(String((req.body || {}).img || ''));
+  if (!m) return res.status(400).json({ error: 'Hibás kép' });
+  const buf = Buffer.from(m[1], 'base64');
+  if (buf.length > 500000 || buf[0] !== 0xFF || buf[1] !== 0xD8) return res.status(400).json({ error: 'Hibás kép' });
+  const last = db.prepare('SELECT MAX(at) AS t FROM shots WHERE user_id=?').get(u.id);
+  if (last && last.t && Date.now() - last.t < 4000) return res.json({ ok: true, skipped: true });
+  db.prepare('INSERT INTO shots(user_id,at,data,enc) VALUES(?,?,?,?)').run(u.id, Date.now(), DATA_KEY ? encBuf(buf) : buf, DATA_KEY ? 1 : 0);
+  db.prepare('DELETE FROM shots WHERE user_id=? AND id NOT IN (SELECT id FROM shots WHERE user_id=? ORDER BY id DESC LIMIT 8)').run(u.id, u.id);
+  db.prepare('UPDATE users SET shot_req=0, share_on=1 WHERE id=?').run(u.id);
+  res.json({ ok: true });
+});
+app.post('/api/admin/shot-request', auth, teacher, (req, res) => {    // a tanár azonnali képet kér (csak aktív megosztásnál érkezik meg)
+  db.prepare("UPDATE users SET shot_req=1 WHERE id=? AND role='student'").run(+((req.body || {}).id)); res.json({ ok: true });
+});
+app.get('/api/admin/shots/:id', auth, teacher, (req, res) => res.json(db.prepare('SELECT id,at FROM shots WHERE user_id=? ORDER BY id DESC').all(+req.params.id)));
+app.get('/api/admin/away/:id', auth, teacher, (req, res) => res.json(db.prepare('SELECT start_at,dur FROM away_log WHERE user_id=? ORDER BY id').all(+req.params.id)));
+app.post('/api/admin/points', auth, teacher, (req, res) => {           // nyílt, indoklással járó pontmódosítás (pl. más eszköz/segítség észlelése)
+  const b = req.body || {}, id = Math.floor(+b.id), delta = Math.max(-100, Math.min(100, Math.floor(+b.delta) || 0));
+  const reason = String(b.reason || '').trim().slice(0, 300);
+  if (!delta) return res.status(400).json({ error: 'Adj meg egy nullától eltérő pontértéket.' });
+  const u = db.prepare("SELECT id FROM users WHERE id=? AND role='student'").get(id);
+  if (!u) return res.status(404).json({ error: 'Nincs ilyen diák.' });
+  db.prepare('UPDATE users SET score_adj=score_adj+? WHERE id=?').run(delta, id);
+  db.prepare('INSERT INTO point_adj(user_id,delta,reason,at) VALUES(?,?,?,?)').run(id, delta, reason || null, Date.now());
+  audit(req.u.username, 'points', `${delta>0?'+':''}${delta} pont – ${id} – ${reason}`, clientIp(req));
+  res.json({ ok: true });
+});
+app.get('/api/shot-img/:id', auth, teacher, (req, res) => {
+  const f = db.prepare('SELECT data,enc FROM shots WHERE id=?').get(+req.params.id);
+  if (!f) return res.status(404).end();
+  sendBlob(res, { data: f.data, enc: f.enc, mime: 'image/jpeg' });
+});
 
 app.use((err, req, res, next) => {                                   // hibakezelő: nincs stack trace a kliensnek
   if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Hibás kérés' });

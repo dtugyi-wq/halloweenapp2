@@ -4,47 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>A Boszorkányhegyi Hálózat átka</title>
-<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 
-:root{--or:#ff7a1a;--pu:#9b5cff;--tx:#efe6ff;--mut:#a899c4;--card:#1a1228;--red:#ff3b3b;--ok:#5dff9d}
+:root{--or:#e5391f;--pu:#8e1b2e;--tx:#eadccb;--mut:#b89a94;--card:#13070b;--red:#ff3b3b;--ok:#5dff9d}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:radial-gradient(ellipse at 50% -10%,#3d1a60 0%,#0b0713 62%) fixed;color:var(--tx);font-family:'Special Elite',Georgia,serif;line-height:1.55;min-height:100vh}
+body{background:radial-gradient(ellipse at 50% -10%,#4a0610 0%,#050206 62%) fixed;color:var(--tx);font-family:'Special Elite',Georgia,serif;line-height:1.55;min-height:100vh}
 h1,h2,h3{font-family:'Creepster',Georgia,serif;font-weight:400;letter-spacing:2px;margin:.3em 0}
-code{background:#2b1d44;color:#ffb36b;padding:1px 6px;border-radius:5px;font-size:.92em}
+code{background:#2a0b10;color:#ff8a5c;padding:1px 6px;border-radius:5px;font-size:.92em}
 .wrap{max-width:980px;margin:0 auto;padding:20px 16px 70px}
 .hero{text-align:center;padding:60px 10px 30px;position:relative;overflow:hidden}
-.moon{width:150px;height:150px;border-radius:50%;margin:0 auto 10px;background:radial-gradient(circle at 35% 35%,#fff7d6,#ffd36b 60%,#e0a53a);box-shadow:0 0 90px 25px rgba(255,200,90,.35)}
-.hero h1{font-size:clamp(2.4rem,8vw,4.6rem);color:var(--or);text-shadow:0 0 22px rgba(255,122,26,.65)}
+.moon{width:150px;height:150px;border-radius:50%;margin:0 auto 10px;background:radial-gradient(circle at 35% 35%,#ffd9c9,#d1202a 60%,#5e0810);box-shadow:0 0 90px 25px rgba(220,30,40,.35)}
+.hero h1{font-size:clamp(2.4rem,8vw,4.6rem);color:var(--or);text-shadow:0 0 22px rgba(229,57,31,.65)}
 .hero p{max-width:640px;margin:14px auto;color:var(--mut);font-size:1.05rem}
 .bat{position:absolute;font-size:28px;animation:fly 14s linear infinite;opacity:.8}
 @keyframes fly{from{transform:translateX(-80px) translateY(0)}50%{transform:translateX(50vw) translateY(40px)}to{transform:translateX(110vw) translateY(-10px)}}
 .pump{font-size:54px;display:inline-block;animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-8px) rotate(4deg)}}
 button{font-family:inherit;cursor:pointer}
-.big{background:linear-gradient(180deg,#ff9a3c,#e05a00);color:#1a0a00;border:0;border-radius:14px;padding:16px 40px;font-size:1.5rem;font-family:'Creepster',serif;letter-spacing:2px;box-shadow:0 0 30px rgba(255,122,26,.6);transition:transform .15s}
+.big{background:linear-gradient(180deg,#e5391f,#7a0f0a);color:#fff0e8;border:0;border-radius:14px;padding:16px 40px;font-size:1.5rem;font-family:'Creepster',serif;letter-spacing:2px;box-shadow:0 0 30px rgba(229,57,31,.6);transition:transform .15s}
 .big:hover{transform:scale(1.06)}
 #bar{position:sticky;top:0;z-index:20;background:rgba(11,7,19,.92);border-bottom:2px solid var(--pu);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;backdrop-filter:blur(4px)}
 #timer{font-family:'Creepster',serif;font-size:2rem;color:var(--or);letter-spacing:3px}
 #timer.low{color:var(--red);animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.35}}
 .prog{color:var(--mut)}
-details{background:var(--card);border:1px solid #3a2a58;border-radius:12px;margin:14px 0;padding:6px 14px}
+details{background:var(--card);border:1px solid #4d141b;border-radius:12px;margin:14px 0;padding:6px 14px}
 summary{cursor:pointer;font-family:'Creepster',serif;font-size:1.4rem;color:var(--pu);letter-spacing:2px;padding:6px 0}
 .tw{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:.86rem;margin:8px 0}
-th,td{border:1px solid #3a2a58;padding:4px 8px;text-align:left;white-space:nowrap}
-th{background:#2b1d44;color:var(--or)}
+th,td{border:1px solid #4d141b;padding:4px 8px;text-align:left;white-space:nowrap}
+th{background:#2a0b10;color:var(--or)}
 svg text{font-family:'Special Elite',Georgia,serif}
-.card{background:var(--card);border:1px solid #3a2a58;border-radius:14px;padding:16px 20px;margin:18px 0}
+.card{background:var(--card);border:1px solid #4d141b;border-radius:14px;padding:16px 20px;margin:18px 0}
 .card h2{color:var(--or);margin:0 0 4px}
 .pts{color:var(--mut);font-size:.9rem}
 .card.locked{opacity:.45;text-align:center}
-.card.puz{border:2px solid var(--pu);box-shadow:0 0 28px rgba(155,92,255,.35)}
+.card.puz{border:2px solid var(--pu);box-shadow:0 0 28px rgba(142,27,46,.35)}
 .card ul,.card ol{padding-left:22px}
 .card li{margin:6px 0}
-input[type=text]{background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px 14px;font-size:1.1rem;font-family:inherit;width:min(260px,100%)}
+input[type=text]{background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px 14px;font-size:1.1rem;font-family:inherit;width:min(260px,100%)}
 .ans{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .ans button{background:var(--pu);color:#fff;border:0;border-radius:10px;padding:11px 22px;font-size:1rem}
 .ans button:disabled{opacity:.4}
@@ -53,17 +53,17 @@ input[type=text]{background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);b
 @keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 #scare,#end{position:fixed;inset:0;z-index:100;background:#000;display:none;align-items:center;justify-content:center}
 #scare video{width:100%;height:100%;object-fit:contain;background:#000}
-#verr{display:none;position:absolute;max-width:560px;background:#1a1228;border:2px solid var(--red);border-radius:12px;padding:18px;text-align:center}
+#verr{display:none;position:absolute;max-width:560px;background:#13070b;border:2px solid var(--red);border-radius:12px;padding:18px;text-align:center}
 #verr button{margin-top:10px;background:var(--pu);color:#fff;border:0;border-radius:8px;padding:8px 18px}
 #end{flex-direction:column;text-align:center;padding:20px;background:radial-gradient(circle,#4a0000,#000)}
 #end h1{font-size:clamp(2.5rem,9vw,5rem);color:var(--red)}
-footer{text-align:center;margin-top:40px;color:#5a4a78;font-size:.8rem}
-footer a{color:#5a4a78;cursor:pointer;text-decoration:underline}
+footer{text-align:center;margin-top:40px;color:#7a3a42;font-size:.8rem}
+footer a{color:#7a3a42;cursor:pointer;text-decoration:underline}
 .ok{color:var(--ok)}
 
-input[type=password],input[type=text]{background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px 14px;font-size:1.1rem;font-family:inherit;width:min(280px,100%)}
+input[type=password],input[type=text]{background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px 14px;font-size:1.1rem;font-family:inherit;width:min(280px,100%)}
 input[type=file]{color:var(--tx);font-family:inherit;max-width:100%}
-textarea{width:100%;min-height:90px;background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px;font-family:monospace}
+textarea{width:100%;min-height:90px;background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px;font-family:monospace}
 .sm{background:var(--pu);color:#fff;border:0;border-radius:8px;padding:5px 12px;font-family:inherit}
 .sm.red{background:#a01818}
 .msg.ok{color:var(--ok)}
@@ -71,36 +71,74 @@ a{color:var(--or)}
 #who{color:var(--mut);font-size:.9rem;display:flex;gap:10px;align-items:center}
 .wide{max-width:1300px!important}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:10px 0}
-.tile{background:linear-gradient(135deg,#2b1d44,#150e22);border:1px solid #4a3470;border-radius:14px;padding:12px;text-align:center;box-shadow:0 0 18px rgba(155,92,255,.18)}
+.tile{background:linear-gradient(135deg,#2a0b10,#0b0306);border:1px solid #6a1a24;border-radius:14px;padding:12px;text-align:center;box-shadow:0 0 18px rgba(142,27,46,.18)}
 .tile span{font-size:1.4rem}.tile b{display:block;font-family:'Creepster',serif;font-size:2.2rem;color:var(--or);line-height:1.1}.tile small{color:var(--mut)}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.tools input[type=text]{width:220px}.tools select{background:#0f0a1a;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:8px;font-family:inherit}
+.tools input[type=text]{width:220px}.tools select{background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:8px;font-family:inherit}
 .sp{flex:1}.auto{color:var(--mut);font-size:.85rem}
-.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:#2b1d44;color:var(--tx);border:1px solid #4a3470;border-radius:20px;padding:4px 12px;font-family:inherit}.chip.on{background:var(--or);color:#1a0a00;border-color:var(--or)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:#2a0b10;color:var(--tx);border:1px solid #6a1a24;border-radius:20px;padding:4px 12px;font-family:inherit}.chip.on{background:var(--or);color:#fff0e8;border-color:var(--or)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin:14px 0}
-.ucard{background:var(--card);border:1px solid #3a2a58;border-left:5px solid #5a4a78;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
-.ucard.run{border-left-color:var(--or);box-shadow:0 0 18px rgba(255,122,26,.18)}.ucard.done{border-left-color:var(--ok)}.ucard.expired{border-left-color:var(--red);opacity:.85}
+.ucard{background:var(--card);border:1px solid #4d141b;border-left:5px solid #7a3a42;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.ucard.run{border-left-color:var(--or);box-shadow:0 0 18px rgba(229,57,31,.18)}.ucard.done{border-left-color:var(--ok)}.ucard.expired{border-left-color:var(--red);opacity:.85}
 .uh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.badge{font-size:.78rem;padding:3px 10px;border-radius:20px;background:#2b1d44;white-space:nowrap}.badge.run{background:#5a2e00;color:#ffb36b}.badge.done{background:#0d4a2a;color:var(--ok)}.badge.expired{background:#5a0f0f;color:#ff8a8a}
-.cd{font-family:'Creepster',serif;font-size:2.6rem;letter-spacing:3px;color:var(--or);text-align:center;line-height:1}.ucard.idle .cd{color:#5a4a78}.ucard.done .cd{color:var(--ok)}.ucard.expired .cd{color:var(--red)}.cd.low{color:var(--red)!important;animation:pulse 1s infinite}
+.badge{font-size:.78rem;padding:3px 10px;border-radius:20px;background:#2a0b10;white-space:nowrap}.badge.run{background:#5a2e00;color:#ff8a5c}.badge.done{background:#0d4a2a;color:var(--ok)}.badge.expired{background:#5a0f0f;color:#ff8a8a}
+.cd{font-family:'Creepster',serif;font-size:2.6rem;letter-spacing:3px;color:var(--or);text-align:center;line-height:1}.ucard.idle .cd{color:#7a3a42}.ucard.done .cd{color:var(--ok)}.ucard.expired .cd{color:var(--red)}.cd.low{color:var(--red)!important;animation:pulse 1s infinite}
 .dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
-.dot{width:16px;height:16px;border-radius:50%;background:#2b1d44;border:1px solid #4a3470;display:inline-block}.dot.on{background:var(--or);box-shadow:0 0 8px var(--or);border-color:var(--or)}.dot.cur{border-color:var(--pu);box-shadow:0 0 8px var(--pu);animation:pulse 1.2s infinite}
+.dot{width:16px;height:16px;border-radius:50%;background:#2a0b10;border:1px solid #6a1a24;display:inline-block}.dot.on{background:var(--or);box-shadow:0 0 8px var(--or);border-color:var(--or)}.dot.cur{border-color:var(--pu);box-shadow:0 0 8px var(--pu);animation:pulse 1.2s infinite}
 .files{display:flex;flex-direction:column;gap:2px;font-size:.88rem}.btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto}
-#ann{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:50;max-width:min(640px,94vw);background:#3b1d00;border:2px solid var(--or);color:#fff;padding:12px 18px;border-radius:14px;box-shadow:0 0 30px rgba(255,122,26,.6);font-size:1.05rem}
+#ann{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:50;max-width:min(640px,94vw);background:#3b1d00;border:2px solid var(--or);color:#fff;padding:12px 18px;border-radius:14px;box-shadow:0 0 30px rgba(229,57,31,.6);font-size:1.05rem}
 #ann button{margin-left:10px;background:none;border:0;color:#fff;font-size:1.1rem}
-.card.note{border:2px solid var(--or);box-shadow:0 0 22px rgba(255,122,26,.35)}
+.card.note{border:2px solid var(--or);box-shadow:0 0 22px rgba(229,57,31,.35)}
 .bad td{color:#ff8a8a}
-select.jump{background:#0f0a1a;color:var(--tx);border:1px solid var(--pu);border-radius:8px;padding:4px;font-family:inherit}
+select.jump{background:#080204;color:var(--tx);border:1px solid var(--pu);border-radius:8px;padding:4px;font-family:inherit}
 .pts.bad{color:#ff8a8a}
-.helpcard{border:2px solid var(--red);box-shadow:0 0 24px rgba(255,59,59,.35)}.hreq{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #3a2a58}
+.helpcard{border:2px solid var(--red);box-shadow:0 0 24px rgba(255,59,59,.35)}.hreq{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #4d141b}
 .ucard.hopen{border-left-color:var(--red);box-shadow:0 0 20px rgba(255,59,59,.45)}
-.help{margin-top:10px}.hmsg{background:#2b1d44;border-radius:10px;padding:8px 12px;margin:6px 0}.hmsg.wait{border:1px dashed var(--or)}
+.help{margin-top:10px}.hmsg{background:#2a0b10;border-radius:10px;padding:8px 12px;margin:6px 0}.hmsg.wait{border:1px dashed var(--or)}
+.msgs{max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:6px 2px}
+.m{max-width:82%;padding:6px 11px;border-radius:12px;word-break:break-word}.m small{display:block;opacity:.55;font-size:.7rem}
+.m.me{align-self:flex-end;background:#6a1a24}.m.oth{align-self:flex-start;background:#2a0b10;border:1px solid #4d141b}
+.hct{color:var(--mut);font-size:.9rem;margin-bottom:4px}.hchat{border:1px solid var(--pu);border-radius:12px;padding:10px;margin-top:8px;background:#0b0306}
+.hclosed{margin-top:8px}.hclosed summary{font-size:1rem;color:var(--mut);font-family:inherit;letter-spacing:0}
+.hthread{border-top:1px solid #4d141b;padding:10px 0}.hth{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.thumb{width:100%;max-height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--pu);cursor:pointer;display:block}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:8px}
+#modal{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:14px}
+.mbox{background:var(--card);border:2px solid var(--pu);border-radius:14px;padding:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto}
+.ucard.stuck{border-left-color:#e0a000}.bad2{color:#ffb347}.rec{color:#ff4040;animation:pulse 1.2s infinite;margin-right:8px}.card.share.on{border-color:#c0182a}
+#sht,.card select{background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:8px;font-family:inherit;max-width:100%}
+/* ---- ijesztő stílus ---- */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:15;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.88) 100%)}
+body::after{content:'';position:fixed;inset:-50%;pointer-events:none;z-index:14;opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain .8s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-2%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.fog{position:fixed;inset:0;pointer-events:none;z-index:13;background:radial-gradient(ellipse 60% 30% at 20% 92%,rgba(190,190,210,.11),transparent),radial-gradient(ellipse 50% 25% at 80% 88%,rgba(190,190,210,.08),transparent);animation:fogd 22s ease-in-out infinite alternate}
+@keyframes fogd{from{transform:translateX(-5%)}to{transform:translateX(5%)}}
+.webl,.webr{position:fixed;top:0;width:180px;height:180px;pointer-events:none;z-index:16;opacity:.33;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%23cfc8c0' stroke-width='.6' fill='none'%3E%3Cpath d='M0 0L100 100M0 25L75 100M0 50L50 100M0 75L25 100M25 0L100 75M50 0L100 50M75 0L100 25'/%3E%3Cpath d='M0 15Q15 15 15 0M0 32Q32 32 32 0M0 50Q50 50 50 0M0 70Q70 70 70 0M0 92Q92 92 92 0'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat}
+.webl{left:0}.webr{right:0;transform:scaleX(-1)}
+h1{font-family:'Nosifer','Creepster',Georgia,serif}
+.hero h1{font-size:clamp(1.5rem,5.2vw,3rem);color:#c1121f;text-shadow:0 0 18px rgba(193,18,31,.85);line-height:1.5;animation:flick 5s infinite}
+@keyframes flick{0%,90%,100%{opacity:1}91%{opacity:.3}92%{opacity:1}94%{opacity:.5}95%{opacity:1}}
+#timer{animation:flick 7s infinite}.card h2{text-shadow:0 0 10px rgba(229,57,31,.45)}
+#bar::after{content:'';position:absolute;left:0;right:0;top:100%;height:26px;pointer-events:none;background:radial-gradient(ellipse 10px 22px at 20px 0,#7a0010 68%,transparent 70%) 0 0/70px 26px repeat-x,radial-gradient(ellipse 6px 14px at 52px 0,#a00018 68%,transparent 70%) 0 0/70px 26px repeat-x}
+#flash{position:fixed;inset:0;background:#b00010;opacity:0;pointer-events:none;z-index:95;transition:opacity .08s}#flash.on{opacity:.5}
+body.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(3px,4px)}}
+#whisper{position:fixed;z-index:60;pointer-events:none;font-family:'Creepster',serif;font-size:2rem;color:#c1121f;letter-spacing:4px;opacity:0;text-shadow:0 0 14px #000,0 0 22px #7a0010;transition:opacity 1s}#whisper.on{opacity:.85}
+#eyes i{position:fixed;opacity:0;font-style:normal;font-size:22px;pointer-events:none;z-index:12;filter:drop-shadow(0 0 6px #f00);animation:eye 20s infinite}
+@keyframes eye{0%,70%{opacity:0}74%,80%{opacity:.85}84%{opacity:0}88%,92%{opacity:.7}96%,100%{opacity:0}}
+::selection{background:#8e1b2e;color:#fff}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
+.adjcard,.card.adjcard{border:2px solid #e5391f}
+.adjrow{padding:4px 0;border-top:1px solid #4d141b}
+.tl{margin:8px 0}.tlbar{position:relative;height:22px;background:#0d3a1a;border-radius:6px;overflow:hidden;border:1px solid #1d5a2e}
+.seg{position:absolute;top:0;bottom:0;background:#7a0f0a;border-radius:2px}
 </style>
 </head>
 <body>
 <div id="bar" style="display:none"></div>
 <div class="wrap" id="app"></div>
 <div id="ann"></div>
+<div class="fog"></div><div class="webl"></div><div class="webr"></div><div id="eyes"></div><div id="flash"></div><div id="whisper"></div><div id="modal"></div>
 <div id="scare"><video id="vid" playsinline preload="auto"></video><div id="verr"></div></div>
 <div id="end"><h1>Az átok győzött…</h1><p>Lejárt az idő. A Kastély örökre sötétben maradt.</p><button class="big" id="replay" style="margin-top:20px">Újranézem</button></div>
 
@@ -168,11 +206,11 @@ function mapSvg(){
   ['SD1','SD2','Po1 LACP',1],['SD1','SA1','Po2 PAgP',1],['SD2','SA2','Po3 PAgP',1],['SA1','PA1',''],['SA1','PA2',''],['SA2','PA3',''],
   ['R1','R2','L4'],['R1','RT','L1'],['R2','RK','L2'],['RT','RK','L3'],['RT','ST',''],['ST','PT',''],['RK','SK',''],['SK','PK','']];
   let s='<svg viewBox="0 0 1000 520" width="100%" style="min-width:680px">';
-  L.forEach(([a,b,lb,th])=>{const A=n[a],B=n[b];s+=`<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${th?'#ff7a1a':'#9b5cff'}" stroke-width="${th?5:2}" ${a.startsWith('ISP')?'stroke-dasharray="6 4"':''}/>`;
-    if(lb) s+=`<text x="${(A[0]+B[0])/2+6}" y="${(A[1]+B[1])/2-4}" fill="#a899c4" font-size="12">${lb}</text>`});
+  L.forEach(([a,b,lb,th])=>{const A=n[a],B=n[b];s+=`<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${th?'#e5391f':'#8e1b2e'}" stroke-width="${th?5:2}" ${a.startsWith('ISP')?'stroke-dasharray="6 4"':''}/>`;
+    if(lb) s+=`<text x="${(A[0]+B[0])/2+6}" y="${(A[1]+B[1])/2-4}" fill="#b89a94" font-size="12">${lb}</text>`});
   Object.values(n).forEach(([x,y,nm,k])=>{
-    const sh=k=='r'?`<circle cx="${x}" cy="${y}" r="24" fill="#2b1d44" stroke="#ff7a1a" stroke-width="3"/>`:k=='s'?`<rect x="${x-26}" y="${y-15}" width="52" height="30" rx="5" fill="#2b1d44" stroke="#9b5cff" stroke-width="3"/>`:`<rect x="${x-22}" y="${y-13}" width="44" height="26" rx="8" fill="#1a1228" stroke="#5dff9d" stroke-width="2"/>`;
-    s+=sh+`<text x="${x}" y="${y+4}" text-anchor="middle" fill="#fff" font-size="${k=='r'?10:11}">${k=='r'?'⬤':k=='s'?'▦':'🖥'}</text><text x="${x}" y="${y+(k=='r'?40:30)}" text-anchor="middle" fill="#efe6ff" font-size="13">${nm}</text>`});
+    const sh=k=='r'?`<circle cx="${x}" cy="${y}" r="24" fill="#2a0b10" stroke="#e5391f" stroke-width="3"/>`:k=='s'?`<rect x="${x-26}" y="${y-15}" width="52" height="30" rx="5" fill="#2a0b10" stroke="#8e1b2e" stroke-width="3"/>`:`<rect x="${x-22}" y="${y-13}" width="44" height="26" rx="8" fill="#13070b" stroke="#5dff9d" stroke-width="2"/>`;
+    s+=sh+`<text x="${x}" y="${y+4}" text-anchor="middle" fill="#fff" font-size="${k=='r'?10:11}">${k=='r'?'⬤':k=='s'?'▦':'🖥'}</text><text x="${x}" y="${y+(k=='r'?40:30)}" text-anchor="middle" fill="#eadccb" font-size="13">${nm}</text>`});
   return s+'</svg>';
 }
 
@@ -213,9 +251,12 @@ setInterval(async()=>{
   if(!ST||ST.user.role!=='student'||$('#scare').style.display==='flex') return;
   try{
     const s=await api('/api/state'); showAnn(s.announce);
-    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||JSON.stringify(s.help)!==JSON.stringify(ST.help)){ST=s;apply()} else {ST.start=s.start;off=s.now-Date.now()}
+    const hs=h=>(h||[]).map(x=>x.id+':'+(x.handled_at?1:0)).join();
+    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||hs(s.help)!==hs(ST.help)||JSON.stringify(s.shared)!==JSON.stringify(ST.shared)){ST=s;apply()}
+    else{const chg=JSON.stringify(s.help)!==JSON.stringify(ST.help);ST.start=s.start;ST.help=s.help;ST.shotReq=s.shotReq;off=s.now-Date.now();if(chg){updateChats();ding()}}
+    if(ST.shotReq) snap();
   }catch(e){if(e.status===401){ST=null;render()}}
-},10000);
+},4000);
 
 /* ===== Nézetek ===== */
 const hero=inner=>`<div class="hero"><span class="bat" style="top:30px">🦇</span><span class="bat" style="top:110px;animation-delay:-6s">🦇</span><span class="bat" style="top:200px;animation-delay:-10s">🦇</span>
@@ -223,7 +264,7 @@ const hero=inner=>`<div class="hero"><span class="bat" style="top:30px">🦇</sp
 <div><span class="pump">🎃</span> <span class="pump" style="animation-delay:-1s">👻</span> <span class="pump" style="animation-delay:-2s">🎃</span></div>${inner}</div>`;
 function setBar(timer){
   const b=$('#bar'); b.style.display='flex';
-  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who"><span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total)+(ST.help&&ST.help.length?' · 🆘 '+ST.help.length+' (−'+ST.help.length*ST.helpCost+' pont)':''):''}</span><button class="sm" id="out">Kilépés</button></div>`;
+  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who">${timer&&shareStream?'<span class="rec">🔴 képernyőmegosztás</span>':''}<span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total)+(ST.help&&ST.help.length?' · 🆘 '+ST.help.length+' (−'+ST.help.length*ST.helpCost+' pont)':''):''}</span><button class="sm" id="out">Kilépés</button></div>`;
   $('#out').onclick=async()=>{try{await api('/api/logout',{})}catch(e){} ST=null;refHtml=null;$('#end').style.display='none';render()};
 }
 function render(){
@@ -244,21 +285,68 @@ function viewLogin(){
 }
 function viewIntro(){
   setBar(false); $('#bar').querySelector('div').textContent='🎃 '+(ST.user.name||ST.user.username);
-  $('#app').innerHTML=hero(`<p>${STORY}</p><p>Időtök: <strong>${Math.round(ST.durationMs/60000)} perc</strong>. Minden feladat előtt egy logikai rejtvényt kell megfejtenetek, a végén pedig fel kell töltenetek a Packet Tracer munkafájlotokat. Vigyázzatok: a sötétben bármi előugorhat…</p><button class="big" id="go">🕯️ Kezdődjön az éjszaka</button>`);
+  $('#app').innerHTML=hero(`<p>${STORY}</p><p>Időtök: <strong>${Math.round(ST.durationMs/60000)} perc</strong>. Minden feladat előtt egy logikai rejtvényt kell megfejtenetek, a végén pedig fel kell töltenetek a Packet Tracer munkafájlotokat. Vigyázzatok: a sötétben bármi előugorhat… Ha lejár az idő, ő jön érted.</p><p class="pts">ℹ️ A tanár látja a haladásodat, azt, ha a háttérben vagy, és ha te engedélyezed, a képernyődet is.</p><button class="big" id="go">🕯️ Kezdődjön az éjszaka</button>`);
   $('#go').onclick=async()=>{ST=await api('/api/start',{});apply();vid.load()};
 }
+const bub=(m,me)=>m.map(x=>`<div class="m ${x.from===me?'me':'oth'}"><span>${esc(x.text).replace(/\n/g,'<br>')}</span><small>${new Date(x.at).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'})}</small></div>`).join('');
 function helpBlock(n){
   const hs=(ST.help||[]).filter(x=>x.task===n), open=hs.find(x=>!x.handled_at);
   let h='<div class="help">';
-  hs.filter(x=>x.handled_at).forEach(x=>{h+=x.reply?`<div class="hmsg">💬 <b>Tanári válasz:</b> ${esc(x.reply).replace(/\n/g,'<br>')}</div>`:'<div class="hmsg">✔ A tanár megnézte a kérésedet.</div>'});
-  if(open) h+=`<div class="hmsg wait">⏳ Segítséget kértél (${dt(open.created_at)}). A tanár hamarosan válaszol.</div>`;
+  hs.filter(x=>x.handled_at).forEach(x=>{h+=`<details class="hclosed"><summary>💬 Lezárt beszélgetés (${dt(x.created_at)})</summary><div class="msgs static">${bub(x.msgs,'student')||'<i>Nem volt üzenet.</i>'}</div></details>`});
+  if(open) h+=`<div class="hchat" data-req="${open.id}"><div class="hct">🆘 Segítség-chat: a tanár hamarosan válaszol. A beszélgetés addig tart, amíg le nem zárja.</div><div class="msgs">${bub(open.msgs,'student')}</div><div class="ans"><input type="text" class="cin" data-req="${open.id}" maxlength="500" placeholder="Írd le, miben akadtál el…"><button class="sm hsend" data-req="${open.id}">Küldés</button></div></div>`;
   else if(!ST.end&&remaining()>0) h+=`<button class="sm helpbtn" data-task="${n}">🆘 Segítség kérése (−${ST.helpCost} pont)</button>`;
   return h+'</div>';
 }
+async function sendChat(id){
+  const i=document.querySelector(`.cin[data-req="${id}"]`),tx=i.value.trim(); if(!tx) return; i.value='';
+  try{ST=await api('/api/help/message',{id,text:tx});apply();const n=document.querySelector(`.cin[data-req="${id}"]`);if(n)n.focus()}catch(e){alert(e.message);i.value=tx}
+}
+function updateChats(){
+  document.querySelectorAll('.hchat').forEach(c=>{const h=(ST.help||[]).find(x=>x.id===+c.dataset.req);if(!h)return;const m=c.querySelector('.msgs');
+    if(m.dataset.n!==String(h.msgs.length)){m.innerHTML=bub(h.msgs,'student');m.dataset.n=h.msgs.length;m.scrollTop=m.scrollHeight}});
+}
+function ding(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=660;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.12,c.currentTime);o.start();o.stop(c.currentTime+.2)}catch(e){}}
+
+/* ===== Képernyőmegosztás (a diák beleegyezésével, a böngésző mindig jelzi) ===== */
+let shareStream=null, shareVideo=null;
+async function startShare(){
+  try{
+    shareStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+    shareVideo=document.createElement('video'); shareVideo.srcObject=shareStream; shareVideo.muted=true; await shareVideo.play();
+    shareStream.getVideoTracks()[0].addEventListener('ended',()=>{shareStream=null;shareVideo=null;api('/api/share-state',{on:false}).catch(()=>{});if(ST&&ST.user.role==='student')render()});
+    api('/api/share-state',{on:true}).catch(()=>{}); setTimeout(snap,1200); render();
+  }catch(e){shareStream=null;alert('A képernyőmegosztás nem indult el: '+(e.message||e.name))}
+}
+function stopShare(){if(shareStream)shareStream.getTracks().forEach(x=>x.stop());shareStream=null;shareVideo=null;api('/api/share-state',{on:false}).catch(()=>{});render()}
+function snap(){
+  if(!shareStream||!shareVideo||!shareVideo.videoWidth||!ST||!ST.start||ST.end) return;
+  const c=document.createElement('canvas'),w=Math.min(1280,shareVideo.videoWidth);
+  c.width=w; c.height=Math.round(shareVideo.videoHeight*w/shareVideo.videoWidth);
+  c.getContext('2d').drawImage(shareVideo,0,0,c.width,c.height);
+  api('/api/shot',{img:c.toDataURL('image/jpeg',0.6)}).catch(()=>{});
+}
+setInterval(snap,30000);
+function shareCard(){
+  return shareStream
+   ?`<div class="card share on"><b>🔴 A képernyőd meg van osztva a tanárral.</b> <button class="sm" onclick="stopShare()">Megosztás leállítása</button></div>`
+   :`<div class="card share"><b>🖥 Képernyőmegosztás</b> (${ST.requireShare?'kötelező':'ajánlott'}): a tanár így látja a Packet Tracer ablakodat, és gyorsabban tud segíteni. A böngésző mindig jelzi, ha megosztás megy, és bármikor leállíthatod. <button class="sm" onclick="startShare()">Megosztás indítása</button></div>`;
+}
+function gateView(){$('#app').innerHTML=`<div class="card"><h2>🖥 Képernyőmegosztás szükséges</h2><p>A feladatok megjelenéséhez oszd meg a képernyődet (vagy a Packet Tracer ablakát). Az idő közben telik.</p><button class="big" onclick="startShare()">Megosztás indítása</button></div>`}
+function sharedCard(){
+  return ST.shared&&ST.shared.length?`<div class="card"><h2>📥 Letölthető fájlok</h2><p class="pts">A tanár által feltöltött kiinduló fájlok. Töltsd le őket, és ebben dolgozz.</p>${ST.shared.map(f=>`<div>📦 <a href="/api/shared/${f.id}">${esc(f.filename)}</a> <span class="pts">${mb(f.size)}${f.task?' · '+f.task+'. feladathoz':''}</span></div>`).join('')}</div>`:'';
+}
+/* ===== Háttérben töltött idő (a Packet Tracer külön program, ezért ez főleg az aktivitást mutatja) ===== */
+let awayStart=0;
+document.addEventListener('visibilitychange',()=>{
+  if(!ST||ST.user.role!=='student'||!ST.start||ST.end) return;
+  if(document.hidden) awayStart=Date.now();
+  else if(awayStart){const ms=Date.now()-awayStart;awayStart=0;if(ms>3000)api('/api/away',{ms}).catch(()=>{})}
+});
 function viewStudent(){
   setBar(true);
+  if(ST.requireShare&&!shareStream){gateView();return}
   if(refHtml===null) refHtml=ref();
-  let h=refHtml+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
+  let h=shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+refHtml+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
   h+=`<div class="card"><h2>📦 Packet Tracer fájl feltöltése</h2><p class="pts">Tallózd ki a .pkt fájlodat, a feltöltés a szerver adatbázisába kerül. Többször is feltölthetsz, a legutóbbit értékeljük.</p>
   <div class="ans"><input type="file" id="pktfile" accept=".pkt,.pka"><button id="ubtn" disabled>Feltöltés</button></div>
   <progress id="uprog" max="100" value="0" style="width:100%;display:none"></progress><div class="msg" id="umsg"></div>
@@ -274,7 +362,12 @@ function viewStudent(){
   }
   if(ST.solved>=ST.total&&!ST.end) h+=`<div style="text-align:center"><button class="big" id="fin">✅ Befejeztük</button></div>`;
   if(ST.end) h+=`<div class="card"><h2 class="ok">Kész! Maradék idő: ${fmt(remaining())}</h2></div>`;
+  const keep={};document.querySelectorAll('.cin').forEach(i=>{keep[i.dataset.req]=i.value});
   $('#app').innerHTML=h;
+  document.querySelectorAll('.cin').forEach(i=>{if(keep[i.dataset.req])i.value=keep[i.dataset.req]});
+  document.querySelectorAll('.hsend').forEach(b=>b.onclick=()=>sendChat(+b.dataset.req));
+  document.querySelectorAll('.cin').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')sendChat(+i.dataset.req)});
+  document.querySelectorAll('.hchat .msgs').forEach(m=>m.scrollTop=m.scrollHeight);
   const b=$('#abtn'); if(b){b.onclick=check;$('#ain').onkeydown=e=>{if(e.key==='Enter')check()}}
   const f=$('#fin'); if(f) f.onclick=async()=>{ST=await api('/api/finish',{});apply()};
   setupUpload();
@@ -336,6 +429,7 @@ function viewTeacher(){
   <div class="card"><h3>📢 Üzenet a diákoknak</h3><div class="ans"><input type="text" id="amsgt" placeholder="pl. Még 10 perc van hátra!" style="flex:1;min-width:220px"><button class="sm" id="asend">Küldés</button><button class="sm red" id="aclr">Üzenet törlése</button></div></div>
   <div id="hlp"></div>
   <div class="grid" id="grid">Betöltés…</div>
+  <div class="card"><h2>📥 Fájlok a diákoknak</h2><p class="pts">Ide töltsd fel a kiinduló Packet Tracer fájlt (.pkt, .pka, .zip). A diákok az oldalukon letölthetik, és ebben dolgoznak.</p><div class="ans"><input type="file" id="shf" accept=".pkt,.pka,.zip"><select id="sht"><option value="">Minden diáknak (indítás után azonnal)</option></select><button class="sm" id="shup">Feltöltés</button></div><div class="msg" id="shm"></div><div id="shl"></div></div>
   <div class="card"><h2>➕ Új diákok</h2><p class="pts">Soronként: <code>felhasználónév;jelszó;név</code> (a név elhagyható, a jelszó legalább 4 karakter)</p><textarea id="nu" placeholder="csapat1;Dracula123;Vámpírok&#10;csapat2;Mumus456;Mumiák"></textarea><button class="sm" id="mk" style="margin-top:8px">Létrehozás</button><div class="msg" id="mkm"></div></div>
   <details class="card" id="audd"><summary>🛡️ Biztonsági napló (belépések, feltöltések, tanári műveletek)</summary><div id="aud" class="tw">Betöltés…</div></details>`;
   $('#asort').value=AF.s;
@@ -356,6 +450,13 @@ function viewTeacher(){
     else if(a==='tm5')adm('/api/admin/time',{id,minutes:-5});
     else if(a==='skip')adm('/api/admin/solved',{id,solved:u.solved+1});
     else if(a==='back')adm('/api/admin/solved',{id,solved:u.solved-1});
+    else if(a==='detail')openDetail(id);
+    else if(a==='pts'){
+      const d=prompt('Pontváltozás (pl. -10 vagy 5):'); if(d===null||!d.trim())return;
+      const n=parseInt(d,10); if(!n){alert('Adj meg egy nullától eltérő egész számot.');return}
+      const r=prompt('Indoklás (a diák is látni fogja):')||''; adm('/api/admin/points',{id,delta:n,reason:r});
+    }
+    else if(a==='shot'){adm('/api/admin/shot-request',{id});alert('Kép kérve. Ha a diák megosztja a képernyőjét, néhány másodpercen belül megérkezik.')}
     else if(a==='note'){const t=prompt('Egyéni megjegyzés / feladat a diáknak (üres = törlés):',u.note||'');if(t!==null)adm('/api/admin/note',{id,text:t})}
     else if(a==='pw'){const p=prompt('Új jelszó (min. 4 karakter):');if(p)adm('/api/admin/password',{id,password:p})}
     else if(a==='reset'){if(confirm('Nullázod a diák állását? (A feltöltött fájlok megmaradnak.)'))adm('/api/admin/reset',{id})}
@@ -364,21 +465,85 @@ function viewTeacher(){
   $('#grid').onchange=e=>{const sel=e.target.closest('select.jump');if(!sel||sel.value==='')return;const id=+sel.dataset.id,v=+sel.value,u=ADM.map[id];
     if(confirm(`${u.name||u.username}: ugrás a(z) ${v===0?'kezdetre':v+'. feladatra'} a rejtvények megoldása nélkül?`))adm('/api/admin/solved',{id,solved:v});else sel.value=''};
   $('#hlp').onclick=e=>{
-    const r=e.target.closest('[data-hr]'),d=e.target.closest('[data-hd]');
-    if(r){const t=prompt('Válasz a diáknak (a feladat mellett jelenik meg nála):');if(t!==null)adm('/api/admin/help-reply',{id:+r.dataset.hr,reply:t})}
-    else if(d)adm('/api/admin/help-reply',{id:+d.dataset.hd,reply:''});
+    const c=e.target.closest('[data-hd]'),s2=e.target.closest('[data-hs]');
+    if(c) adm('/api/admin/help-close',{id:+c.dataset.hd}); else if(s2) sendTeacherMsg(+s2.dataset.hs);
   };
+  $('#hlp').onkeydown=e=>{if(e.key==='Enter'&&e.target.classList.contains('cin'))sendTeacherMsg(+e.target.dataset.id)};
+  $('#shup').onclick=uploadShared;
+  $('#shl').onclick=e=>{const d=e.target.closest('[data-sd]');if(d&&confirm('Törlöd a fájlt?'))adm('/api/admin/shared-delete',{id:+d.dataset.sd})};
+  $('#modal').onclick=e=>{if(e.target.id==='modal'||e.target.closest('[data-x]'))$('#modal').style.display='none'};
   $('#audd').ontoggle=()=>{if($('#audd').open)loadAudit()};
   loadAdmin();
 }
-let lastOpen=-1;
+const STUCK_MS=20*60000;
+const fmtMs=ms=>{const m=Math.round(ms/60000);return m<1?Math.round(ms/1000)+' mp':m+' perc'};
+let lastSig=-1;
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.setValueAtTime(.2,c.currentTime);o.start();o.stop(c.currentTime+.3)}catch(e){}}
 function drawHelp(){
   const H=ADM.d.help.filter(h=>!h.handled_at).reverse(),el=$('#hlp');
-  if(lastOpen>=0&&H.length>lastOpen) beep(); lastOpen=H.length;
+  const sig=H.length*1000+H.reduce((s,h)=>s+h.msgs.filter(m=>m.from==='student').length,0);
+  if(lastSig>=0&&sig>lastSig) beep(); lastSig=sig;
   if(!H.length){el.innerHTML='';return}
-  el.innerHTML=`<div class="card helpcard"><h2>🆘 Segítségkérések (${H.length})</h2>`+H.map(h=>{const u=ADM.map[h.user_id]||{};
-    return `<div class="hreq"><div><b>${esc(u.name||u.username||'?')}</b> – ${h.task}. feladat: ${esc(ADM.d.taskTitles[h.task-1]||'')}<div class="pts">${dt(h.created_at)}</div></div><div class="btns"><button class="sm" data-hr="${h.id}">💬 Válasz</button><button class="sm" data-hd="${h.id}">✔ Kész</button></div></div>`}).join('')+'</div>';
+  let wrap=el.querySelector('.helpcard');
+  if(!wrap){el.innerHTML='<div class="card helpcard"><h2></h2><div class="threads"></div></div>';wrap=el.firstChild}
+  wrap.querySelector('h2').textContent=`🆘 Nyitott segítség-chatek (${H.length})`;
+  const box=wrap.querySelector('.threads'),ids=H.map(h=>String(h.id));
+  [...box.children].forEach(c=>{if(!ids.includes(c.dataset.id))c.remove()});
+  H.forEach(h=>{
+    let t=box.querySelector(`.hthread[data-id="${h.id}"]`);
+    if(!t){const u=ADM.map[h.user_id]||{};t=document.createElement('div');t.className='hthread';t.dataset.id=h.id;
+      t.innerHTML=`<div class="hth"><div><b>${esc(u.name||u.username||'?')}</b> – ${h.task}. feladat: ${esc(ADM.d.taskTitles[h.task-1]||'')}<div class="pts">Kérés: ${dt(h.created_at)}</div></div><button class="sm red" data-hd="${h.id}">✔ Lezárás</button></div><div class="msgs"></div><div class="ans"><input type="text" class="cin" data-id="${h.id}" maxlength="500" placeholder="Válasz a diáknak…"><button class="sm" data-hs="${h.id}">Küldés</button></div>`;
+      box.appendChild(t)}
+    const m=t.querySelector('.msgs');
+    if(m.dataset.n!==String(h.msgs.length)){
+      m.innerHTML=h.msgs.length?h.msgs.map(x=>`<div class="m ${x.from==='teacher'?'me':'oth'}"><span>${esc(x.text).replace(/\n/g,'<br>')}</span><small>${new Date(x.at).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'})}</small></div>`).join(''):'<div class="pts">A diák még nem írt üzenetet.</div>';
+      m.dataset.n=h.msgs.length; m.scrollTop=m.scrollHeight;
+    }
+  });
+}
+async function sendTeacherMsg(id){
+  const i=document.querySelector(`.cin[data-id="${id}"]`),tx=i.value.trim(); if(!tx) return; i.value='';
+  try{await api('/api/admin/help-message',{id,text:tx});await loadAdmin()}catch(e){alert(e.message);i.value=tx}
+}
+function drawShared(){
+  const el=$('#shl'),sel=$('#sht'); if(!el) return;
+  if(sel&&sel.options.length<2) sel.innerHTML='<option value="">Minden diáknak (indítás után azonnal)</option>'+ADM.d.taskTitles.map((t,i)=>`<option value="${i+1}">${i+1}. feladat feloldásakor – ${esc(t)}</option>`).join('');
+  el.innerHTML=ADM.d.shared.length?ADM.d.shared.map(f=>`<div class="hreq"><div>📦 <a href="/api/shared/${f.id}">${esc(f.filename)}</a> <span class="pts">${mb(f.size)} · ${f.task?f.task+'. feladattól':'mindenkinek'} · ${dt(f.uploaded_at)}</span></div><button class="sm red" data-sd="${f.id}">🗑</button></div>`).join(''):'<p class="pts">Még nincs feltöltött fájl.</p>';
+}
+function uploadShared(){
+  const f=$('#shf').files[0],m=$('#shm'); if(!f){m.className='msg';m.textContent='Válassz fájlt.';return}
+  const fd=new FormData(); fd.append('task',$('#sht').value); fd.append('file',f);
+  const r=new XMLHttpRequest(); r.open('POST','/api/admin/shared'); m.className='msg'; m.textContent='Feltöltés…';
+  r.onload=()=>{let j={};try{j=JSON.parse(r.responseText)}catch(e){} if(r.status===200){m.className='msg ok';m.textContent='✅ Feltöltve';$('#shf').value='';loadAdmin()}else m.textContent=j.error||('Hiba ('+r.status+')')};
+  r.onerror=()=>{m.textContent='Hálózati hiba'}; r.send(fd);
+}
+function awayTimeline(u,log,n){
+  const total=Math.max(1,(u.end||n)-u.start);
+  const segs=log.map(a=>`<div class="seg" style="left:${(a.start_at-u.start)/total*100}%;width:${Math.max(.3,a.dur/total*100)}%" title="${dt(a.start_at)} · ${fmtMs(a.dur)}"></div>`).join('');
+  const longest=log.reduce((m,a)=>Math.max(m,a.dur),0);
+  return `<div class="tl"><div class="tlbar">${segs}</div></div><p class="pts">Zöld: a feladatlapon aktív. Piros: a lap elhagyva (másik fül, Packet Tracer vagy más ablak – a böngésző ennél pontosabbat biztonsági okból nem ad ki). Leghosszabb kiesés: ${longest?fmtMs(longest):'–'} · váltások: ${log.length}</p>`;
+}
+async function openDetail(id){
+  const u=ADM.map[id],n=admNow(); let shots=[],away=[],adj=[]; try{shots=await api('/api/admin/shots/'+id)}catch(e){}
+  try{away=await api('/api/admin/away/'+id)}catch(e){}
+  adj=ADM.d.adjustments.filter(a=>a.user_id===id);
+  const pr=ADM.d.progress.filter(p=>p.user_id===id).sort((a,b)=>a.at-b.at); let rows='';
+  pr.forEach((p,i)=>{if(p.solved<1)return;const nx=pr[i+1],dur=(nx?nx.at:(u.end||n))-p.at;rows+=`<tr><td>${p.solved}. feladat</td><td>${esc(ADM.d.taskTitles[p.solved-1]||'')}</td><td>${dt(p.at)}</td><td>${fmt(dur)}${nx?'':' (folyamatban)'}</td></tr>`});
+  $('#modal').innerHTML=`<div class="mbox"><button class="sm red" data-x style="float:right">✕</button><h2>${esc(u.name||u.username)}</h2>
+   <p class="pts">💤 Háttérben: ${u.away_count||0}× (${fmtMs(u.away_ms||0)}) · ❌ hibás válasz: ${u.wrong||0} · 🖥 ${u.share_on?'megosztja a képernyőt':'nem oszt meg képernyőt'}${u.score_adj?` · pontmódosítás: ${u.score_adj>0?'+':''}${u.score_adj}`:''}</p>
+   <h3>🕒 Aktivitás-idővonal</h3>${u.start?awayTimeline(u,away,n):'<p class="pts">Még nem indította el.</p>'}
+   <div class="ans"><button class="sm" id="dpts">⚖️ Pont módosítása</button></div>
+   ${adj.length?`<h3>⚖️ Pontmódosítások</h3>${adj.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}`:''}
+   <h3>⏱ Feladatonkénti idő</h3>${rows?`<div class="tw"><table><tr><th>Feladat</th><th>Cím</th><th>Feloldva</th><th>Ezzel töltött idő</th></tr>${rows}</table></div>`:'<p class="pts">Még nincs adat.</p>'}
+   <h3>🖥 Képernyőképek</h3><button class="sm" id="shreq">📸 Kép kérése most</button>
+   <div class="shots">${shots.map(x=>`<a href="/api/shot-img/${x.id}" target="_blank"><img class="thumb" src="/api/shot-img/${x.id}" title="${dt(x.at)}"></a>`).join('')||'<p class="pts">Nincs kép (a diák még nem osztotta meg a képernyőjét).</p>'}</div></div>`;
+  $('#modal').style.display='flex';
+  $('#dpts').onclick=()=>{
+    const d=prompt('Pontváltozás (pl. -10 vagy 5):'); if(d===null||!d.trim())return;
+    const n=parseInt(d,10); if(!n){alert('Adj meg egy nullától eltérő egész számot.');return}
+    const r=prompt('Indoklás (a diák is látni fogja):')||''; adm('/api/admin/points',{id,delta:n,reason:r}).then(()=>openDetail(id));
+  };
+  $('#shreq').onclick=async()=>{await api('/api/admin/shot-request',{id});$('#shreq').textContent='✔ Kérés elküldve (a diák következő szinkronjánál érkezik meg)'};
 }
 async function loadAudit(){
   try{const r=await api('/api/admin/audit');$('#aud').innerHTML='<table><tr><th>Idő</th><th>Felhasználó</th><th>Esemény</th><th>Részlet</th><th>IP</th></tr>'+r.map(x=>`<tr class="${/fail|denied|blocked/.test(x.action)?'bad':''}"><td>${dt(x.at)}</td><td>${esc(x.user)}</td><td>${esc(x.action)}</td><td>${esc(x.detail)}</td><td>${esc(x.ip)}</td></tr>`).join('')+'</table>'}catch(e){$('#aud').textContent=e.message}
@@ -389,7 +554,7 @@ async function loadAdmin(){
     ADM={d,at:Date.now(),map:Object.fromEntries(d.users.map(u=>[u.id,u]))};
     if(!$('#grid')) return;
     if(document.activeElement&&document.activeElement.matches('select.jump')) return;
-    drawTiles(); drawGrid(); drawHelp();
+    drawTiles(); drawGrid(); drawHelp(); drawShared();
     if($('#audd')&&$('#audd').open) loadAudit();
   }catch(e){const g=$('#grid');if(g)g.textContent=e.message}
 }
@@ -412,18 +577,19 @@ function ucard(u,n,T,rank){
   const fl=u.files.slice(0,3).map(f=>`<a href="/api/files/${f.id}" title="${dt(f.uploaded_at)} · ${mb(f.size)}">📦 ${esc(f.filename)}</a>`).join('')+(u.files.length>3?`<span class="pts"> +${u.files.length-3} további</span>`:'');
   const b=(a,l,c)=>`<button class="sm ${c||''}" data-a="${a}" data-id="${u.id}">${l}</button>`;
   const hs=ADM.d.help.filter(h=>h.user_id===u.id),ho=hs.filter(h=>!h.handled_at);
+  const sharing=u.share_on&&u.shot_at&&n-u.shot_at<120000,cur=u.since?n-u.since:0,stuck=s==='run'&&cur>STUCK_MS;
   const prog=s==='idle'?'Még nem kezdte el':`Feladat: ${s==='done'?T:Math.min(u.solved+1,T)} / ${T} · ${u.solved} megoldva`;
-  return `<div class="ucard ${s}${ho.length?' hopen':''}"><div class="uh"><div><b>${medal}${esc(u.name||u.username)}</b><div class="pts">${esc(u.username)}</div></div><span class="badge ${s}">${ST_LABEL[s]}</span></div>
+  return `<div class="ucard ${s}${ho.length?' hopen':''}${stuck?' stuck':''}"><div class="uh"><div><b>${medal}${esc(u.name||u.username)}</b><div class="pts">${esc(u.username)}</div></div><span class="badge ${s}">${ST_LABEL[s]}</span></div>
   <div class="cd${s==='run'&&rem<600000?' low':''}" data-id="${u.id}">${fmt(rem)}</div>
-  <div class="dots">${dots}</div>
-  <div class="pts">${prog} · ❌ ${u.wrong||0} hibás válasz${hs.length?` · 🆘 ${hs.length} kérés (−${hs.length*ADM.d.helpCost} pont)`:''}<br>${on?'<span class="ok">● online</span>':'○ '+(u.last_seen?'utoljára: '+dt(u.last_seen):'még nem lépett be')}</div>
+  ${u.shot_id?`<img class="thumb" src="/api/shot-img/${u.shot_id}" data-a="detail" data-id="${u.id}" title="${dt(u.shot_at)}">`:''}<div class="dots">${dots}</div>
+  <div class="pts">${prog} · ❌ ${u.wrong||0} hibás válasz${hs.length?` · 🆘 ${hs.length} kérés (−${hs.length*ADM.d.helpCost} pont)`:''}${u.score_adj?` · ${u.score_adj>0?'🎁 +':'⚠️ '}${u.score_adj} pont`:''}${u.away_count?` · 💤 háttérben ${u.away_count}× (${fmtMs(u.away_ms)})`:''}<br>${sharing?'🖥 megosztja · ':'🖥 nem oszt meg · '}${stuck?`<span class="bad2">⚠ ${fmt(cur)} perce ezen a feladaton</span> · `:''}${on?'<span class="ok">● online</span>':'○ '+(u.last_seen?'utoljára: '+dt(u.last_seen):'még nem lépett be')}</div>
   <div class="files">${fl||'<span class="pts">Nincs feltöltött fájl</span>'}</div>
-  ${ho.length?`<div class="pts bad">🆘 Kér segítséget: ${ho.map(h=>h.task+'. feladat').join(', ')}</div>`:''}${u.note?`<div class="pts">📌 ${esc(u.note)}</div>`:''}<div class="btns"><select class="jump" data-id="${u.id}"><option value="">↪ Ugrás…</option>${Array.from({length:T+1},(_,k)=>`<option value="${k}">${k===0?'Újrakezdés (0)':k+'. feladat'+(k===T?' (vége)':'')}</option>`).join('')}</select>${b('t5','+5 p')}${b('t15','+15 p')}${b('tm5','−5 p')}${b('back','◀')}${b('skip','▶')}${b('note','📝')}${b('pw','🔑')}${b('reset','Reset','red')}${b('del','🗑','red')}</div></div>`;
+  ${ho.length?`<div class="pts bad">🆘 Kér segítséget: ${ho.map(h=>h.task+'. feladat').join(', ')}</div>`:''}${u.note?`<div class="pts">📌 ${esc(u.note)}</div>`:''}<div class="btns"><select class="jump" data-id="${u.id}"><option value="">↪ Ugrás…</option>${Array.from({length:T+1},(_,k)=>`<option value="${k}">${k===0?'Újrakezdés (0)':k+'. feladat'+(k===T?' (vége)':'')}</option>`).join('')}</select>${b('t5','+5 p')}${b('t15','+15 p')}${b('tm5','−5 p')}${b('back','◀')}${b('skip','▶')}${b('note','📝')}${b('detail','🔎')}${b('shot','📸')}${b('pts','⚖️')}${b('pw','🔑')}${b('reset','Reset','red')}${b('del','🗑','red')}</div></div>`;
 }
 function csvExport(){
   const n=admNow();
-  const rows=[['Felhasználó','Név','Megoldott','Státusz','Kezdés','Befejezés','Maradék idő','Hibás válaszok','Segítségkérések','Levont pont','Fájlok']];
-  ADM.d.users.forEach(u=>rows.push([u.username,u.name||'',u.solved+'/'+ADM.d.total,ST_LABEL[stOf(u,n)].replace(/^\S+\s/,''),dt(u.start),dt(u.end),u.start?fmt(remOf(u,n)):'',u.wrong||0,ADM.d.help.filter(h=>h.user_id===u.id).length,ADM.d.help.filter(h=>h.user_id===u.id).length*ADM.d.helpCost,u.files.map(f=>f.filename).join(' | ')]));
+  const rows=[['Felhasználó','Név','Megoldott','Státusz','Kezdés','Befejezés','Maradék idő','Hibás válaszok','Segítségkérések','Segítség miatt levont pont','Tanári pontmódosítás','Fájlok']];
+  ADM.d.users.forEach(u=>rows.push([u.username,u.name||'',u.solved+'/'+ADM.d.total,ST_LABEL[stOf(u,n)].replace(/^\S+\s/,''),dt(u.start),dt(u.end),u.start?fmt(remOf(u,n)):'',u.wrong||0,ADM.d.help.filter(h=>h.user_id===u.id).length,ADM.d.help.filter(h=>h.user_id===u.id).length*ADM.d.helpCost,u.score_adj||0,u.files.map(f=>f.filename).join(' | ')]));
   const t='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='eredmenyek.csv';a.click();
 }
@@ -431,8 +597,23 @@ setInterval(()=>{
   if(!ADM||!$('#grid')) return;
   const n=admNow();
   document.querySelectorAll('.cd[data-id]').forEach(el=>{const u=ADM.map[el.dataset.id];if(!u)return;const r=remOf(u,n);el.textContent=fmt(r);el.classList.toggle('low',stOf(u,n)==='run'&&r<600000)});
-  if(AF.auto&&++admN%5===0) loadAdmin();
+  if(AF.auto&&++admN%3===0) loadAdmin();
 },1000);
+
+/* ===== Hangulat: villanások, suttogások, szemek ===== */
+const WH=['Nézz hátra…','Nem vagy egyedül.','Figyel téged.','Már közel van…','Ne nézz a sarokba.','Hallod a lélegzetét?','Az idő fogy…','Miért nem fordulsz meg?'];
+function spook(){
+  if(ST&&ST.user.role==='teacher'){setTimeout(spook,60000);return}
+  if($('#scare').style.display!=='flex'){
+    const f=$('#flash'),w=$('#whisper');
+    document.body.classList.add('shake');f.classList.add('on');setTimeout(()=>{f.classList.remove('on');document.body.classList.remove('shake')},350);
+    w.textContent=WH[Math.floor(Math.random()*WH.length)];w.style.left=(8+Math.random()*65)+'%';w.style.top=(15+Math.random()*65)+'%';
+    w.classList.add('on');setTimeout(()=>w.classList.remove('on'),2800);
+  }
+  setTimeout(spook,45000+Math.random()*75000);
+}
+setTimeout(spook,25000);
+(function(){const e=$('#eyes');for(let i=0;i<5;i++){const d=document.createElement('i');d.textContent='👁';d.style.cssText=`left:${Math.random()<.5?Math.random()*10:90+Math.random()*8}%;top:${10+Math.random()*80}%;animation-delay:${Math.random()*20}s;animation-duration:${16+Math.random()*16}s`;e.appendChild(d)}})();
 
 function ref(){return `
 <details open><summary>🗺️ Térkép</summary><div class="tw">${mapSvg()}</div></details>
