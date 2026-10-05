@@ -132,6 +132,10 @@ body.shake{animation:shake .35s}
 .adjrow{padding:4px 0;border-top:1px solid #4d141b}
 .tl{margin:8px 0}.tlbar{position:relative;height:22px;background:#0d3a1a;border-radius:6px;overflow:hidden;border:1px solid #1d5a2e}
 .seg{position:absolute;top:0;bottom:0;background:#7a0f0a;border-radius:2px}
+.bonuscard{border:2px solid #d1202a}
+.bq{border-top:1px solid #4d141b;padding:10px 0}.bq.solved{color:var(--ok)}
+.bq textarea,#essaytxt{width:100%;min-height:110px;background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px;font-family:inherit;margin-top:6px}
+.essaywait{align-items:flex-start}
 </style>
 </head>
 <body>
@@ -156,16 +160,26 @@ const mb=b=>(b/1048576).toFixed(2)+' MB';
 const vid=$('#vid'); vid.src=VIDEOS[0];
 
 /* ===== Videó ===== */
-let vi=0;
-function srcErr(){
-  if(vi<VIDEOS.length-1){vi++;vid.src=VIDEOS[vi];vid.load();const p=vid.play();if(p&&p.catch)p.catch(()=>{});return}
-  diag();
+// több fájl, véletlenszerű sorrendben, HEAD-próbával az útvonalhoz
+const PREFIXES=['/public/media/','/media/','media/','/frontend/public/media/'];
+const SCARE_FILES=['scare.mp4','scare2.mp4','scare3.mp4','scare4.mp4'];   // ha csak az első létezik, a többi csendben kimarad
+let resolved={}, lastFile=null;
+async function resolveFile(f){
+  if(resolved[f]!==undefined) return resolved[f];
+  for(const p of PREFIXES){ try{ const r=await fetch(p+f,{method:'HEAD'}); if(r.ok){resolved[f]=p+f; return resolved[f];} }catch(e){} }
+  resolved[f]=null; return null;
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+async function pickVideo(){
+  const rest=SCARE_FILES.filter(f=>f!==lastFile);
+  for(const f of shuffle(rest.length?rest:SCARE_FILES)){const u=await resolveFile(f); if(u){lastFile=f; return u;}}
+  return null;
 }
 async function diag(done){
-  failShow('Vizsgálom a videó elérését…',done);
+  failShow('Vizsgálom a videók elérését…',done);
   let r='';
-  for(const u of VIDEOS){try{const x=await fetch(u,{method:'HEAD'});r+='<tr><td><code>'+u+'</code></td><td>'+x.status+'</td><td>'+(x.headers.get('content-type')||'?')+'</td><td>'+(x.headers.get('content-length')||'?')+'</td></tr>'}catch(e){r+='<tr><td><code>'+u+'</code></td><td colspan=3>hiba</td></tr>'}}
-  failShow('<b>A videó nem játszható le.</b><table style="margin:10px auto;font-size:.8rem"><tr><th>Útvonal</th><th>Státusz</th><th>Típus</th><th>Méret</th></tr>'+r+'</table><div style="font-size:.85rem;text-align:left">• <b>Típus text/html</b> vagy <b>404</b>: rossz az útvonal (a szerver az index.html-t adja vissza).<br>• <b>Típus video/mp4</b>, de mégsem játszik: nem H.264/AAC a kódolás, vagy sérült a fájl.</div>',done);
+  for(const f of SCARE_FILES) for(const p of PREFIXES){const u=p+f; try{const x=await fetch(u,{method:'HEAD'});r+='<tr><td><code>'+u+'</code></td><td>'+x.status+'</td><td>'+(x.headers.get('content-type')||'?')+'</td></tr>'}catch(e){r+='<tr><td><code>'+u+'</code></td><td colspan=2>hiba</td></tr>'}}
+  failShow('<b>Egyetlen videó sem játszható le.</b><div class="tw"><table style="margin:10px auto;font-size:.75rem"><tr><th>Útvonal</th><th>Státusz</th><th>Típus</th></tr>'+r+'</table></div><div style="font-size:.85rem;text-align:left">• <b>404</b> vagy <b>text/html</b>: nincs ott a fájl.<br>• <b>video/mp4</b>, mégsem játszik: nem H.264/AAC a kódolás.</div>',done);
 }
 function failShow(msg,done){
   const e=$('#verr'); e.innerHTML=msg+'<br><button id="vclose">Bezár</button>'; e.style.display='block';
@@ -175,14 +189,17 @@ function unmuteLater(){
   setTimeout(()=>{
     vid.muted=false; let v=0;
     const iv=setInterval(()=>{v=Math.min(1,v+0.15);vid.volume=v;if(v>=1)clearInterval(iv)},50);
-    setTimeout(()=>{if(vid.paused&&!vid.ended){vid.muted=true;vid.play().catch(()=>{})}},400); // ha a böngésző megállítaná, némán megy tovább
+    setTimeout(()=>{if(vid.paused&&!vid.ended){vid.muted=true;vid.play().catch(()=>{})}},400);
   },SOUND_DELAY_MS);
 }
-function playScare(final,done){
-  const box=$('#scare'); $('#verr').style.display='none'; box.style.display='flex';
+async function playScare(final,done){
+  const box=$('#scare'); $('#verr').style.display='none';
+  const src=await pickVideo();
+  if(!src){ diag(()=>{if(final)showEnd();else if(done)done()}); return; }
+  box.style.display='flex'; vid.src=src; vid.load();
   try{vid.currentTime=0}catch(e){}
   const finish=()=>{box.style.display='none'; vid.onended=null; if(final) showEnd(); else if(done) done();};
-  vid.onended=finish; vid.onerror=srcErr; vid.muted=true; vid.volume=0;
+  vid.onended=finish; vid.onerror=()=>diag(()=>{if(final)showEnd();else if(done)done()}); vid.muted=true; vid.volume=0;
   vid.removeEventListener('playing',unmuteLater); vid.addEventListener('playing',unmuteLater,{once:true});
   const p=vid.play();
   if(p&&p.catch) p.catch(e=>{
@@ -191,8 +208,28 @@ function playScare(final,done){
     else if(e&&e.name!=='AbortError') failShow('Lejátszási hiba: '+(e.message||e.name),()=>{if(final)showEnd();else if(done)done()});
   });
 }
-function showEnd(){$('#end').style.display='flex'}
-$('#replay').onclick=()=>{$('#end').style.display='none';playScare(true)};
+
+/* ===== Halk, szintetizált háttérhangok (nincs külön hangfájl) ===== */
+let SFX_ON=true; try{SFX_ON=localStorage.getItem('hw_sfx')!=='0'}catch(e){}
+let actx=null; const getActx=()=>actx||(actx=new (window.AudioContext||window.webkitAudioContext)());
+function creak(){
+  if(!SFX_ON) return; try{
+  const c=getActx(),o=c.createOscillator(),g=c.createGain();o.type='sawtooth';
+  o.frequency.setValueAtTime(90+Math.random()*40,c.currentTime);o.frequency.linearRampToValueAtTime(40,c.currentTime+1.6);
+  g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(.05,c.currentTime+.3);g.gain.linearRampToValueAtTime(0,c.currentTime+1.6);
+  o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+1.7)}catch(e){}
+}
+function distantWhisper(){
+  if(!SFX_ON) return; try{
+  const c=getActx(),buf=c.createBuffer(1,c.sampleRate*0.8,c.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+  const src=c.createBufferSource();src.buffer=buf;
+  const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=600+Math.random()*400;f.Q.value=1.2;
+  const g=c.createGain();g.gain.setValueAtTime(.04,c.currentTime);g.gain.linearRampToValueAtTime(0,c.currentTime+.8);
+  src.connect(f);f.connect(g);g.connect(c.destination);src.start()}catch(e){}
+}
+function ambientLoop(){ if(Math.random()<0.5) creak(); else distantWhisper(); setTimeout(ambientLoop,40000+Math.random()*60000); }
+setTimeout(ambientLoop,20000);
 
 
 /* ===== Térkép (SVG) ===== */
@@ -264,8 +301,9 @@ const hero=inner=>`<div class="hero"><span class="bat" style="top:30px">🦇</sp
 <div><span class="pump">🎃</span> <span class="pump" style="animation-delay:-1s">👻</span> <span class="pump" style="animation-delay:-2s">🎃</span></div>${inner}</div>`;
 function setBar(timer){
   const b=$('#bar'); b.style.display='flex';
-  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who">${timer&&shareStream?'<span class="rec">🔴 képernyőmegosztás</span>':''}<span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total)+(ST.help&&ST.help.length?' · 🆘 '+ST.help.length+' (−'+ST.help.length*ST.helpCost+' pont)':''):''}</span><button class="sm" id="out">Kilépés</button></div>`;
+  b.innerHTML=`<div>${timer?'⏳ <span id="timer">--:--:--</span>':'🎃 Tanári felület'}</div><div id="who">${timer?`<label class="sfx"><input type="checkbox" id="sfxcb" ${SFX_ON?'checked':''}> 🔈</label>`:''}${timer&&shareStream?'<span class="rec">🔴 képernyőmegosztás</span>':''}<span>${esc(ST.user.name||ST.user.username)}${timer?' · '+(ST.end?'✅ Kész':'Feladat: '+Math.min(ST.solved+1,ST.total)+' / '+ST.total)+(ST.help&&ST.help.length?' · 🆘 '+ST.help.length+' (−'+ST.help.length*ST.helpCost+' pont)':''):''}</span><button class="sm" id="out">Kilépés</button></div>`;
   $('#out').onclick=async()=>{try{await api('/api/logout',{})}catch(e){} ST=null;refHtml=null;$('#end').style.display='none';render()};
+  const sc=$('#sfxcb'); if(sc) sc.onchange=()=>{SFX_ON=sc.checked;try{localStorage.setItem('hw_sfx',SFX_ON?'1':'0')}catch(e){}};
 }
 function render(){
   $('#app').classList.toggle('wide',!!ST&&ST.user.role==='teacher');
@@ -289,6 +327,25 @@ function viewIntro(){
   $('#go').onclick=async()=>{ST=await api('/api/start',{});apply();vid.load()};
 }
 const bub=(m,me)=>m.map(x=>`<div class="m ${x.from===me?'me':'oth'}"><span>${esc(x.text).replace(/\n/g,'<br>')}</span><small>${new Date(x.at).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'})}</small></div>`).join('');
+function bonusCard(){
+  if((!ST.bonusMath||!ST.bonusMath.length)&&!ST.bonusEssay) return '';
+  let h='<div class="card bonuscard"><h2>🎓 Bónuszkör (opcionális, extra pont)</h2><p class="pts">Ezek nem kötelezők, a hálózatos feladatokhoz nem kapcsolódnak. Bármikor megoldhatod, amíg tart a verseny.</p>';
+  if(ST.bonusMath&&ST.bonusMath.length){
+    h+='<h3>📐 Matematika</h3>';
+    ST.bonusMath.forEach(q=>{
+      h+=q.solved
+        ?`<div class="bq solved">✅ <b>(${q.pts} pont)</b> ${esc(q.q)}</div>`
+        :`<div class="bq"><b>(${q.pts} pont)</b> ${esc(q.q)}<div class="ans"><input type="text" class="bmin" data-qid="${q.id}" placeholder="Válasz"><button class="sm bmbtn" data-qid="${q.id}">Beküldés</button></div><div class="msg bmmsg" data-qid="${q.id}"></div></div>`;
+    });
+  }
+  if(ST.bonusEssay){
+    const e=ST.bonusEssay, m=e.mine;
+    h+='<h3>📖 Irodalom – Thomas Mann (max '+e.maxPts+' pont, a tanár értékeli)</h3><p>'+esc(e.q)+'</p>';
+    if(m&&m.graded_at) h+=`<div class="bq solved">✅ Értékelve: <b>${m.score}/${e.maxPts} pont</b>${m.feedback?' – '+esc(m.feedback):''}<details><summary>A beküldött szöveged</summary><p>${esc(m.text).replace(/\n/g,'<br>')}</p></details></div>`;
+    else h+=`<textarea id="essaytxt" placeholder="Írd ide a válaszodat…">${m?esc(m.text):''}</textarea><div class="ans"><button class="sm" id="essaysend">${m?'Frissítés':'Beküldés'}</button></div><div class="msg" id="essaymsg">${m?'Beküldve: '+dt(m.submitted_at)+' · még nincs értékelve':''}</div>`;
+  }
+  return h+'</div>';
+}
 function helpBlock(n){
   const hs=(ST.help||[]).filter(x=>x.task===n), open=hs.find(x=>!x.handled_at);
   let h='<div class="help">';
@@ -360,6 +417,7 @@ function viewStudent(){
       <div class="ans"><input type="text" id="ain" autocomplete="off" placeholder="A válaszod"><button id="abtn">Feloldás</button></div><div class="msg" id="amsg"></div></div>`;
     } else h+=`<div class="card locked"><h2>🔒 ${last?'Végső ellenőrzés':(i+1)+'. feladat'}</h2><div class="pts">Előbb oldd meg az előző rejtvényt</div></div>`;
   }
+  h+=bonusCard();
   if(ST.solved>=ST.total&&!ST.end) h+=`<div style="text-align:center"><button class="big" id="fin">✅ Befejeztük</button></div>`;
   if(ST.end) h+=`<div class="card"><h2 class="ok">Kész! Maradék idő: ${fmt(remaining())}</h2></div>`;
   const keep={};document.querySelectorAll('.cin').forEach(i=>{keep[i.dataset.req]=i.value});
@@ -371,6 +429,15 @@ function viewStudent(){
   const b=$('#abtn'); if(b){b.onclick=check;$('#ain').onkeydown=e=>{if(e.key==='Enter')check()}}
   const f=$('#fin'); if(f) f.onclick=async()=>{ST=await api('/api/finish',{});apply()};
   setupUpload();
+  document.querySelectorAll('.bmbtn').forEach(b=>b.onclick=async()=>{
+    const qid=b.dataset.qid,i=document.querySelector(`.bmin[data-qid="${qid}"]`),m=document.querySelector(`.bmmsg[data-qid="${qid}"]`),v=i.value.trim();
+    if(!v){return} b.disabled=true;
+    try{ST=await api('/api/bonus-math',{qid,answer:v});apply()}catch(e){m.textContent=e.message;b.disabled=false}
+  });
+  const es=$('#essaysend'); if(es) es.onclick=async()=>{
+    const t2=$('#essaytxt').value.trim(); if(!t2){return} es.disabled=true;
+    try{ST=await api('/api/bonus-essay',{text:t2});apply()}catch(e){$('#essaymsg').textContent=e.message;es.disabled=false}
+  };
   document.querySelectorAll('.helpbtn').forEach(b=>b.onclick=async()=>{
     const n=+b.dataset.task;
     if(!confirm(`Biztosan segítséget kérsz a(z) ${n}. feladathoz? Ez ${ST.helpCost} pontba kerül.`)) return;
@@ -429,6 +496,7 @@ function viewTeacher(){
   <div class="card"><h3>📢 Üzenet a diákoknak</h3><div class="ans"><input type="text" id="amsgt" placeholder="pl. Még 10 perc van hátra!" style="flex:1;min-width:220px"><button class="sm" id="asend">Küldés</button><button class="sm red" id="aclr">Üzenet törlése</button></div></div>
   <div id="hlp"></div>
   <div class="grid" id="grid">Betöltés…</div>
+  <div id="bonusadm"></div>
   <div class="card"><h2>📥 Fájlok a diákoknak</h2><p class="pts">Ide töltsd fel a kiinduló Packet Tracer fájlt (.pkt, .pka, .zip). A diákok az oldalukon letölthetik, és ebben dolgoznak.</p><div class="ans"><input type="file" id="shf" accept=".pkt,.pka,.zip"><select id="sht"><option value="">Minden diáknak (indítás után azonnal)</option></select><button class="sm" id="shup">Feltöltés</button></div><div class="msg" id="shm"></div><div id="shl"></div></div>
   <div class="card"><h2>➕ Új diákok</h2><p class="pts">Soronként: <code>felhasználónév;jelszó;név</code> (a név elhagyható, a jelszó legalább 4 karakter)</p><textarea id="nu" placeholder="csapat1;Dracula123;Vámpírok&#10;csapat2;Mumus456;Mumiák"></textarea><button class="sm" id="mk" style="margin-top:8px">Létrehozás</button><div class="msg" id="mkm"></div></div>
   <details class="card" id="audd"><summary>🛡️ Biztonsági napló (belépések, feltöltések, tanári műveletek)</summary><div id="aud" class="tw">Betöltés…</div></details>`;
@@ -505,6 +573,29 @@ async function sendTeacherMsg(id){
   const i=document.querySelector(`.cin[data-id="${id}"]`),tx=i.value.trim(); if(!tx) return; i.value='';
   try{await api('/api/admin/help-message',{id,text:tx});await loadAdmin()}catch(e){alert(e.message);i.value=tx}
 }
+function drawBonus(){
+  const el=$('#bonusadm'); if(!el) return;
+  const pend=(ADM.d.bonusEssays||[]).filter(e=>e.graded_at===null||e.graded_at===undefined);
+  const done=(ADM.d.bonusEssays||[]).filter(e=>e.graded_at!==null&&e.graded_at!==undefined);
+  const mstat={}; (ADM.d.bonusMathSolved||[]).forEach(s=>{mstat[s.user_id]=(mstat[s.user_id]||0)+1});
+  const totalQ=(ADM.d.bonusMathDefs||[]).length;
+  if(!pend.length&&!done.length&&!totalQ){el.innerHTML='';return}
+  let h='<div class="card bonuscard"><h2>🎓 Bónuszkör – admin</h2>';
+  if(totalQ) h+=`<p class="pts">Matek bónusz: ${Object.keys(mstat).length} diák oldott meg legalább egyet (max ${totalQ} feladat/fő).</p>`;
+  if(pend.length){
+    h+='<h3>📖 Elbírálásra váró esszék ('+pend.length+')</h3>';
+    h+=pend.map(e=>{const u=ADM.map[e.user_id]||{};return `<div class="hreq essaywait"><div style="flex:1"><b>${esc(u.name||u.username||'?')}</b> <span class="pts">(${dt(e.submitted_at)})</span><p>${esc(e.text).replace(/\n/g,'<br>')}</p><div class="ans"><input type="text" class="escore" data-id="${e.user_id}" placeholder="Pont (0-${ADM.d.essayMaxPts})" style="width:140px"><input type="text" class="efb" data-id="${e.user_id}" placeholder="Visszajelzés (opcionális)" style="flex:1;min-width:160px"><button class="sm" data-grade="${e.user_id}">Mentés</button></div></div></div>`}).join('');
+  }
+  if(done.length){
+    h+='<details><summary>✅ Már értékelt esszék ('+done.length+')</summary>'+done.map(e=>{const u=ADM.map[e.user_id]||{};return `<div class="hreq"><div><b>${esc(u.name||u.username||'?')}</b>: ${e.score}/${ADM.d.essayMaxPts} pont${e.feedback?' – '+esc(e.feedback):''}</div></div>`}).join('')+'</details>';
+  }
+  el.innerHTML=h+'</div>';
+  el.querySelectorAll('[data-grade]').forEach(btn=>btn.onclick=()=>{
+    const id=+btn.dataset.grade,score=+document.querySelector(`.escore[data-id="${id}"]`).value,fb=document.querySelector(`.efb[data-id="${id}"]`).value;
+    if(!Number.isFinite(score)){alert('Adj meg egy pontszámot.');return}
+    adm('/api/admin/grade-essay',{id,score,feedback:fb});
+  });
+}
 function drawShared(){
   const el=$('#shl'),sel=$('#sht'); if(!el) return;
   if(sel&&sel.options.length<2) sel.innerHTML='<option value="">Minden diáknak (indítás után azonnal)</option>'+ADM.d.taskTitles.map((t,i)=>`<option value="${i+1}">${i+1}. feladat feloldásakor – ${esc(t)}</option>`).join('');
@@ -554,7 +645,7 @@ async function loadAdmin(){
     ADM={d,at:Date.now(),map:Object.fromEntries(d.users.map(u=>[u.id,u]))};
     if(!$('#grid')) return;
     if(document.activeElement&&document.activeElement.matches('select.jump')) return;
-    drawTiles(); drawGrid(); drawHelp(); drawShared();
+    drawTiles(); drawGrid(); drawHelp(); drawShared(); drawBonus();
     if($('#audd')&&$('#audd').open) loadAudit();
   }catch(e){const g=$('#grid');if(g)g.textContent=e.message}
 }

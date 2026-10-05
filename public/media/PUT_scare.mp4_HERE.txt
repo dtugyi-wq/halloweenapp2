@@ -1,1 +1,1 @@
-Ide másold a scare.mp4 fájlt (H.264/AAC).
+Ide másold a scare.mp4, scare2.mp4, scare3.mp4, scare4.mp4 fájlokat (H.264/AAC). Csak a meglévők játszódnak le, véletlenszerű sorrendben; elég akár csak a scare.mp4 is.

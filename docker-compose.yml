@@ -10,6 +10,9 @@ services:
       TEACHER_PASS: ${TEACHER_PASS:?Hozz letre egy .env fajlt TEACHER_PASS=... sorral}
       DURATION_MIN: ${DURATION_MIN:-160}
       MAX_MB: 30
+      HELP_COST: ${HELP_COST:-5}
+      STUDENT_SESSION_LIMIT: ${STUDENT_SESSION_LIMIT:-1}
+      REQUIRE_SHARE: ${REQUIRE_SHARE:-1}
       DATA_KEY: ${DATA_KEY:-}            # a feltöltött .pkt fájlok titkosításához (ne veszítsd el!)
       COOKIE_SECURE: ${COOKIE_SECURE:-}  # 1 = a belépés csak HTTPS-en működik
       # TRUST_PROXY: "1"      # akkor kapcsold be, ha HTTPS reverse proxy mögött fut

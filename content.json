@@ -163,5 +163,32 @@
    "q": "2 vámpírnak 2-2, 3 zombinak 2-2, egy pókszörnynek pedig 8 lába van. Hány lábuk van összesen?",
    "a": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a"
   }
- ]
+ ],
+ "bonusMath": [
+  {
+   "id": "bm1",
+   "pts": 10,
+   "q": "Oldd meg a valós számok halmazán: log₂(x−3) + log₂(x+3) = 4. Add meg a megoldást egész számként (csak a számot írd be).",
+   "a": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"
+  },
+  {
+   "id": "bm2",
+   "pts": 15,
+   "q": "A kriptában 13 fülke van egymás mellett, sorban. A szellemvadász véletlenszerűen, visszatevés nélkül kiválaszt közülük 4-et. Mekkora a valószínűsége, hogy a kiválasztott 4 fülke között van legalább két EGYMÁS MELLETTI (szomszédos) fülke? Add meg tizedestört alakban, két tizedesjegyre kerekítve, tizedesponttal (pl. 0.71).",
+   "a": "5afbd86adcb5b7f9e20ef868c7d3140f15df20e24e04d410188a3fc668417264"
+  },
+  {
+   "id": "bm3",
+   "pts": 20,
+   "q": "A tóban úszó liliomok száma minden éjjel megduplázódik, majd minden hajnalban a varjak megesznek belőle pontosan 7 darabot. A 0. nap kezdetén (az első duplázás előtt) 10 liliom van a tavon. Hányadik éjszaka UTÁN lesz ELŐSZÖR 500-nál több liliom a tavon? Add meg egész számként (csak az éjszaka sorszámát írd be).",
+   "a": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
+  },
+  {
+   "id": "bm4",
+   "pts": 25,
+   "q": "Az elátkozott kertben három fáklya szabályos (egyenlő oldalú) háromszöget alkot, oldaluk pontosan 4 méter. Mekkora sugarú az a kör, amely mindhárom fáklyán átmegy (a háromszög körülírt köre)? Add meg méterben, két tizedesjegyre kerekítve, tizedesponttal (pl. 2.31).",
+   "a": "138d9e809e386a7b800791d1f664f56d1c55f3d1ba411b950862729bc486c5ce"
+  }
+ ],
+ "bonusEssay": null
 }

@@ -13,7 +13,8 @@ const GRACE = 5 * 60000;                                   // feltöltés még e
 const MAX_MB = +process.env.MAX_MB || 30;                  // max .pkt méret
 const MAX_FILES = 20;                                      // max fájl / felhasználó (a régebbiek törlődnek)
 const SESSION_MS = 12 * 3600000;
-const REQUIRE_SHARE = !!process.env.REQUIRE_SHARE;   // 1: a diák csak képernyőmegosztással látja a feladatokat
+const STUDENT_SESSION_LIMIT = Math.max(1, +process.env.STUDENT_SESSION_LIMIT || 1);   // hány eszközről lehet egyszerre bejelentkezve egy diák
+const REQUIRE_SHARE = process.env.REQUIRE_SHARE === '0' ? false : true;   // alapértelmezetten kötelező; REQUIRE_SHARE=0 kikapcsolja
 const HELP_COST = +process.env.HELP_COST || 5;      // egy segítségkérés ára (pont)
 const HELP_COOLDOWN = 20000;                        // két kérés között min. ennyi ms
 // Biztonság
@@ -45,10 +46,12 @@ CREATE TABLE IF NOT EXISTS away_log(id INTEGER PRIMARY KEY, user_id INTEGER NOT 
 CREATE INDEX IF NOT EXISTS idx_away_user ON away_log(user_id);
 CREATE TABLE IF NOT EXISTS point_adj(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, delta INTEGER NOT NULL, reason TEXT, at INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_padj_user ON point_adj(user_id);
+CREATE TABLE IF NOT EXISTS bonus_math(user_id INTEGER NOT NULL, qid TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(user_id,qid));
+CREATE TABLE IF NOT EXISTS bonus_essay(user_id INTEGER PRIMARY KEY, text TEXT NOT NULL, submitted_at INTEGER NOT NULL, score INTEGER, feedback TEXT, graded_at INTEGER);
 CREATE TABLE IF NOT EXISTS shots(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, at INTEGER NOT NULL, data BLOB NOT NULL, enc INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS idx_shots_user ON shots(user_id);
 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, at INTEGER, user TEXT, action TEXT, detail TEXT, ip TEXT);`);
-for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
+for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN hash TEXT', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
   try { db.exec(sql); } catch (e) { /* már létezik */ }
 }
 
@@ -64,7 +67,14 @@ function addUser(username, password, name, role = 'student') {
 }
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
 const total = content.tasks.length;
+const BONUS_MATH = content.bonusMath || [];
+const BONUS_ESSAY = content.bonusEssay || null;
 const sha = x => crypto.createHash('sha256').update(x).digest('hex');
+const pktHeuristic = size => size < 2000 ? { label: 'Gyanúsan kicsi (lehet, hogy üres vagy az alap fájl)', cls: 'warn' }
+  : size < 20000 ? { label: 'Kicsi fájl – egyszerű topológia is lehet', cls: '' }
+  : size < 300000 ? { label: 'Közepes méret – valószínűleg tartalmaz munkát', cls: 'ok' }
+  : { label: 'Nagy fájl – komplex topológiának tűnik', cls: 'ok' };
+// FONTOS: a .pkt Packet Tracer saját, tömörített bináris formátuma, nem olvasható szövegként, ezért itt csak méret és egyezés (hash) alapú, tájékoztató jellegű becslés készül – ez nem helyettesíti a tanári ellenőrzést.
 const clientIp = req => String(req.ip || '').replace('::ffff:', '');
 const audit = (user, action, detail = '', ip = '') => {
   try {
@@ -72,7 +82,9 @@ const audit = (user, action, detail = '', ip = '') => {
     if (Math.random() < 0.02) db.prepare('DELETE FROM audit WHERE id < (SELECT MAX(id)-2000 FROM audit)').run();
   } catch (e) {}
 };
-const wipeActivity = id => {   // egy diák tevékenységi adatainak törlése (reset / törlés)
+const wipeActivity = id => {
+  db.prepare("DELETE FROM bonus_math WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
+  db.prepare("DELETE FROM bonus_essay WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);   // egy diák tevékenységi adatainak törlése (reset / törlés)
   db.prepare("DELETE FROM help_messages WHERE request_id IN (SELECT id FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student'))").run(id);
   db.prepare("DELETE FROM help_requests WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
   db.prepare("DELETE FROM progress WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(id);
@@ -140,8 +152,12 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó' });
   }
   failMap.delete(ip); userFails.delete(un);
-  const token = crypto.randomBytes(32).toString('hex');
   db.prepare('DELETE FROM sessions WHERE expires<?').run(now);
+  if (u.role === 'student') {
+    const actives = db.prepare('SELECT token FROM sessions WHERE user_id=? AND expires>? ORDER BY expires ASC').all(u.id, now);
+    if (actives.length >= STUDENT_SESSION_LIMIT) actives.slice(0, actives.length - STUDENT_SESSION_LIMIT + 1).forEach(x => db.prepare('DELETE FROM sessions WHERE token=?').run(x.token));
+  }
+  const token = crypto.randomBytes(32).toString('hex');
   db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(token, u.id, now + SESSION_MS);
   res.setHeader('Set-Cookie', `sid=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_MS / 1000}${(COOKIE_SECURE || req.secure) ? '; Secure' : ''}`);
   audit(un, 'login', '', ip);
@@ -173,7 +189,10 @@ function stateOf(u) {
     start: u.start_at, end: u.end_at, solved: u.solved, total, expiredSeen: !!u.expired_seen,
     tasks: content.tasks.slice(0, u.solved),                       // csak a feloldott feladatok mennek ki
     puzzle: running && u.solved < total ? { q: content.puzzles[u.solved].q } : null,
-    files, announce: getAnn(), note: u.note || null,
+    files, announce: getAnn(), note: u.note || null, wrong: u.wrong_count || 0,
+    progress: db.prepare('SELECT solved,at FROM progress WHERE user_id=? ORDER BY id').all(u.id),
+    bonusMath: BONUS_MATH.map(q => ({ id: q.id, q: q.q, pts: q.pts, solved: !!db.prepare('SELECT 1 FROM bonus_math WHERE user_id=? AND qid=?').get(u.id, q.id) })),
+    bonusEssay: BONUS_ESSAY ? { q: BONUS_ESSAY.q, maxPts: BONUS_ESSAY.maxPts, mine: db.prepare('SELECT text,submitted_at,score,feedback,graded_at FROM bonus_essay WHERE user_id=?').get(u.id) || null } : null,
     help: helpOf(u.id), helpCost: HELP_COST, shotReq: !!u.shot_req, requireShare: REQUIRE_SHARE,
     shared: u.start_at ? db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files WHERE task IS NULL OR task<=? ORDER BY id DESC').all(u.solved) : [],
     scoreAdj: u.score_adj || 0, adjustments: db.prepare('SELECT delta,reason,at FROM point_adj WHERE user_id=? ORDER BY id DESC').all(u.id)
@@ -211,6 +230,29 @@ app.post('/api/help', auth, student, (req, res) => {          // segítségkér�
   if (last && last.t && Date.now() - last.t < HELP_COOLDOWN) return res.status(429).json({ error: 'Várj egy kicsit a következő kérés előtt.' });
   db.prepare('INSERT INTO help_requests(user_id,task,created_at) VALUES(?,?,?)').run(u.id, task, Date.now());
   audit(u.username, 'help', 'feladat ' + task, clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/bonus-math', auth, student, (req, res) => {
+  const u = req.u, qid = String((req.body || {}).qid || '');
+  const qdef = BONUS_MATH.find(x => x.id === qid);
+  if (!u.start_at || u.end_at || expired(u) || !qdef) return res.status(400).json({ error: 'Ez most nem elérhető.' });
+  if (db.prepare('SELECT 1 FROM bonus_math WHERE user_id=? AND qid=?').get(u.id, qid)) return res.status(409).json({ error: 'Ezt már megoldottad.' });
+  if (sha(norm(String((req.body || {}).answer || ''))) !== qdef.a) return res.status(400).json({ error: 'Nem jó a válasz.' });
+  db.prepare('INSERT INTO bonus_math(user_id,qid,at) VALUES(?,?,?)').run(u.id, qid, Date.now());
+  db.prepare('UPDATE users SET score_adj=score_adj+? WHERE id=?').run(qdef.pts, u.id);
+  db.prepare('INSERT INTO point_adj(user_id,delta,reason,at) VALUES(?,?,?,?)').run(u.id, qdef.pts, 'Bónusz matek megoldva: ' + qdef.id, Date.now());
+  audit(u.username, 'bonus-math', qdef.id, clientIp(req));
+  res.json(stateOf(fresh(u.id)));
+});
+app.post('/api/bonus-essay', auth, student, (req, res) => {
+  const u = req.u, text = String((req.body || {}).text || '').trim().slice(0, 4000);
+  if (!BONUS_ESSAY) return res.status(400).json({ error: 'Nincs ilyen feladat.' });
+  if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem küldhetsz be szöveget.' });
+  if (!text) return res.status(400).json({ error: 'Üres a beküldés.' });
+  const ex = db.prepare('SELECT graded_at FROM bonus_essay WHERE user_id=?').get(u.id);
+  if (ex && ex.graded_at) return res.status(409).json({ error: 'Ezt már kiértékelte a tanár, nem módosítható.' });
+  db.prepare('INSERT INTO bonus_essay(user_id,text,submitted_at) VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET text=excluded.text, submitted_at=excluded.submitted_at').run(u.id, text, Date.now());
+  audit(u.username, 'bonus-essay-submit', '', clientIp(req));
   res.json(stateOf(fresh(u.id)));
 });
 app.post('/api/finish', auth, student, (req, res) => {
@@ -276,11 +318,17 @@ app.get('/api/admin/overview', auth, teacher, (req, res) => {
     (SELECT at FROM shots WHERE user_id=users.id ORDER BY id DESC LIMIT 1) AS shot_at,
     (SELECT MAX(at) FROM progress WHERE user_id=users.id) AS since
     FROM users WHERE role='student' ORDER BY username`).all();
-  const files = db.prepare('SELECT id,user_id,filename,size,uploaded_at FROM files ORDER BY id DESC').all();
+  const files = db.prepare('SELECT id,user_id,filename,size,uploaded_at,hash FROM files ORDER BY id DESC').all();
+  const dupHash = {}; files.forEach(f => { if (f.hash) (dupHash[f.hash] = dupHash[f.hash] || []).push(f); });
+  const dup = {}; Object.values(dupHash).filter(g => g.length > 1).forEach(g => g.forEach(f => { dup[f.id] = g.filter(x => x.id !== f.id).map(x => ({ user_id: x.user_id, filename: x.filename })); }));
+  const usersById = Object.fromEntries(users.map(u => [u.id, u]));
   res.json({ now: Date.now(), durationMs: DUR, total, helpCost: HELP_COST, taskTitles: content.tasks.map(t => t.title),
     help: allHelp(), progress: db.prepare('SELECT user_id,solved,at FROM progress ORDER BY id').all(),
     shared: db.prepare('SELECT id,filename,size,task,uploaded_at FROM shared_files ORDER BY id DESC').all(),
-    adjustments: db.prepare('SELECT user_id,delta,reason,at FROM point_adj ORDER BY id DESC LIMIT 300').all(), users: users.map(u => ({ ...u, files: files.filter(f => f.user_id === u.id) })) });
+    bonusEssays: BONUS_ESSAY ? db.prepare('SELECT user_id,text,submitted_at,score,feedback,graded_at FROM bonus_essay ORDER BY submitted_at DESC').all() : [],
+    bonusMathSolved: db.prepare('SELECT user_id,qid,at FROM bonus_math').all(), bonusMathDefs: BONUS_MATH.map(q => ({ id: q.id, pts: q.pts })), essayMaxPts: BONUS_ESSAY ? BONUS_ESSAY.maxPts : 0,
+    adjustments: db.prepare('SELECT user_id,delta,reason,at FROM point_adj ORDER BY id DESC LIMIT 300').all(),
+    users: users.map(u => ({ ...u, files: files.filter(f => f.user_id === u.id).map(f => ({ ...f, dupWith: (dup[f.id] || null) ? dup[f.id].map(x => ({ ...x, username: usersById[x.user_id] ? usersById[x.user_id].username : '?' })) : null })) })) });
 });
 app.post('/api/admin/users', auth, teacher, (req, res) => {
   let created = 0; const skipped = [];
@@ -343,6 +391,17 @@ app.post('/api/admin/help-message', auth, teacher, (req, res) => {   // tanári 
   const h = db.prepare('SELECT id FROM help_requests WHERE id=? AND handled_at IS NULL').get(+b.id);
   if (!h) return res.status(404).json({ error: 'A beszélgetés már le van zárva.' });
   db.prepare('INSERT INTO help_messages(request_id,sender,text,at) VALUES(?,?,?,?)').run(h.id, 'teacher', text, Date.now());
+  res.json({ ok: true });
+});
+app.post('/api/admin/grade-essay', auth, teacher, (req, res) => {
+  const b = req.body || {}, id = Math.floor(+b.id), max = BONUS_ESSAY ? BONUS_ESSAY.maxPts : 100;
+  const score = Math.max(0, Math.min(max, Math.floor(+b.score) || 0)), feedback = String(b.feedback || '').trim().slice(0, 1000);
+  const row = db.prepare('SELECT score FROM bonus_essay WHERE user_id=?').get(id);
+  if (!row) return res.status(404).json({ error: 'Nincs beküldött szöveg ettől a diáktól.' });
+  if (row.score !== null) db.prepare('UPDATE users SET score_adj=score_adj-? WHERE id=?').run(row.score, id);
+  db.prepare('UPDATE bonus_essay SET score=?, feedback=?, graded_at=? WHERE user_id=?').run(score, feedback || null, Date.now(), id);
+  db.prepare('UPDATE users SET score_adj=score_adj+? WHERE id=?').run(score, id);
+  audit(req.u.username, 'grade-essay', id + ': ' + score, clientIp(req));
   res.json({ ok: true });
 });
 app.post('/api/admin/help-close', auth, teacher, (req, res) => {        // lezárás: a diák újra kérhet (újabb HELP_COST pontért)
