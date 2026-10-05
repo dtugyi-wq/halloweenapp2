@@ -196,49 +196,109 @@
    "Mindig a legnagyobb host-igényű hálózattal kezdd a kiosztást, utána haladj csökkenő sorrendben.",
    "A /30-as linkeknél csak 2 használható cím kell, ne pazarolj rájuk nagyobb blokkot.",
    "Az IPv6-nál minden alhálózat kaphat egységesen /64-et, itt nem kell VLSM-logikával számolnod.",
-   "Ellenőrizd: a kiosztott hálózatok összmérete nem lépheti túl a rendelkezésre álló 172.16.0.0/22 blokkot."
+   "Ellenőrizd: a kiosztott hálózatok összmérete nem lépheti túl a rendelkezésre álló 172.16.0.0/22 blokkot.",
+   "A host-igényhez mindig adj hozzá 2-t (hálózati és broadcast cím), mielőtt a szükséges prefixhosszt kiszámolod.",
+   "Egy /24-es hálózat 254 használható host-címet ad, egy /25-ös 126-ot – ebből könnyen visszaszámolhatod, mekkora blokk kell.",
+   "Rajzold fel papíron a blokkokat egymás alá, így azonnal látszik, ha két hálózat átfedi egymást.",
+   "A VLSM lényege, hogy minden alhálózat pontosan annyi címet kapjon, amennyi kell – ne kerekíts feleslegesen nagyobbra \"biztonságból\".",
+   "Ha elakadsz, számítsd ki bináris alakban a maszkot, és nézd meg, hány '1' bitet kell hozzáadnod az alaphálózathoz.",
+   "A link-hálózatok (router–router) mindig a lista végén kapjanak helyet, miután a nagyobb LAN-okat már kiosztottad.",
+   "Egy IPv6 /64-es alhálózatban a host-rész 64 bit, ennyi cím gyakorlatilag korlátlannak számít egy iskolai hálózathoz.",
+   "Ellenőrzésképp add össze az összes kiosztott alhálózat méretét, és nézd meg, hogy belefér-e a 172.16.0.0/22 blokkba túlcsordulás nélkül."
   ],
   "2": [
    "Az SSH-hoz előbb domain nevet és RSA kulcsot kell beállítani, csak utána engedélyezhető a 2-es verzió.",
    "A VTY vonalakon a 'transport input ssh' beállítás nélkül a Telnet is nyitva maradhat.",
    "A jelszó-titkosításhoz ne felejtsd el a globális 'service password-encryption' parancsot.",
-   "Az enable secret és a helyi felhasználó jelszava két különböző beállítás, mindkettő kell."
+   "Az enable secret és a helyi felhasználó jelszava két különböző beállítás, mindkettő kell.",
+   "A 'login block-for' paranccsal időzíthető letiltás véd a jelszótalálgatás ellen, de csak akkor, ha be is van kapcsolva.",
+   "A konzolport és a VTY vonalak külön jelszót kapnak, az egyik beállítása nem helyettesíti a másikat.",
+   "2048 bites RSA kulcs nélkül az SSH 2-es verziója nem aktiválható – próbáld sorrendben: domain, kulcs, SSH verzió.",
+   "A felhasználói fiók jelszavát a 'secret' kulcsszóval add meg, hogy titkosítva tárolódjon, ne 'password'-del.",
+   "Ha a Telnet is engedélyezve marad a VTY-n, az SSH megléte ellenére is sebezhető marad a router.",
+   "Teszteld a beállítást: próbálj Telnettel csatlakozni – ha sikerül, valami még nyitva maradt.",
+   "A jelszóhossz-minimum beállítása globális, minden új jelszóra vonatkozik, a régebbiekre nem feltétlenül."
   ],
   "3": [
    "A natív VLAN-nak egyeznie kell a trunk mindkét végén, különben VLAN-szivárgás léphet fel.",
    "A port security 'sticky' móddal megjegyzi az első MAC-címet, nem kell kézzel beírni.",
    "A router-on-a-stick subinterfészein az encapsulation parancs előzze meg az IP-cím beállítását.",
-   "Ellenőrizd a 'show vlan brief' kimenetét: minden port a megfelelő VLAN-ban van-e."
+   "Ellenőrizd a 'show vlan brief' kimenetét: minden port a megfelelő VLAN-ban van-e.",
+   "A trunk port alapértelmezetten minden VLAN-t átenged, hacsak nem szűkíted le kifejezetten az engedélyezett listát.",
+   "A port security violation módja ('restrict', 'shutdown', 'protect') eltérően reagál a szabálysértésre – nézd meg, melyik mit csinál.",
+   "Egy access port nem fogad trunk-forgalmat; ha véletlenül trunk módban hagysz egy végponti portot, az gondot okozhat.",
+   "A subinterfészeken az IP-cím mindig a subinterfész VLAN-jához tartozó alhálózatból jöjjön, ne a fő interfészéből.",
+   "A VLAN adatbázis törlése (delete vlan.dat) gyakori hibaelhárítási lépés, ha a VLAN-ok összezavarodtak.",
+   "Ellenőrizd mindkét oldalon a trunk engedélyezett VLAN listáját – ha csak az egyiken szűkíted le, a forgalom megszakadhat.",
+   "A nem használt portok VLAN-ba helyezése és lekapcsolása csökkenti a biztonsági kockázatot, ezt ne hagyd ki.",
+   "A port biztonsági napló megmutatja, mikor és melyik porton történt szabálysértés, ez hasznos hibakereséshez."
   ],
   "4": [
    "A LACP módja 'active', a PAgP módja 'desirable' – ha a két oldal módja nem passzol, nem jön létre a csatorna.",
    "A Port-channel interfészt ugyanúgy trunkölni kell, mint egy sima portot.",
    "A root bridge priority-t VLAN-onként külön lehet beállítani.",
-   "A 'show etherchannel summary' SU jelzése mutatja, hogy a csatorna valóban működik-e."
+   "A 'show etherchannel summary' SU jelzése mutatja, hogy a csatorna valóban működik-e.",
+   "Az EtherChannel tagjainak azonos sebességgel és duplex beállítással kell rendelkezniük, különben nem jön létre a csatorna.",
+   "A 'channel-group' parancsot mindkét fizikai interfészen ki kell adni, nem elég az egyiken.",
+   "Ha a Port-channel interfész VLAN-beállításai eltérnek a tagportokétól, az inkonzisztencia hibát okozhat.",
+   "A PAgP csak Cisco-eszközök között működik, más gyártónál LACP-t kell használni.",
+   "Egy taglink kiesése esetén a forgalom a megmaradt tagokon folytatódik, amíg legalább egy aktív marad.",
+   "A 'show interfaces trunk' paranccsal ellenőrizheted, hogy a Port-channel valóban trunkol-e.",
+   "A spanning tree a működő Port-channelt egyetlen logikai portként kezeli, nem az egyes fizikai tagokat külön-külön."
   ],
   "5": [
    "Ne felejtsd el kizárni a gateway címét és az első néhány címet a DHCP poolból.",
    "Az IPv6 stateless DHCPv6-nál az 'other-config-flag'-et kell beállítani, nem a 'managed-config-flag'-et.",
    "Ha a DHCP szerver más alhálózatban van, az 'ip helper-address' nélkül a kérés nem jut el hozzá.",
-   "A stateful DHCPv6-hoz az RA-ban az M-bitet (managed) kell bekapcsolni."
+   "A stateful DHCPv6-hoz az RA-ban az M-bitet (managed) kell bekapcsolni.",
+   "A DHCP pool neve csak azonosításra szolgál, nem befolyásolja, melyik VLAN-hoz tartozik – azt a hálózati cím dönti el.",
+   "Ha egy kliens nem kap címet, ellenőrizd, hogy a VLAN gateway-je egyezik-e a DHCP pool alaphálózatával.",
+   "Az IPv6 SLAAC-nál a kliens a router hirdetéséből (RA) építi fel a saját címét, szerverre nincs szükség hozzá.",
+   "A 'show ip dhcp binding' paranccsal megnézheted, mely címeket osztott ki ténylegesen a szerver.",
+   "Az IPv6 DNS-szerver címét a stateless DHCPv6-nál külön pool-ban kell megadni, nem az RA-ban.",
+   "Ha két VLAN ugyanazt a DHCP szervert használja, mindkettőhöz külön pool kell, eltérő hálózati címmel.",
+   "A kizárt címtartományt (excluded-address) a pool létrehozása ELŐTT érdemes megadni, különben már kiosztott címekkel ütközhet.",
+   "A DHCPv6 relay hasonló szerepet tölt be IPv6-ban, mint az IPv4-nél az ip helper-address, de külön kell beállítani."
   ],
   "6": [
    "A passive-interface-t a LAN felé állítsd be, a router-router linkeken ne.",
    "A point-to-point hálózattípus gyorsabb konvergenciát ad, mint a broadcast típus soros linkeken.",
    "Az OSPF költség a sávszélességből számolódik; ha átállítod a referencia-sávszélességet, mindenhol állítsd át.",
-   "A 'show ip ospf neighbor' FULL állapot hiánya gyakran hello/dead timer eltérésre utal."
+   "A 'show ip ospf neighbor' FULL állapot hiánya gyakran hello/dead timer eltérésre utal.",
+   "Az OSPF szomszédság FULL állapotba akkor kerül, ha mindkét router kicserélte és elfogadta egymás LSA-it.",
+   "Két router csak akkor lesz szomszéd, ha az area-számuk, a hálózati maszkjuk és a hello/dead időzítőjük egyezik.",
+   "A router-id-t érdemes kézzel beállítani, különben a legmagasabb loopback vagy interfész IP alapján választja a router.",
+   "Az OSPF a legjobb útvonalat a legalacsonyabb összköltség alapján választja, nem a legkevesebb ugrás (hop) alapján.",
+   "Ha egy interfészen nem fut OSPF hello, az nem jelenik meg szomszédként, de a hálózata OSPF-ben hirdetve lehet (passive-interface).",
+   "A 'show ip protocols' paranccsal gyorsan ellenőrizheted, mely hálózatokat hirdeti az OSPF folyamat.",
+   "Az IPv6-nál az OSPFv3 saját parancssorral fut ('ipv6 router ospf'), nem ugyanaz a folyamat, mint az OSPFv2.",
+   "Ha egy link mindkét végén más a hálózattípus beállítása, a szomszédság soha nem alakul ki stabilan."
   ],
   "7": [
    "Az azonos csoportszám (standby csoport) legyen minden VLAN-on következetes mindkét routeren.",
    "A 'preempt' nélkül az elsődleges router visszatérésekor nem veszi vissza az active szerepet.",
    "A virtuális IP-nek a VLAN hálózatán belül kell lennie, de nem lehet már használt cím.",
-   "A HSRP 2-es verziója más multicast címet használ, mint az 1-es, ne keverd őket."
+   "A HSRP 2-es verziója más multicast címet használ, mint az 1-es, ne keverd őket.",
+   "Az aktív router rendszeresen hello üzenetet küld; ha ez elmarad, a standby router veszi át a szerepet.",
+   "A HSRP csoportonként külön virtuális MAC-címet használ, ez segít megkülönböztetni a csoportokat a hálózati forgalomban.",
+   "A priority érték alapértelmezetten 100 – ha nem állítasz be magasabbat egyik routeren sem, a magasabb IP-című router lesz aktív.",
+   "A 'show standby brief' kimenetében az Active és Standby oszlop mutatja, melyik router melyik szerepet tölti be VLAN-onként.",
+   "Ha a két router különböző VLAN-okon különböző szerepet tölt be, az jó terheléselosztást eredményez, de gondosan be kell állítani mindkettőn.",
+   "A virtuális IP-nek elérhetőnek kell lennie a kliens gépek alapértelmezett átjárójaként – ellenőrizd, hogy a DHCP ezt a címet osztja-e ki.",
+   "A HSRP állapotváltás néhány másodpercig tarthat, ezalatt rövid kapcsolatkimaradás érzékelhető."
   ],
   "8": [
    "A floating static route csak akkor kerül be a táblába, ha nincs jobb (kisebb AD-jű) útvonal ugyanarra a célra.",
    "Ha mindkét oldal OSPF-ben hirdeti a default route-ot, figyelj a metrikára, különben hurok alakulhat ki.",
    "A link-local next-hopos IPv6 route-nál meg kell adni a kimenő interfészt is, különben nem egyértelmű.",
-   "Teszteld a floating route-ot úgy, hogy ténylegesen kihúzod az elsődleges linket, ne csak elméletben gondold végig."
+   "Teszteld a floating route-ot úgy, hogy ténylegesen kihúzod az elsődleges linket, ne csak elméletben gondold végig.",
+   "Az adminisztratív távolság (AD) dönti el, melyik útvonalforrást részesíti előnyben a router azonos célnál.",
+   "A statikus útvonal AD-je alapértelmezetten 1, az OSPF-é 110 – minél kisebb a szám, annál megbízhatóbbnak számít.",
+   "A 'show ip route' kimenetében a csillag (*) jelzi az aktívan használt alapértelmezett útvonalat.",
+   "Floating static route-nál a magasabb AD-t kézzel kell megadni a parancs végén, különben nem floating, hanem elsődleges lesz.",
+   "Ha egy route két routeren is egymás felé mutat, érdemes megvizsgálni, nem alakult-e ki routing hurok.",
+   "Az IPv6 default route célcíme mindig ::/0, ahogy az IPv4-nél a 0.0.0.0/0.",
+   "Teszteléskor ne csak a 'show ip route'-ot nézd, hanem tényleges ping vagy traceroute paranccsal is ellenőrizd az útvonalat."
   ]
  }
 }

@@ -145,16 +145,20 @@ body.shake{animation:shake .35s}
 .wheelbtn{animation:wheelpulse 2.2s ease-in-out infinite}
 @keyframes wheelpulse{0%,100%{box-shadow:0 0 0 rgba(229,57,31,0)}50%{box-shadow:0 0 14px rgba(229,57,31,.6)}}
 @media (prefers-reduced-motion:reduce){.wheelbtn{animation:none}}
-.gamblecard{position:relative;border:3px solid #ff2a2a;background:radial-gradient(ellipse at 50% 0%,rgba(142,27,46,.35),transparent 70%),var(--card);
-  box-shadow:0 0 10px rgba(255,42,42,.4),inset 0 0 30px rgba(255,42,42,.12);animation:devilborder 2.4s ease-in-out infinite;overflow:hidden}
-@keyframes devilborder{0%,100%{box-shadow:0 0 8px rgba(255,42,42,.35),inset 0 0 24px rgba(255,42,42,.1)}50%{box-shadow:0 0 26px rgba(255,42,42,.85),inset 0 0 40px rgba(255,42,42,.25)}}
-.devilh{color:#ff2a2a;text-shadow:0 0 10px #ff2a2a,0 0 24px #7a0f0a;animation:flick 3.5s infinite;text-align:center}
-.pentacorner{position:absolute;font-size:1.6rem;color:#ff2a2a;opacity:.55;text-shadow:0 0 10px #ff2a2a;animation:pentaspin 6s linear infinite}
-.pentacorner.tl{top:4px;left:8px}.pentacorner.tr{top:4px;right:8px}.pentacorner.bl{bottom:4px;left:8px}.pentacorner.br{bottom:4px;right:8px}
+
+.gamblemini{position:relative;margin-top:12px;border:2px solid #ff2a2a;border-radius:12px;background:radial-gradient(ellipse at 50% 0%,rgba(142,27,46,.3),transparent 75%),#1a0508;
+  box-shadow:0 0 8px rgba(255,42,42,.35);animation:devilborder 2.4s ease-in-out infinite;overflow:hidden}
+.gamblemini summary{cursor:pointer;padding:9px 14px;font-family:'Nosifer','Creepster',serif;font-size:.95rem;letter-spacing:1px;color:#ff5a5a;text-shadow:0 0 8px #ff2a2a;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.coinbadge{font-family:'Special Elite',serif;font-size:.85rem;color:#ffd9c9;background:#3a0a0a;border:1px solid #ff2a2a;border-radius:20px;padding:2px 10px}
+.gm-body{position:relative;padding:4px 14px 14px}
+.gm-row{margin:8px 0}
+@keyframes devilborder{0%,100%{box-shadow:0 0 6px rgba(255,42,42,.3)}50%{box-shadow:0 0 18px rgba(255,42,42,.75)}}
+.pentacorner{position:absolute;font-size:1.1rem;color:#ff2a2a;opacity:.45;text-shadow:0 0 8px #ff2a2a;animation:pentaspin 6s linear infinite}
+.pentacorner.tl{top:2px;left:6px}.pentacorner.tr{top:2px;right:6px}.pentacorner.bl{bottom:2px;left:6px}.pentacorner.br{bottom:2px;right:6px}
 @keyframes pentaspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .betbtn{background:linear-gradient(180deg,#ff2a2a,#5e0810);color:#fff;border:1px solid #ff8a5c;animation:wheelpulse 1.6s ease-in-out infinite}
 #flash.win{background:#ffd700}
-@media (prefers-reduced-motion:reduce){.gamblecard,.devilh,.pentacorner,.betbtn{animation:none}}
+@media (prefers-reduced-motion:reduce){.gamblemini,.betbtn{animation:none}}
 #addrtoggle .card{border:2px solid #8e1b2e}
 </style>
 </head>
@@ -400,27 +404,19 @@ function wheelCard(){
   ST.wheel.available.forEach(m=>{h+=`<div class="bq"><button class="sm wheelbtn" data-ms="${m}">🎡 Pörgetés (${m}. feladat után jár)</button><span class="msg wheelmsg" data-ms="${m}"></span></div>`});
   return h+'</div>';
 }
-function gambleCard(){
-  if(!ST.bets) return '';
-  let h=`<div class="card gamblecard"><div class="pentacorner tl">⛧</div><div class="pentacorner tr">⛧</div><div class="pentacorner bl">⛧</div><div class="pentacorner br">⛧</div><h2 class="devilh">😈 Fogadás a Sötétséggel 😈</h2><p class="pts">Külön érmeegyenleg, a versenypontjaidtól független – ezzel sosem veszíthetsz igazi pontot. Egyenleg: <b>${ST.coins} 🪙</b> (induló: 10, max: 25). Egy feladatnál csak egyszer fogadhatsz (tét: ${ST.betStake} érme, nyeréskor duplázódik, vesztésnél elvész, ~30% esély a nyerésre) és csak egyszer vehetsz hintet (${ST.hintCost} érme).</p>`;
-  for(let tI=1;tI<=8;tI++){
-    if(ST.solved<tI) continue;
-    const b=ST.bets.find(x=>x.task===tI), hi=ST.hints.find(x=>x.task===tI);
-    h+=`<div class="bq"><b>${tI}. feladat</b> `;
-    h+= b ? `– ${b.win?`🎉 nyertél (+${b.payout-b.stake} érme)`:'💀 vesztettél'} <span class="pts">(${dt(b.at)})</span>` : `<button class="sm betbtn" data-task="${tI}">🎲 Fogadás (${ST.betStake} 🪙)</button>`;
-    h+= hi ? ` · 💡 <i>${esc(hi.hint)}</i>` : ` <button class="sm hintbtn" data-task="${tI}">💡 Hint (${ST.hintCost} 🪙)</button>`;
-    h+='</div>';
-  }
-  return h+'</div>';
+function gambleMini(tI){
+  if(!ST.bets||tI>8) return '';
+  const b=ST.bets.find(x=>x.task===tI), hi=ST.hints.find(x=>x.task===tI);
+  return `<details class="gamblemini"><summary>😈 Fogadás &amp; Hint <span class="coinbadge">${ST.coins} 🪙</span></summary>
+    <div class="gm-body">
+      <div class="pentacorner tl">⛧</div><div class="pentacorner br">⛧</div>
+      <p class="pts">Külön érmeegyenleg, a versenypontjaidtól független. Tét: ${ST.betStake} 🪙 (nyeréskor duplázódik, ~30% esély), hint ára: ${ST.hintCost} 🪙. Mindkettő csak egyszer, ennél a feladatnál.</p>
+      <div class="gm-row">${ b ? `<span class="${b.win?'ok':''}">${b.win?`🎉 Nyertél! +${b.payout-b.stake} 🪙`:'💀 Vesztettél.'}</span>` : `<button class="sm betbtn" data-task="${tI}">🎲 Fogadás (${ST.betStake} 🪙)</button>` }</div>
+      <div class="gm-row">${ hi ? `💡 <i>${esc(hi.hint)}</i>` : `<button class="sm hintbtn" data-task="${tI}">💡 Hint (${ST.hintCost} 🪙)</button>` }</div>
+    </div>
+  </details>`;
 }
-function addrCard(){
-  if(ST.addrForce) return refHtml;   // admin mindenkinek bekapcsolta – a normál, nyitott nézet
-  const locked = `<details><summary>📋 Címzési táblázat 🔒</summary><div class="card">
-    <p>A táblázat megvásárolható a <b>valódi versenypontjaid terhére</b> (ez negatívba is viheti a pontszámod): <b>${ST.addrPrice} pont</b>.</p>
-    ${ST.addrBought?'<p class="ok">✅ Megvetted, de valamiért mégsem látszik – frissíts.</p>':'<button class="sm" id="addrbuy">📋 Megveszem</button><div class="msg" id="addrmsg"></div>'}
-  </div></details>`;
-  return ST.addrBought ? refHtml : refHtml.replace(/<details><summary>📋 Címzési táblázat<\/summary>[\s\S]*?<\/details>/, locked);
-}
+
 function helpBlock(n){
   const hs=(ST.help||[]).filter(x=>x.task===n), open=hs.find(x=>!x.handled_at);
   let h='<div class="help">';
@@ -478,8 +474,7 @@ function viewStudent(){
   setBar(true);
   if(ST.requireShare&&!shareStream){gateView();return}
   if(refHtml===null) refHtml=ref();
-  let hTop=shareCard()+sharedCard()+addrCard();
-  let h=hTop+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+refHtml+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
+  let h=shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+addrCard()+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
   h+=`<div class="card"><h2>📦 Packet Tracer fájl feltöltése</h2><p class="pts">Tallózd ki a .pkt fájlodat, a feltöltés a szerver adatbázisába kerül. Többször is feltölthetsz, a legutóbbit értékeljük.</p>
   <div class="ans"><input type="file" id="pktfile" accept=".pkt,.pka"><button id="ubtn" disabled>Feltöltés</button></div>
   <progress id="uprog" max="100" value="0" style="width:100%;display:none"></progress><div class="msg" id="umsg"></div>
@@ -487,13 +482,13 @@ function viewStudent(){
   for(let i=0;i<ST.total;i++){
     const k=ST.tasks[i], last=i===ST.total-1;
     if(k){
-      h+=`<div class="card"><h2>${last?'🏁 ':(i+1)+'. feladat – '}${k.title}</h2><div class="pts">${k.pts}</div><ul>${k.items.map(x=>`<li>${x}</li>`).join('')}</ul>${k.ol.length?`<strong>${k.olt}:</strong><ol>${k.ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${k.note?`<p>${k.note}</p>`:''}${helpBlock(i+1)}</div>`;
+      h+=`<div class="card"><h2>${last?'🏁 ':(i+1)+'. feladat – '}${k.title}</h2><div class="pts">${k.pts}</div><ul>${k.items.map(x=>`<li>${x}</li>`).join('')}</ul>${k.ol.length?`<strong>${k.olt}:</strong><ol>${k.ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${k.note?`<p>${k.note}</p>`:''}${helpBlock(i+1)}${gambleMini(i+1)}</div>`;
     } else if(i===ST.solved&&ST.puzzle){
       h+=`<div class="card puz" id="puz"><h2>🔮 Rejtvény a(z) ${i+1}. ${last?'ellenőrzés':'feladat'} feloldásához</h2><p style="font-size:1.1rem">${esc(ST.puzzle.q)}</p>
       <div class="ans"><input type="text" id="ain" autocomplete="off" placeholder="A válaszod"><button id="abtn">Feloldás</button></div><div class="msg" id="amsg"></div></div>`;
     } else h+=`<div class="card locked"><h2>🔒 ${last?'Végső ellenőrzés':(i+1)+'. feladat'}</h2><div class="pts">Előbb oldd meg az előző rejtvényt</div></div>`;
   }
-  h+=bonusCard()+wheelCard()+gambleCard();
+  h+=bonusCard()+wheelCard();
   if(ST.solved>=ST.total&&!ST.end) h+=`<div style="text-align:center"><button class="big" id="fin">✅ Befejeztük</button></div>`;
   if(ST.end) h+=`<div class="card"><h2 class="ok">Kész! Maradék idő: ${fmt(remaining())}</h2></div>`;
   const keep={};document.querySelectorAll('.cin').forEach(i=>{keep[i.dataset.req]=i.value});
