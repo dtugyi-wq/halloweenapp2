@@ -1,0 +1,15 @@
+services:
+  halloween:
+    build: .
+    container_name: halloween
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      TEACHER_USER: ${TEACHER_USER:-tanar}
+      TEACHER_PASS: ${TEACHER_PASS:?Hozz letre egy .env fajlt TEACHER_PASS=... sorral}
+      DURATION_MIN: ${DURATION_MIN:-160}
+      MAX_MB: 30
+      # TRUST_PROXY: "1"      # akkor kapcsold be, ha HTTPS reverse proxy mögött fut
+    volumes:
+      - ./data:/data          # itt él az adatbázis (halloween.db), újraindításkor is megmarad

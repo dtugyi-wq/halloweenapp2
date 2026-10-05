@@ -1,0 +1,167 @@
+{
+ "tasks": [
+  {
+   "title": "VLSM és címzés",
+   "pts": "10 pont",
+   "items": [
+    "Készítsetek VLSM táblázatot a 172.16.0.0/22 blokkra (hálózati cím, maszk, host-tartomány, broadcast). Igények: VLAN 10: 200 host, VLAN 20: 100, Temető LAN: 60, VLAN 30: 50, Kripta LAN: 28, VLAN 99: 25, plusz L1–L4 router–router linkek. Hasonlítsátok össze a Címzési táblázattal, és indokoljátok a felosztás sorrendjét.",
+    "Állítsátok be az összes router interfészt dual-stack módon a Címzési táblázat szerint (a serial linkeken az órajelről se feledkezzetek meg).",
+    "Minden eszköznek legyen hostname-je és bejelentkezési bannere (tartalma legyen Halloween-es)."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "Alap biztonság és SSH",
+   "pts": "10 pont",
+   "items": [
+    "Minden routeren és switchen: titkosított privilegizált jelszó, konzol- és VTY-védelem, tárolt jelszavak titkosítása, legalább 8 karakteres jelszó, védelem a jelszótalálgatás ellen.",
+    "SSH v2 helyi felhasználóval (<code>vadasz</code>), 2048 bites kulccsal; Telnet tiltva, inaktivitási időkorlát 5 perc.",
+    "Bizonyítsátok: a Kastély egyik PC-járól SSH-val beléptek az R-TEMETO-ra.",
+    "Bónusz: az SSH csak a menedzsment VLAN-ból érhető el."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "VLAN-ok és trunkok",
+   "pts": "10 pont",
+   "items": [
+    "Hozzátok létre a VLAN 10, 20, 30, 99-et (nevek: Kisertetek, Boszorkanyok, Vampirok, Mgmt) <strong>kézzel, minden switchen</strong>; VTP ne terjessze őket.",
+    "Access portok: SW-A1 Fa0/6–10 VLAN 10, Fa0/11–15 VLAN 20; SW-A2 Fa0/6–10 VLAN 30. Gyors átmenet a végpontportokon.",
+    "Trunkök: a native VLAN 99 legyen, és csak a szükséges VLAN-ok haladjanak át.",
+    "A nem használt portok legyenek lekapcsolva és egy külön, használaton kívüli VLAN-ban (999).",
+    "Router-on-a-stick: R-KASTELY1 és R-KASTELY2 <code>Gi0/0/1</code> subinterface-ei (IPv4 + IPv6).",
+    "Port security az access portokon: legfeljebb 2 MAC, megtanult MAC megőrzése, a szabálysértés csak naplózódjon.",
+    "A switchek menedzsment címe a Címzési táblázat szerint."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "EtherChannel",
+   "pts": "10 pont",
+   "items": [
+    "SW-D1 – SW-D2: Po1 <strong>LACP</strong>; SW-D1 – SW-A1: Po2 <strong>PAgP</strong>; SW-D2 – SW-A2: Po3 <strong>PAgP</strong>. A Port-channelek trunkök legyenek.",
+    "Bizonyítsátok, hogy minden csatorna működik. Kapcsoljatok le egy tagot folyamatos ping közben, és írjátok le a tapasztalatot.",
+    "Állítsátok be a root bridge-eket: SW-D1 a VLAN 10 és 20, SW-D2 a VLAN 30 és 99 root-ja, egymás tartalékaként."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "DHCP IPv4 és IPv6",
+   "pts": "10 pont",
+   "items": [
+    "IPv4: R-KASTELY1 szolgálja ki a VLAN 10, 20, 30-at; a Temetőben és a Kripta LAN-on helyi DHCP. A hálózatok első 10 címe és a gateway-ek ne legyenek kiosztva. DNS: 8.8.8.8.",
+    "IPv6: VLAN 10 <strong>SLAAC</strong>, VLAN 20 <strong>stateless DHCPv6</strong>, VLAN 30 <strong>SLAAC</strong>, Temető <strong>stateful DHCPv6</strong>, Kripta <strong>SLAAC</strong>.",
+    "Bizonyítsátok minden PC-n (<code>ipconfig /all</code>), hogy a megfelelő módszerrel kapott címet."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "OSPFv2 és OSPFv3",
+   "pts": "14 pont",
+   "items": [
+    "OSPFv2 és OSPFv3, Area 0, az ISP-k kivételével minden routeren. Router-id: R-KASTELY1 <code>1.1.1.1</code>, R-KASTELY2 <code>2.2.2.2</code>, R-TEMETO <code>3.3.3.3</code>, R-KRIPTA <code>4.4.4.4</code>.",
+    "A LAN-ok felé ne menjen OSPF hello; a router–router linkek legyenek pont-pont típusúak; a referencia sávszélesség mindenhol egységes (1000 Mbps).",
+    "A Temető → Kripta forgalom elsődlegesen a közvetlen linken (L3) menjen, hiba esetén a Kastélyon át. Bizonyítsátok <code>traceroute</code>-tal, majd szimuláljátok az L3 kiesését.",
+    "Igazoljátok a szomszédságokat és az útválasztási táblákat IPv4 és IPv6 esetén is."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "HSRP (IPv4)",
+   "pts": "12 pont",
+   "items": [
+    "HSRP <strong>v2</strong> a VLAN 10, 20, 30, 99 gateway-eken a Kastély routereken; a virtuális IP-k a Címzési táblázat szerint.",
+    "R-KASTELY1 legyen az active a VLAN 10 és 30-on, R-KASTELY2 a VLAN 20 és 99-en; az elsődleges router visszatéréskor vegye vissza a szerepét.",
+    "Teszt: folyamatos ping a 8.8.8.8-ra közben kapcsoljátok le az R-KASTELY1-et. Hány csomag veszett el, mi látszik a <code>show standby brief</code>-ben előtte és utána?"
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  },
+  {
+   "title": "Default route-ok és floating static route-ok",
+   "pts": "16 pont",
+   "items": [
+    "<strong>A.</strong> R-KASTELY1: elsődleges default route az ISP-FO felé (IPv4 és IPv6).",
+    "<strong>B.</strong> R-KASTELY1: <strong>floating</strong> default az L4-en át az R-KASTELY2-re (AD 250, IPv4 és IPv6).",
+    "<strong>C.</strong> R-KASTELY2: default route az ISP-TARTALEK felé. Az AD-t úgy válasszátok meg, hogy ne alakuljon ki routing hurok az OSPF-ben tanult defaulttal. Indokoljátok, és bizonyítsátok <code>traceroute</code>-tal, mi történik rossz AD esetén.",
+    "<strong>D.</strong> Mindkét Kastély router hirdesse a default route-ot OSPFv2-ben és OSPFv3-ban; az R-KASTELY2 rosszabb metrikával.",
+    "<strong>E.</strong> Temető: statikus route a Kripta LAN-ra, amely csak az OSPF útvonal kiesésekor lép életbe.",
+    "<strong>F.</strong> Kastély routerek: floating static a Kripta LAN-ra, amely csak az OSPF kiesésekor aktív.",
+    "<strong>G.</strong> R-KASTELY2: az IPv6 default route legyen link-local next-hoppal és kimenő interfésszel megadva."
+   ],
+   "olt": "Teszt (L4 átállás)",
+   "ol": [
+    "Normál állapotban: az R-KASTELY1 melyik default route-ot használja? Mutassátok meg.",
+    "Húzzátok ki az R-KASTELY1 – ISP-FO kábelt. Mi változik a routing táblában?",
+    "Egy PC-ről <code>tracert 8.8.8.8</code>: milyen útvonalon megy a forgalom? Képernyőkép kell.",
+    "Állítsátok vissza a kábelt, és mérjétek meg a kiesést folyamatos ping közben.",
+    "Ismételjétek meg IPv6-tal."
+   ],
+   "note": "<strong>Bónusz (+4 pont):</strong> az R-KASTELY1 csak akkor hirdessen default route-ot OSPF-ben, ha az elsődleges ISP-n át él a route (feltételes originate). Ezután az R-KASTELY2 default route-ja lehet 250-es AD-jű is. Tesztelje ISP-FO kiesésnél, hogy nincs hurok. A Packet Tracer nem minden verziója támogatja, ilyenkor dokumentáljátok a tapasztalatot."
+  },
+  {
+   "title": "Végső ellenőrzés – „A Reggel\"",
+   "pts": "extra 8 pont",
+   "items": [
+    "Minden PC pingel minden PC-t (IPv4 és IPv6).",
+    "Az elsődleges ISP kiesésekor automatikusan átáll a tartalék, visszaállásakor visszavált.",
+    "SSH működik mindenhol, Telnet sehol.",
+    "Egyetlen EtherChannel-tag kiesése nem szakítja meg a kapcsolatot."
+   ],
+   "olt": "",
+   "ol": [],
+   "note": ""
+  }
+ ],
+ "puzzles": [
+  {
+   "q": "A boszorkány üstjében 3 béka van. Minden órában a békák száma megkétszereződik, majd 1 béka kiugrik az üstből. Hány béka van az üstben 4 óra múlva?",
+   "a": "33"
+  },
+  {
+   "q": "Fejtsd meg a sorozatot: 2, 6, 12, 20, 30, ? Mi a következő szám?",
+   "a": "42"
+  },
+  {
+   "q": "Dracula, Mumus, a Boszorkány és a Mumia sorban áll. Mumus az első, a Mumia az utolsó. A Boszorkány közvetlenül Dracula előtt áll. Ki áll a második helyen?",
+   "a": "boszorkany"
+  },
+  {
+   "q": "Egy szellem az első éjjel 1 láncot vesz fel, és minden következő éjjel kétszer annyit, mint az előzőn. Hányadik éjjel lesz először 100-nál több láncot a nyakában az aznapi darabszám?",
+   "a": "8"
+  },
+  {
+   "q": "Három dobozon ez áll: CUKOR, TRÜKK, VEGYES. Mindhárom felirat HAMIS. A VEGYES feliratú dobozból cukrot húzol. Mi van valójában a TRÜKK feliratú dobozban? (cukor / trükk / vegyes)",
+   "a": "vegyes"
+  },
+  {
+   "q": "3 szellem 3 perc alatt 3 ablakot ijeszt meg. Hány perc alatt ijeszt meg 100 szellem 100 ablakot?",
+   "a": "3"
+  },
+  {
+   "q": "Fejtsd meg a kódot: minden betűt az angol ábécében eggyel előrébb léptettünk. A titkos szó: IBMMPXFFO",
+   "a": "halloween"
+  },
+  {
+   "q": "Egy tök egy kilogrammból és még a saját tömegének feléből áll. Hány kilogramm a tök?",
+   "a": "2"
+  },
+  {
+   "q": "2 vámpírnak 2-2, 3 zombinak 2-2, egy pókszörnynek pedig 8 lába van. Hány lábuk van összesen?",
+   "a": "18"
+  }
+ ]
+}

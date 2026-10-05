@@ -1,0 +1,17 @@
+# Ezt a fájlt másold a szerverre docker-compose.yml néven (a forráskód nem kell hozzá).
+services:
+  halloween:
+    image: ghcr.io/FELHASZNALO/halloween-app:latest   # a GitHub felhasználóneved és a repó neve, kisbetűvel
+    container_name: halloween
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      TEACHER_USER: ${TEACHER_USER:-tanar}
+      TEACHER_PASS: ${TEACHER_PASS:?Hozz letre egy .env fajlt TEACHER_PASS=... sorral}
+      DURATION_MIN: ${DURATION_MIN:-160}
+      MAX_MB: 30
+      # TRUST_PROXY: "1"
+    volumes:
+      - ./data:/data
+      # - ./media:/app/public/media:ro    # csak akkor, ha a scare.mp4 nincs a repóban/image-ben
