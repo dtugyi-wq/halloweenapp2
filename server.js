@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS addr_buys(user_id INTEGER PRIMARY KEY, at INTEGER NOT
 CREATE TABLE IF NOT EXISTS shots(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, at INTEGER NOT NULL, data BLOB NOT NULL, enc INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS idx_shots_user ON shots(user_id);
 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, at INTEGER, user TEXT, action TEXT, detail TEXT, ip TEXT);`);
-for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN hash TEXT', 'ALTER TABLE users ADD COLUMN coins INTEGER NOT NULL DEFAULT 10', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
+for (const sql of ['ALTER TABLE users ADD COLUMN last_seen INTEGER', 'ALTER TABLE users ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN note TEXT', 'ALTER TABLE users ADD COLUMN away_count INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN away_ms INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN shot_req INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN share_on INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE users ADD COLUMN score_adj INTEGER NOT NULL DEFAULT 0', 'ALTER TABLE files ADD COLUMN hash TEXT', 'ALTER TABLE users ADD COLUMN coins INTEGER NOT NULL DEFAULT 10', 'ALTER TABLE users ADD COLUMN paused_at INTEGER', 'ALTER TABLE files ADD COLUMN enc INTEGER NOT NULL DEFAULT 0']) {
   try { db.exec(sql); } catch (e) { /* már létezik */ }
 }
 
@@ -220,6 +220,7 @@ function stateOf(u) {
     tasks: content.tasks.slice(0, u.solved),                       // csak a feloldott feladatok mennek ki
     puzzle: running && u.solved < total ? { q: content.puzzles[u.solved].q } : null,
     files, announce: getAnn(), note: u.note || null, wrong: u.wrong_count || 0,
+    paused: !!u.paused_at, pausedRemaining: u.paused_at ? (u.start_at + DUR - u.paused_at) : null,
     progress: db.prepare('SELECT solved,at FROM progress WHERE user_id=? ORDER BY id').all(u.id),
     bonusMath: BONUS_MATH.map(q => ({ id: q.id, q: q.q, pts: q.pts, solved: !!db.prepare('SELECT 1 FROM bonus_math WHERE user_id=? AND qid=?').get(u.id, q.id) })),
     bonusEssay: BONUS_ESSAY ? { q: BONUS_ESSAY.q, maxPts: BONUS_ESSAY.maxPts, mine: db.prepare('SELECT text,submitted_at,score,feedback,graded_at FROM bonus_essay WHERE user_id=?').get(u.id) || null } : null,
@@ -237,6 +238,8 @@ function stateOf(u) {
 const fresh = id => db.prepare('SELECT * FROM users WHERE id=?').get(id);
 const student = (req, res, next) => req.u.role === 'student' ? next() : res.status(403).json({ error: 'Csak diákoknak' });
 const expired = u => u.start_at && Date.now() > u.start_at + DUR;
+const isPaused = u => !!u.paused_at;
+const PAUSE_ERR = { error: 'Az órát a tanár szüneteltette. Várj, amíg folytatja.' };
 
 app.get('/api/state', auth, (req, res) => res.json(stateOf(req.u)));
 app.post('/api/start', auth, student, (req, res) => {
@@ -245,6 +248,7 @@ app.post('/api/start', auth, student, (req, res) => {
 });
 app.post('/api/puzzle', auth, student, (req, res) => {
   const u = req.u;
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!u.start_at || u.end_at || u.solved >= total) return res.status(400).json({ error: 'Most nincs aktív rejtvény' });
   if (expired(u)) return res.status(403).json({ error: 'Lejárt az idő' });
   const wait = Math.ceil((u.last_wrong + 8000 - Date.now()) / 1000);
@@ -270,6 +274,7 @@ app.post('/api/help', auth, student, (req, res) => {          // segítségkér�
 });
 app.post('/api/bonus-math', auth, student, (req, res) => {
   const u = req.u, qid = String((req.body || {}).qid || '');
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   const qdef = BONUS_MATH.find(x => x.id === qid);
   if (!u.start_at || u.end_at || expired(u) || !qdef) return res.status(400).json({ error: 'Ez most nem elérhető.' });
   if (db.prepare('SELECT 1 FROM bonus_math WHERE user_id=? AND qid=?').get(u.id, qid)) return res.status(409).json({ error: 'Ezt már megoldottad.' });
@@ -282,6 +287,7 @@ app.post('/api/bonus-math', auth, student, (req, res) => {
 });
 app.post('/api/bonus-essay', auth, student, (req, res) => {
   const u = req.u, text = String((req.body || {}).text || '').trim().slice(0, 4000);
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!BONUS_ESSAY) return res.status(400).json({ error: 'Nincs ilyen feladat.' });
   if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem küldhetsz be szöveget.' });
   if (!text) return res.status(400).json({ error: 'Üres a beküldés.' });
@@ -305,6 +311,7 @@ app.post('/api/wheel', auth, student, (req, res) => {
 });
 app.post('/api/bet', auth, student, (req, res) => {
   const u = req.u, task = Math.floor(+((req.body || {}).task));
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem fogadhatsz.' });
   if (!Number.isInteger(task) || task < 1 || task > 8 || u.solved < task) return res.status(400).json({ error: 'Ehhez a feladathoz még nem fogadhatsz.' });
   if (db.prepare('SELECT 1 FROM bet_log WHERE user_id=? AND task=?').get(u.id, task)) return res.status(409).json({ error: 'Ennél a feladatnál már fogadtál.' });
@@ -320,6 +327,7 @@ app.post('/api/bet', auth, student, (req, res) => {
 });
 app.post('/api/hint', auth, student, (req, res) => {
   const u = req.u, task = Math.floor(+((req.body || {}).task)), pool = HINTS[String(task)];
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem vehetsz hintet.' });
   if (!pool || !pool.length || u.solved < task) return res.status(400).json({ error: 'Ehhez a feladathoz nincs hint, vagy még nem jutottál el odáig.' });
   if (db.prepare('SELECT 1 FROM hint_buys WHERE user_id=? AND task=?').get(u.id, task)) return res.status(409).json({ error: 'Ehhez a feladathoz már vettél hintet.' });
@@ -332,6 +340,7 @@ app.post('/api/hint', auth, student, (req, res) => {
 });
 app.post('/api/addr-buy', auth, student, (req, res) => {
   const u = req.u;
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!u.start_at || u.end_at || expired(u)) return res.status(403).json({ error: 'Most nem vásárolhatsz.' });
   if (getAddrForce()) return res.status(400).json({ error: 'A címzési tábla jelenleg mindenki számára ingyenesen elérhető.' });
   if (db.prepare('SELECT 1 FROM addr_buys WHERE user_id=?').get(u.id)) return res.status(409).json({ error: 'Már megvetted.' });
@@ -342,6 +351,7 @@ app.post('/api/addr-buy', auth, student, (req, res) => {
   res.json(stateOf(fresh(u.id)));
 });
 app.post('/api/finish', auth, student, (req, res) => {
+  if (isPaused(req.u)) return res.status(423).json(PAUSE_ERR);
   if (req.u.start_at && !req.u.end_at && req.u.solved >= total) db.prepare('UPDATE users SET end_at=? WHERE id=?').run(Date.now(), req.u.id);
   res.json(stateOf(fresh(req.u.id)));
 });
@@ -358,6 +368,7 @@ const uploader = multer({
 }).single('file');
 app.post('/api/upload', auth, student, (req, res) => {
   const u = req.u;
+  if (isPaused(u)) return res.status(423).json(PAUSE_ERR);
   if (!u.start_at) return res.status(403).json({ error: 'Előbb indítsd el a játékot.' });
   if (!u.end_at && Date.now() > u.start_at + DUR + GRACE) return res.status(403).json({ error: 'Lejárt az idő, a feltöltés lezárult.' });
   uploader(req, res, err => {
@@ -399,7 +410,7 @@ app.post('/api/admin/note', auth, teacher, (req, res) => {          // egyéni m
 });
 app.get('/api/admin/audit', auth, teacher, (req, res) => res.json(db.prepare('SELECT at,user,action,detail,ip FROM audit ORDER BY id DESC LIMIT 100').all()));
 app.get('/api/admin/overview', auth, teacher, (req, res) => {
-  const users = db.prepare(`SELECT id,username,name,start_at AS start,end_at AS "end",solved,wrong_count AS wrong,last_seen,note,away_count,away_ms,share_on,score_adj,
+  const users = db.prepare(`SELECT id,username,name,start_at AS start,end_at AS "end",solved,wrong_count AS wrong,last_seen,note,away_count,away_ms,share_on,paused_at,score_adj,
     (SELECT id FROM shots WHERE user_id=users.id ORDER BY id DESC LIMIT 1) AS shot_id,
     (SELECT at FROM shots WHERE user_id=users.id ORDER BY id DESC LIMIT 1) AS shot_at,
     (SELECT MAX(at) FROM progress WHERE user_id=users.id) AS since
@@ -463,6 +474,25 @@ app.post('/api/admin/delete', auth, teacher, (req, res) => {
   db.prepare("DELETE FROM files WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(uid(req));
   db.prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE id=? AND role='student')").run(uid(req));
   db.prepare("DELETE FROM users WHERE id=? AND role='student'").run(uid(req));
+  res.json({ ok: true });
+});
+app.post('/api/admin/pause', auth, teacher, (req, res) => {
+  db.prepare("UPDATE users SET paused_at=? WHERE id=? AND role='student' AND start_at IS NOT NULL AND end_at IS NULL AND paused_at IS NULL").run(Date.now(), +((req.body || {}).id));
+  res.json({ ok: true });
+});
+app.post('/api/admin/resume', auth, teacher, (req, res) => {
+  const id = +((req.body || {}).id), u = db.prepare("SELECT paused_at FROM users WHERE id=? AND role='student'").get(id);
+  if (u && u.paused_at) db.prepare('UPDATE users SET start_at=start_at+?, paused_at=NULL WHERE id=?').run(Date.now() - u.paused_at, id);
+  res.json({ ok: true });
+});
+app.post('/api/admin/pause-all', auth, teacher, (req, res) => {
+  db.prepare("UPDATE users SET paused_at=? WHERE role='student' AND start_at IS NOT NULL AND end_at IS NULL AND paused_at IS NULL").run(Date.now());
+  res.json({ ok: true });
+});
+app.post('/api/admin/resume-all', auth, teacher, (req, res) => {
+  const now = Date.now();
+  for (const u of db.prepare("SELECT id,paused_at FROM users WHERE role='student' AND paused_at IS NOT NULL").all())
+    db.prepare('UPDATE users SET start_at=start_at+?, paused_at=NULL WHERE id=?').run(now - u.paused_at, u.id);
   res.json({ ok: true });
 });
 app.post('/api/admin/start-all', auth, teacher, (req, res) => {     // egyszerre indítás mindenkinek

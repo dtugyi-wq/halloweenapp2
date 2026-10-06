@@ -320,7 +320,9 @@ function apply(){if(ST){off=ST.now-Date.now();showAnn(ST.announce)}render()}
 /* ===== Időzítő ===== */
 setInterval(()=>{
   if(!ST||ST.user.role!=='student'||!ST.start) return;
-  const r=remaining(),t=$('#timer'); if(t){t.textContent=fmt(r);t.classList.toggle('low',r<600000&&!ST.end)}
+  const r=ST.paused?ST.pausedRemaining:remaining(), t=$('#timer');
+  if(t){t.textContent=(ST.paused?'⏸ ':'')+fmt(r);t.classList.toggle('low',r<600000&&!ST.end&&!ST.paused)}
+  if(ST.paused) return;
   if(!ST.end&&r<=0){
     if(!ST.expiredSeen){ST.expiredSeen=true;api('/api/ack-expired',{}).catch(()=>{});playScare(true)}
     else if($('#end').style.display!=='flex'&&$('#scare').style.display!=='flex') showEnd();
@@ -340,8 +342,8 @@ setInterval(async()=>{
   try{
     const s=await api('/api/state'); showAnn(s.announce);
     const hs=h=>(h||[]).map(x=>x.id+':'+(x.handled_at?1:0)).join();
-    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||hs(s.help)!==hs(ST.help)||JSON.stringify(s.shared)!==JSON.stringify(ST.shared)){ST=s;apply()}
-    else{const chg=JSON.stringify(s.help)!==JSON.stringify(ST.help);ST.start=s.start;ST.help=s.help;ST.shotReq=s.shotReq;off=s.now-Date.now();if(chg){updateChats();ding()}}
+    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||s.paused!==ST.paused||hs(s.help)!==hs(ST.help)||JSON.stringify(s.shared)!==JSON.stringify(ST.shared)){ST=s;apply()}
+    else{const chg=JSON.stringify(s.help)!==JSON.stringify(ST.help);ST.start=s.start;ST.help=s.help;ST.shotReq=s.shotReq;ST.pausedRemaining=s.pausedRemaining;off=s.now-Date.now();if(chg){updateChats();ding()}}
     if(ST.shotReq) snap();
   }catch(e){if(e.status===401){LOGIN_NOTICE=(e.data&&e.data.reason==='idle')?'⏳ A munkamenet hosszabb inaktivitás (pl. bezárt böngésző) után automatikusan lezárult. Jelentkezz be újra — a verseny órája közben futott tovább.':'A munkamenet lezárult (lehet, hogy másik eszközön léptek be ugyanezzel a fiókkal). Jelentkezz be újra.';ST=null;render()}}
 },4000);
@@ -482,8 +484,9 @@ document.addEventListener('visibilitychange',()=>{
 function viewStudent(){
   setBar(true);
   if(ST.requireShare&&!shareStream){gateView();return}
+  const pauseBanner=ST.paused?`<div class="card" style="border-color:var(--or);text-align:center"><h2 style="margin:0">⏸️ A tanár szüneteltette az órát</h2><p class="pts">Az idő nem telik, amíg a tanár nem folytatja. Addig a rejtvények, a feltöltés és a fogadás sem elérhető.</p></div>`:'';
   if(refHtml===null) refHtml=ref();
-  let h=shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+addrCard()+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
+  let h=pauseBanner+shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+addrCard()+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
   h+=`<div class="card"><h2>📦 Packet Tracer fájl feltöltése</h2><p class="pts">Tallózd ki a .pkt fájlodat, a feltöltés a szerver adatbázisába kerül. Többször is feltölthetsz, a legutóbbit értékeljük.</p>
   <div class="ans"><input type="file" id="pktfile" accept=".pkt,.pka"><button id="ubtn" disabled>Feltöltés</button></div>
   <progress id="uprog" max="100" value="0" style="width:100%;display:none"></progress><div class="msg" id="umsg"></div>
@@ -581,9 +584,9 @@ function setupUpload(){
 /* ===== Tanári felület ===== */
 let ADM=null, AF={q:'',f:'all',s:'prog',auto:true}, admN=0;
 const admNow=()=>ADM.d.now+(Date.now()-ADM.at);
-const stOf=(u,n)=>!u.start?'idle':u.end?'done':(n>u.start+ADM.d.durationMs?'expired':'run');
-const remOf=(u,n)=>!u.start?ADM.d.durationMs:(u.end?u.start+ADM.d.durationMs-u.end:u.start+ADM.d.durationMs-n);
-const ST_LABEL={idle:'⏸ Nem kezdte',run:'⏳ Fut',done:'✅ Kész',expired:'💀 Lejárt'};
+const stOf=(u,n)=>!u.start?'idle':u.end?'done':u.paused_at?'paused':(n>u.start+ADM.d.durationMs?'expired':'run');
+const remOf=(u,n)=>!u.start?ADM.d.durationMs:(u.end?u.start+ADM.d.durationMs-u.end:(u.paused_at?u.start+ADM.d.durationMs-u.paused_at:u.start+ADM.d.durationMs-n));
+const ST_LABEL={idle:'💤 Nem kezdte',run:'⏳ Fut',done:'✅ Kész',expired:'💀 Lejárt',paused:'⏯️ Szüneteltetve'};
 async function adm(url,body){try{await api(url,body||{});await loadAdmin()}catch(e){alert(e.message)}}
 
 function viewTeacher(){
@@ -592,7 +595,7 @@ function viewTeacher(){
   <div class="card tools"><input type="text" id="aq" placeholder="🔎 Keresés névre…" value="${esc(AF.q)}">
     <div class="chips" id="chips">${[['all','Mind'],['idle','Nem kezdte'],['run','Fut'],['done','Kész'],['expired','Lejárt']].map(([k,l])=>`<button class="chip${AF.f===k?' on':''}" data-f="${k}">${l}</button>`).join('')}</div>
     <select id="asort"><option value="prog">Sorrend: haladás (rangsor)</option><option value="time">Sorrend: maradék idő</option><option value="name">Sorrend: név</option></select>
-    <span class="sp"></span><button class="sm" id="astart">▶ Mindenki indítása</button><button class="sm" id="acsv">⬇ CSV</button>
+    <span class="sp"></span><button class="sm" id="astart">▶ Mindenki indítása</button><button class="sm" id="apause">⏸ Mindenki szüneteltetése</button><button class="sm" id="aresume">▶️ Mindenki folytatása</button><button class="sm" id="acsv">⬇ CSV</button>
     <label class="auto"><input type="checkbox" id="aauto" ${AF.auto?'checked':''}> auto frissítés</label></div>
   <div class="card"><h3>📢 Üzenet a diákoknak</h3><div class="ans"><input type="text" id="amsgt" placeholder="pl. Még 10 perc van hátra!" style="flex:1;min-width:220px"><button class="sm" id="asend">Küldés</button><button class="sm red" id="aclr">Üzenet törlése</button></div></div>
   <div id="hlp"></div>
@@ -608,6 +611,8 @@ function viewTeacher(){
   $('#asort').onchange=e=>{AF.s=e.target.value;if(ADM)drawGrid()};
   $('#aauto').onchange=e=>{AF.auto=e.target.checked};
   $('#astart').onclick=()=>{if(confirm('Elindítod az órát mindenkinek, aki még nem kezdte el?'))adm('/api/admin/start-all')};
+  $('#apause').onclick=()=>{if(confirm('Szünetelteted mindenkinek az óráját, aki épp fut?'))adm('/api/admin/pause-all')};
+  $('#aresume').onclick=()=>{if(confirm('Folytatod mindenkinek, aki szünetel?'))adm('/api/admin/resume-all')};
   $('#acsv').onclick=csvExport;
   $('#asend').onclick=async()=>{const t=$('#amsgt').value.trim();if(!t)return;await adm('/api/admin/announce',{text:t});$('#amsgt').value=''};
   $('#aclr').onclick=()=>adm('/api/admin/announce',{text:''});
@@ -621,6 +626,8 @@ function viewTeacher(){
     else if(a==='skip')adm('/api/admin/solved',{id,solved:u.solved+1});
     else if(a==='back')adm('/api/admin/solved',{id,solved:u.solved-1});
     else if(a==='detail')openDetail(id);
+    else if(a==='pauseone')adm('/api/admin/pause',{id});
+    else if(a==='resumeone')adm('/api/admin/resume',{id});
     else if(a==='pts'){
       const d=prompt('Pontváltozás (pl. -10 vagy 5):'); if(d===null||!d.trim())return;
       const n=parseInt(d,10); if(!n){alert('Adj meg egy nullától eltérő egész számot.');return}
@@ -787,7 +794,7 @@ function ucard(u,n,T,rank){
   ${u.shot_id?`<img class="thumb" src="/api/shot-img/${u.shot_id}" data-a="detail" data-id="${u.id}" title="${dt(u.shot_at)}">`:''}<div class="dots">${dots}</div>
   <div class="pts">${prog} · ❌ ${u.wrong||0} hibás válasz${hs.length?` · 🆘 ${hs.length} kérés (−${hs.length*ADM.d.helpCost} pont)`:''}${u.score_adj?` · ${u.score_adj>0?'🎁 +':'⚠️ '}${u.score_adj} pont`:''}${u.away_count?` · 💤 háttérben ${u.away_count}× (${fmtMs(u.away_ms)})`:''}<br>${sharing?'🖥 megosztja · ':'🖥 nem oszt meg · '}${stuck?`<span class="bad2">⚠ ${fmt(cur)} perce ezen a feladaton</span> · `:''}${on?'<span class="ok">● online</span>':'○ '+(u.last_seen?'utoljára: '+dt(u.last_seen):'még nem lépett be')}</div>
   <div class="files">${fl||'<span class="pts">Nincs feltöltött fájl</span>'}</div>
-  ${ho.length?`<div class="pts bad">🆘 Kér segítséget: ${ho.map(h=>h.task+'. feladat').join(', ')}</div>`:''}${u.note?`<div class="pts">📌 ${esc(u.note)}</div>`:''}<div class="btns"><select class="jump" data-id="${u.id}"><option value="">↪ Ugrás…</option>${Array.from({length:T+1},(_,k)=>`<option value="${k}">${k===0?'Újrakezdés (0)':k+'. feladat'+(k===T?' (vége)':'')}</option>`).join('')}</select>${b('t5','+5 p')}${b('t15','+15 p')}${b('tm5','−5 p')}${b('back','◀')}${b('skip','▶')}${b('note','📝')}${b('detail','🔎')}${b('shot','📸')}${b('pts','⚖️')}${b('pw','🔑')}${b('reset','Reset','red')}${b('del','🗑','red')}</div></div>`;
+  ${ho.length?`<div class="pts bad">🆘 Kér segítséget: ${ho.map(h=>h.task+'. feladat').join(', ')}</div>`:''}${u.note?`<div class="pts">📌 ${esc(u.note)}</div>`:''}<div class="btns"><select class="jump" data-id="${u.id}"><option value="">↪ Ugrás…</option>${Array.from({length:T+1},(_,k)=>`<option value="${k}">${k===0?'Újrakezdés (0)':k+'. feladat'+(k===T?' (vége)':'')}</option>`).join('')}</select>${b('t5','+5 p')}${b('t15','+15 p')}${b('tm5','−5 p')}${b('back','◀')}${b('skip','▶')}${b(s==='paused'?'resumeone':'pauseone',s==='paused'?'▶️':'⏸️')}${b('note','📝')}${b('detail','🔎')}${b('shot','📸')}${b('pts','⚖️')}${b('pw','🔑')}${b('reset','Reset','red')}${b('del','🗑','red')}</div></div>`;
 }
 function csvExport(){
   const n=admNow();
