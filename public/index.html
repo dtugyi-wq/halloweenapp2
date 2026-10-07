@@ -65,6 +65,10 @@ footer a{color:#7a3a42;cursor:pointer;text-decoration:underline}
 .topo .flow.fast{animation-duration:.5s;stroke-width:2.8;opacity:.9}
 @keyframes flowmove{to{stroke-dashoffset:-14}}
 @media (prefers-reduced-motion:reduce){.topo .flow{animation:none;opacity:0}}
+.qopts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.qopt{text-align:left;background:#2a0b10;color:var(--tx);border:2px solid #6a1a24;border-radius:10px;padding:10px 14px;font-family:inherit;font-size:1rem;cursor:pointer;transition:border-color .15s,background .15s}
+.qopt:hover:not(:disabled){border-color:var(--pu);background:#4d141b}
+.qopt:disabled{opacity:.55;cursor:default}
 
 input[type=password],input[type=text]{background:#080204;color:var(--tx);border:2px solid var(--pu);border-radius:10px;padding:10px 14px;font-size:1.1rem;font-family:inherit;width:min(280px,100%)}
 input[type=file]{color:var(--tx);font-family:inherit;max-width:100%}
@@ -160,6 +164,10 @@ body.shake{animation:shake .35s}
 #flash.win{background:#ffd700}
 @media (prefers-reduced-motion:reduce){.gamblemini,.betbtn{animation:none}}
 #addrtoggle .card{border:2px solid #8e1b2e}
+.qopts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.qopt{text-align:left;background:#2a0b10;color:var(--tx);border:2px solid #6a1a24;border-radius:10px;padding:10px 14px;font-family:inherit;font-size:1rem;cursor:pointer;transition:border-color .15s,background .15s}
+.qopt:hover:not(:disabled){border-color:var(--pu);background:#4d141b}
+.qopt:disabled{opacity:.55;cursor:default}
 </style>
 </head>
 <body>
@@ -315,11 +323,12 @@ async function api(url,body){
   return j;
 }
 async function boot(){try{ST=await api('/api/state')}catch(e){ST=null} apply()}
-function apply(){if(ST){off=ST.now-Date.now();showAnn(ST.announce)}render()}
+function apply(){if(ST){off=ST.now-Date.now();showAnn(ST.announce);if(ST.user&&ST.user.role==='student')scheduleShots()}render()}
 
 /* ===== Időzítő ===== */
 setInterval(()=>{
   if(!ST||ST.user.role!=='student'||!ST.start) return;
+  updateCooldownUI();
   const r=ST.paused?ST.pausedRemaining:remaining(), t=$('#timer');
   if(t){t.textContent=(ST.paused?'⏸ ':'')+fmt(r);t.classList.toggle('low',r<600000&&!ST.end&&!ST.paused)}
   if(ST.paused) return;
@@ -342,8 +351,8 @@ setInterval(async()=>{
   try{
     const s=await api('/api/state'); showAnn(s.announce);
     const hs=h=>(h||[]).map(x=>x.id+':'+(x.handled_at?1:0)).join();
-    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||s.paused!==ST.paused||hs(s.help)!==hs(ST.help)||JSON.stringify(s.shared)!==JSON.stringify(ST.shared)){ST=s;apply()}
-    else{const chg=JSON.stringify(s.help)!==JSON.stringify(ST.help);ST.start=s.start;ST.help=s.help;ST.shotReq=s.shotReq;ST.pausedRemaining=s.pausedRemaining;off=s.now-Date.now();if(chg){updateChats();ding()}}
+    if(s.solved!==ST.solved||!!s.start!==!!ST.start||s.end!==ST.end||s.note!==ST.note||s.paused!==ST.paused||hs(s.help)!==hs(ST.help)||JSON.stringify(s.shared)!==JSON.stringify(ST.shared)||s.topologyImg!==ST.topologyImg||JSON.stringify(s.group)!==JSON.stringify(ST.group)){refHtml=null;ST=s;apply()}
+    else{const chg=JSON.stringify(s.help)!==JSON.stringify(ST.help),ivChg=s.shotIntervalMs!==ST.shotIntervalMs;ST.start=s.start;ST.help=s.help;ST.shotReq=s.shotReq;ST.pausedRemaining=s.pausedRemaining;ST.shotIntervalMs=s.shotIntervalMs;off=s.now-Date.now();if(chg){updateChats();ding()}if(ivChg)scheduleShots();}
     if(ST.shotReq) snap();
   }catch(e){if(e.status===401){LOGIN_NOTICE=(e.data&&e.data.reason==='idle')?'⏳ A munkamenet hosszabb inaktivitás (pl. bezárt böngésző) után automatikusan lezárult. Jelentkezz be újra — a verseny órája közben futott tovább.':'A munkamenet lezárult (lehet, hogy másik eszközön léptek be ugyanezzel a fiókkal). Jelentkezz be újra.';ST=null;render()}}
 },4000);
@@ -464,7 +473,13 @@ function snap(){
   c.getContext('2d').drawImage(shareVideo,0,0,c.width,c.height);
   api('/api/shot',{img:c.toDataURL('image/jpeg',0.6)}).catch(()=>{});
 }
-setInterval(snap,30000);
+let shotTimer=null;
+function scheduleShots(){
+  if(shotTimer) clearInterval(shotTimer);
+  const ms=(ST&&ST.shotIntervalMs)||30000;
+  shotTimer=setInterval(snap,ms);
+}
+scheduleShots();
 function shareCard(){
   return shareStream
    ?`<div class="card share on"><b>🔴 A képernyőd meg van osztva a tanárral.</b> <button class="sm" onclick="stopShare()">Megosztás leállítása</button></div>`
@@ -486,7 +501,7 @@ function viewStudent(){
   if(ST.requireShare&&!shareStream){gateView();return}
   const pauseBanner=ST.paused?`<div class="card" style="border-color:var(--or);text-align:center"><h2 style="margin:0">⏸️ A tanár szüneteltette az órát</h2><p class="pts">Az idő nem telik, amíg a tanár nem folytatja. Addig a rejtvények, a feltöltés és a fogadás sem elérhető.</p></div>`:'';
   if(refHtml===null) refHtml=ref();
-  let h=pauseBanner+shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+addrCard()+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
+  let h=pauseBanner+groupCard()+shareCard()+sharedCard()+(ST.adjustments&&ST.adjustments.length?`<div class="card adjcard"><h2>⚖️ Pontmódosítások</h2>${ST.adjustments.map(a=>`<div class="adjrow">${a.delta>0?'🎁 +':'⚠️ '}${a.delta} pont${a.reason?' – '+esc(a.reason):''} <span class="pts">(${dt(a.at)})</span></div>`).join('')}</div>`:'')+addrCard()+(ST.note?`<div class="card note"><h2>📌 Tanári üzenet neked</h2><p>${esc(ST.note).replace(/\n/g,'<br>')}</p></div>`:'');
   h+=`<div class="card"><h2>📦 Packet Tracer fájl feltöltése</h2><p class="pts">Tallózd ki a .pkt fájlodat, a feltöltés a szerver adatbázisába kerül. Többször is feltölthetsz, a legutóbbit értékeljük.</p>
   <div class="ans"><input type="file" id="pktfile" accept=".pkt,.pka"><button id="ubtn" disabled>Feltöltés</button></div>
   <progress id="uprog" max="100" value="0" style="width:100%;display:none"></progress><div class="msg" id="umsg"></div>
@@ -496,9 +511,10 @@ function viewStudent(){
     if(k){
       h+=`<div class="card"><h2>${last?'🏁 ':(i+1)+'. feladat – '}${k.title}</h2><div class="pts">${k.pts}</div><ul>${k.items.map(x=>`<li>${x}</li>`).join('')}</ul>${k.ol.length?`<strong>${k.olt}:</strong><ol>${k.ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${k.note?`<p>${k.note}</p>`:''}${helpBlock(i+1)}${gambleMini(i+1)}</div>`;
     } else if(i===ST.solved&&ST.puzzle){
-      h+=`<div class="card puz" id="puz"><h2>🔮 Rejtvény a(z) ${i+1}. ${last?'ellenőrzés':'feladat'} feloldásához</h2><p style="font-size:1.1rem">${esc(ST.puzzle.q)}</p>
-      <div class="ans"><input type="text" id="ain" autocomplete="off" placeholder="A válaszod"><button id="abtn">Feloldás</button></div><div class="msg" id="amsg"></div></div>`;
-    } else h+=`<div class="card locked"><h2>🔒 ${last?'Végső ellenőrzés':(i+1)+'. feladat'}</h2><div class="pts">Előbb oldd meg az előző rejtvényt</div></div>`;
+      const letters=['A','B','C','D'];
+      h+=`<div class="card puz" id="puz"><h2>🌐 Hálózati kérdés a(z) ${i+1}. ${last?'ellenőrzés':'feladat'} feloldásához</h2><p style="font-size:1.1rem">${esc(ST.puzzle.q)}</p>
+      <div class="qopts">${ST.puzzle.options.map((o,oi)=>`<button class="qopt" data-i="${oi}">${letters[oi]}) ${esc(o)}</button>`).join('')}</div><div class="msg" id="amsg"></div></div>`;
+    } else h+=`<div class="card locked"><h2>🔒 ${last?'Végső ellenőrzés':(i+1)+'. feladat'}</h2><div class="pts">Előbb válaszolj az előző kérdésre</div></div>`;
   }
   h+=bonusCard()+wheelCard();
   if(ST.solved>=ST.total&&!ST.end) h+=`<div style="text-align:center"><button class="big" id="fin">✅ Befejeztük</button></div>`;
@@ -509,7 +525,7 @@ function viewStudent(){
   document.querySelectorAll('.hsend').forEach(b=>b.onclick=()=>sendChat(+b.dataset.req));
   document.querySelectorAll('.cin').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')sendChat(+i.dataset.req)});
   document.querySelectorAll('.hchat .msgs').forEach(m=>m.scrollTop=m.scrollHeight);
-  const b=$('#abtn'); if(b){b.onclick=check;$('#ain').onkeydown=e=>{if(e.key==='Enter')check()}}
+  document.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>check(+b.dataset.i));
   const f=$('#fin'); if(f) f.onclick=async()=>{ST=await api('/api/finish',{});apply()};
   setupUpload();
   document.querySelectorAll('.betbtn').forEach(b=>b.onclick=async()=>{
@@ -549,20 +565,27 @@ function viewStudent(){
   });
   if(FLASH){const m=$('#umsg');m.className='msg ok';m.textContent=FLASH;FLASH=''}
 }
-async function check(){
-  const v=$('#ain').value; if(!v.trim()) return;
-  $('#abtn').disabled=true;
+async function check(optionIndex){
+  document.querySelectorAll('.qopt').forEach(b=>b.disabled=true);
   try{
-    const r=await api('/api/puzzle',{answer:v});
+    const r=await api('/api/puzzle',{optionIndex});
     if(r.ok){ST=await api('/api/state');off=ST.now-Date.now(); if(r.scare) playScare(false,render); else render()}
     else wrong(r.wait||8);
-  }catch(e){ if(e.status===429) wrong(e.data.wait||8); else {$('#amsg').textContent=e.message;$('#abtn').disabled=false} }
+  }catch(e){ if(e.status===429) wrong(e.data.wait||8); else {$('#amsg').textContent=e.message;document.querySelectorAll('.qopt').forEach(b=>b.disabled=false)} }
 }
+let cooldownUntil=0;
 function wrong(c){
-  const p=$('#puz'),m=$('#amsg'),b=$('#abtn'); p.classList.remove('shake');void p.offsetWidth;p.classList.add('shake');
-  b.disabled=true; m.textContent=`Hibás válasz! Újra próbálkozhatsz ${c} mp múlva.`;
-  const iv=setInterval(()=>{c--;if(c<=0){clearInterval(iv);b.disabled=false;m.textContent=''}else m.textContent=`Hibás válasz! Újra próbálkozhatsz ${c} mp múlva.`},1000);
+  const p=$('#puz'); if(p){p.classList.remove('shake');void p.offsetWidth;p.classList.add('shake');}
+  cooldownUntil=Date.now()+c*1000;
+  updateCooldownUI();
 }
+function updateCooldownUI(){
+  if(!cooldownUntil) return;
+  const m=$('#amsg'), remain=Math.ceil((cooldownUntil-Date.now())/1000);
+  if(remain>0){ if(m) m.textContent=`Hibás válasz! Újra próbálkozhatsz ${remain} mp múlva.`; document.querySelectorAll('.qopt').forEach(b=>b.disabled=true); }
+  else { if(m) m.textContent=''; document.querySelectorAll('.qopt').forEach(b=>b.disabled=false); cooldownUntil=0; }
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateCooldownUI(); });
 function setupUpload(){
   const f=$('#pktfile'),b=$('#ubtn'),m=$('#umsg'),p=$('#uprog'); if(!f) return;
   const okName=n=>/\.(pkt|pka)$/i.test(n);
@@ -598,9 +621,13 @@ function viewTeacher(){
     <span class="sp"></span><button class="sm" id="astart">▶ Mindenki indítása</button><button class="sm" id="apause">⏸ Mindenki szüneteltetése</button><button class="sm" id="aresume">▶️ Mindenki folytatása</button><button class="sm" id="acsv">⬇ CSV</button>
     <label class="auto"><input type="checkbox" id="aauto" ${AF.auto?'checked':''}> auto frissítés</label></div>
   <div class="card"><h3>📢 Üzenet a diákoknak</h3><div class="ans"><input type="text" id="amsgt" placeholder="pl. Még 10 perc van hátra!" style="flex:1;min-width:220px"><button class="sm" id="asend">Küldés</button><button class="sm red" id="aclr">Üzenet törlése</button></div></div>
+  <div id="taskadm"></div>
+  <div id="topoadm"></div>
+  <div id="groupadm"></div>
   <div id="hlp"></div>
   <div class="grid" id="grid">Betöltés…</div>
   <div id="addrtoggle"></div>
+  <div id="shotinterval"></div>
   <div id="bonusadm"></div>
   <div class="card"><h2>📥 Fájlok a diákoknak</h2><p class="pts">Ide töltsd fel a kiinduló Packet Tracer fájlt (.pkt, .pka, .zip). A diákok az oldalukon letölthetik, és ebben dolgoznak.</p><div class="ans"><input type="file" id="shf" accept=".pkt,.pka,.zip"><select id="sht"><option value="">Minden diáknak (indítás után azonnal)</option></select><button class="sm" id="shup">Feltöltés</button></div><div class="msg" id="shm"></div><div id="shl"></div></div>
   <div class="card"><h2>➕ Új diákok</h2><p class="pts">Soronként: <code>felhasználónév;jelszó;név</code> (a név elhagyható, a jelszó legalább 4 karakter)</p><textarea id="nu" placeholder="csapat1;Dracula123;Vámpírok&#10;csapat2;Mumus456;Mumiák"></textarea><button class="sm" id="mk" style="margin-top:8px">Létrehozás</button><div class="msg" id="mkm"></div></div>
@@ -650,7 +677,7 @@ function viewTeacher(){
   $('#shl').onclick=e=>{const d=e.target.closest('[data-sd]');if(d&&confirm('Törlöd a fájlt?'))adm('/api/admin/shared-delete',{id:+d.dataset.sd})};
   $('#modal').onclick=e=>{if(e.target.id==='modal'||e.target.closest('[data-x]'))$('#modal').style.display='none'};
   $('#audd').ontoggle=()=>{if($('#audd').open)loadAudit()};
-  loadAdmin();
+  loadAdmin(); loadTasksAdmin(); loadGroupsAdmin(); loadTopologyAdmin();
 }
 const STUCK_MS=20*60000;
 const fmtMs=ms=>{const m=Math.round(ms/60000);return m<1?Math.round(ms/1000)+' mp':m+' perc'};
@@ -682,6 +709,24 @@ async function sendTeacherMsg(id){
   const i=document.querySelector(`.cin[data-id="${id}"]`),tx=i.value.trim(); if(!tx) return; i.value='';
   try{await api('/api/admin/help-message',{id,text:tx});await loadAdmin()}catch(e){alert(e.message);i.value=tx}
 }
+function drawShotInterval(){
+  const el=$('#shotinterval'); if(!el) return;
+  const sec=Math.round((ADM.d.shotIntervalMs||30000)/1000);
+  el.innerHTML=`<div class="card"><h2>📸 Képernyőfotó gyakorisága</h2>
+   <p class="pts">Ilyen sűrűn küldi a böngésző a megosztott képernyőről készült képet (minden diáknál egységesen). Minimum 1, maximum 300 másodperc.</p>
+   <div class="ans"><input type="text" id="shotsec" value="${sec}" style="width:90px"> mp
+   <button class="sm" id="shotpreset1">1 mp</button><button class="sm" id="shotpreset5">5 mp</button><button class="sm" id="shotpreset10">10 mp</button><button class="sm" id="shotpreset30">30 mp</button><button class="sm" id="shotpreset60">60 mp</button>
+   <button class="sm" id="shotsave">Mentés</button></div>
+   <div class="msg" id="shotmsg"></div></div>`;
+  const apply=v=>{$('#shotsec').value=v};
+  $('#shotpreset1').onclick=()=>apply(1); $('#shotpreset5').onclick=()=>apply(5); $('#shotpreset10').onclick=()=>apply(10);
+  $('#shotpreset30').onclick=()=>apply(30); $('#shotpreset60').onclick=()=>apply(60);
+  $('#shotsave').onclick=async()=>{
+    const v=Math.max(1,Math.min(300,parseInt($('#shotsec').value,10)||30));
+    try{await api('/api/admin/shot-interval',{seconds:v});$('#shotmsg').className='msg ok';$('#shotmsg').textContent='✅ Mentve: '+v+' mp';loadAdmin()}
+    catch(e){$('#shotmsg').textContent=e.message}
+  };
+}
 function drawAddrToggle(){
   const el=$('#addrtoggle'); if(!el) return;
   const on=ADM.d.addrForce;
@@ -691,6 +736,126 @@ function drawAddrToggle(){
    <p class="pts" style="margin-top:8px">Eddig megvásárolta: ${(ADM.d.addrBuys||[]).length} diák.</p></div>`;
   $('#addrtbtn').onclick=()=>adm('/api/admin/addr-force',{on:!on});
 }
+
+/* ===== Feladatszerkesztő (admin állítja össze a feladatokat) ===== */
+let TASKS_ADM=[];
+async function loadTasksAdmin(){
+  try{TASKS_ADM=await api('/api/admin/tasks')}catch(e){return} drawTasksAdmin();
+}
+function drawTasksAdmin(){
+  const el=$('#taskadm'); if(!el) return;
+  const rows=TASKS_ADM.map((t,i)=>`<div class="hreq"><div style="flex:1"><b>${i+1}. ${esc(t.title)}</b> <span class="pts">${esc(t.pts)}</span><div class="pts">${t.items.length} lépés${t.ol.length?' · '+t.ol.length+' allépés':''}${t.note?' · van megjegyzés':''}</div></div>
+    <div class="btns" style="margin-top:0">${i>0?`<button class="sm" data-tup="${t.id}">↑</button>`:''}${i<TASKS_ADM.length-1?`<button class="sm" data-tdown="${t.id}">↓</button>`:''}<button class="sm" data-tedit="${t.id}">✏️</button><button class="sm red" data-tdel="${t.id}">🗑</button></div></div>`).join('');
+  el.innerHTML=`<div class="card"><h2>🧩 Feladatok összeállítása</h2>
+   <p class="pts">Itt állítod össze, mi jelenjen meg a diákoknak feladatonként: cím, pontszám, lépések, opcionális alteszt-lista és megjegyzés. A ↑↓ gombokkal állítható a sorrend. <b>Figyelem:</b> ha a verseny már fut, a feladatlista módosítása összezavarhatja a már elindult diákok haladását – ezt inkább indítás előtt állítsd össze.</p>
+   ${rows||'<p class="pts">Még nincs feladat felvéve.</p>'}
+   <button class="sm" id="taddnew" style="margin-top:10px">➕ Új feladat</button></div>`;
+  el.querySelectorAll('[data-tedit]').forEach(b=>b.onclick=()=>openTaskEditor(+b.dataset.tedit));
+  el.querySelectorAll('[data-tdel]').forEach(b=>b.onclick=async()=>{if(!confirm('Biztosan törlöd ezt a feladatot?'))return;try{await api('/api/admin/tasks/delete',{id:+b.dataset.tdel});loadTasksAdmin();loadAdmin()}catch(e){alert(e.message)}});
+  el.querySelectorAll('[data-tup]').forEach(b=>b.onclick=()=>moveTask(+b.dataset.tup,-1));
+  el.querySelectorAll('[data-tdown]').forEach(b=>b.onclick=()=>moveTask(+b.dataset.tdown,1));
+  $('#taddnew').onclick=()=>openTaskEditor(null);
+}
+async function moveTask(id,dir){
+  const i=TASKS_ADM.findIndex(t=>t.id===id),j=i+dir; if(i<0||j<0||j>=TASKS_ADM.length) return;
+  const arr=TASKS_ADM.slice(); [arr[i],arr[j]]=[arr[j],arr[i]];
+  try{await api('/api/admin/tasks/reorder',{order:arr.map(t=>t.id)});await loadTasksAdmin()}catch(e){alert(e.message)}
+}
+function openTaskEditor(id){
+  const t=id?TASKS_ADM.find(x=>x.id===id):{title:'',pts:'',items:[],olt:'',ol:[],note:''};
+  $('#modal').innerHTML=`<div class="mbox"><button class="sm red" data-x style="float:right">✕</button>
+   <h2>${id?'Feladat szerkesztése':'Új feladat'}</h2>
+   <div class="ans" style="flex-direction:column;align-items:stretch;gap:10px">
+    <label>Cím<br><input type="text" id="tf_title" style="width:100%" value="${esc(t.title)}"></label>
+    <label>Pontszám (szöveg, pl. „10 pont")<br><input type="text" id="tf_pts" style="width:100%" value="${esc(t.pts)}"></label>
+    <label>Lépések (soronként egy; HTML tag is írható, pl. &lt;strong&gt;, &lt;code&gt;)<br><textarea id="tf_items" style="min-height:140px">${esc(t.items.join('\n'))}</textarea></label>
+    <label>Alteszt-lista címe (opcionális, pl. „Teszt")<br><input type="text" id="tf_olt" style="width:100%" value="${esc(t.olt)}"></label>
+    <label>Alteszt-lista lépései (soronként egy, opcionális)<br><textarea id="tf_ol" style="min-height:90px">${esc(t.ol.join('\n'))}</textarea></label>
+    <label>Megjegyzés / bónusz (opcionális)<br><textarea id="tf_note" style="min-height:70px">${esc(t.note)}</textarea></label>
+   </div>
+   <div class="ans" style="margin-top:14px"><button class="sm" id="tf_save">💾 Mentés</button></div>
+   <div class="msg" id="tf_msg"></div></div>`;
+  $('#modal').style.display='flex';
+  $('#tf_save').onclick=async()=>{
+    const body={title:$('#tf_title').value,pts:$('#tf_pts').value,
+      items:$('#tf_items').value.split('\n').map(x=>x.trim()).filter(Boolean),
+      olt:$('#tf_olt').value, ol:$('#tf_ol').value.split('\n').map(x=>x.trim()).filter(Boolean),
+      note:$('#tf_note').value};
+    try{
+      if(id) await api('/api/admin/tasks/update',Object.assign({id},body)); else await api('/api/admin/tasks',body);
+      $('#modal').style.display='none'; await loadTasksAdmin(); loadAdmin();
+    }catch(e){$('#tf_msg').textContent=e.message}
+  };
+}
+
+/* ===== Csoportmunka (admin osztja be, ki kivel dolgozik) ===== */
+let GROUPS_ADM=[];
+async function loadGroupsAdmin(){
+  try{GROUPS_ADM=await api('/api/admin/groups')}catch(e){return} drawGroupsAdmin();
+}
+function drawGroupsAdmin(){
+  const el=$('#groupadm'); if(!el) return;
+  const rows=GROUPS_ADM.map(g=>`<div class="hreq" style="flex-direction:column;align-items:stretch">
+    <div class="uh"><b>${esc(g.name)}</b><div class="btns" style="margin-top:0"><button class="sm" data-gedit="${g.id}">✏️ Tagok</button><button class="sm" data-gren="${g.id}">Átnevezés</button><button class="sm red" data-gdel="${g.id}">🗑</button></div></div>
+    <div class="pts">${g.members.length?g.members.map(m=>esc(m.name||m.username)).join(', '):'Még nincs tagja.'}</div></div>`).join('');
+  el.innerHTML=`<div class="card"><h2>👥 Csoportmunka</h2>
+   <p class="pts">Hozz létre csoportokat, és oszd be, ki kivel dolgozzon együtt. Egy diák egyszerre csak egy csoportban lehet. A diákok a saját oldalukon látják a csapattársaikat.</p>
+   ${rows||'<p class="pts">Még nincs csoport.</p>'}
+   <div class="ans" style="margin-top:10px"><input type="text" id="gnewname" placeholder="Új csoport neve"><button class="sm" id="gnewbtn">➕ Csoport létrehozása</button></div></div>`;
+  el.querySelectorAll('[data-gedit]').forEach(b=>b.onclick=()=>openGroupMembers(+b.dataset.gedit));
+  el.querySelectorAll('[data-gren]').forEach(b=>b.onclick=async()=>{
+    const g=GROUPS_ADM.find(x=>x.id===+b.dataset.gren),name=prompt('Új név:',g.name); if(!name)return;
+    try{await api('/api/admin/groups/rename',{id:g.id,name});loadGroupsAdmin()}catch(e){alert(e.message)}
+  });
+  el.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Biztosan törlöd ezt a csoportot?'))return;
+    try{await api('/api/admin/groups/delete',{id:+b.dataset.gdel});loadGroupsAdmin()}catch(e){alert(e.message)}
+  });
+  $('#gnewbtn').onclick=async()=>{
+    const name=$('#gnewname').value.trim(); if(!name)return;
+    try{await api('/api/admin/groups',{name});$('#gnewname').value='';loadGroupsAdmin()}catch(e){alert(e.message)}
+  };
+}
+function openGroupMembers(gid){
+  const g=GROUPS_ADM.find(x=>x.id===gid), memberIds=new Set(g.members.map(m=>m.id));
+  const otherAssigned={}; GROUPS_ADM.forEach(gg=>{if(gg.id!==gid) gg.members.forEach(m=>otherAssigned[m.id]=gg.name)});
+  const students=(ADM?ADM.d.users:[]).slice().sort((a,b)=>a.username.localeCompare(b.username));
+  const opts=students.map(u=>`<label style="display:block;padding:4px 0"><input type="checkbox" class="gmember" value="${u.id}" ${memberIds.has(u.id)?'checked':''}> ${esc(u.name||u.username)}${otherAssigned[u.id]?` <span class="pts">(most: ${esc(otherAssigned[u.id])})</span>`:''}</label>`).join('');
+  $('#modal').innerHTML=`<div class="mbox"><button class="sm red" data-x style="float:right">✕</button>
+   <h2>${esc(g.name)} – tagok</h2><div>${opts||'<p class="pts">Nincs még felvett diák.</p>'}</div>
+   <div class="ans" style="margin-top:14px"><button class="sm" id="gm_save">💾 Mentés</button></div>
+   <div class="msg" id="gm_msg"></div></div>`;
+  $('#modal').style.display='flex';
+  $('#gm_save').onclick=async()=>{
+    const userIds=[...document.querySelectorAll('.gmember:checked')].map(c=>+c.value);
+    try{await api('/api/admin/groups/set-members',{id:gid,userIds});$('#modal').style.display='none';loadGroupsAdmin()}
+    catch(e){$('#gm_msg').textContent=e.message}
+  };
+}
+
+/* ===== Topológia (admin saját térképet tölthet fel a beépített helyett) ===== */
+let TOPO_ON=false;
+async function loadTopologyAdmin(){
+  try{const d=ADM?ADM.d:await api('/api/admin/overview');TOPO_ON=!!d.topologyImg}catch(e){} drawTopologyAdmin();
+}
+function drawTopologyAdmin(){
+  const el=$('#topoadm'); if(!el) return;
+  el.innerHTML=`<div class="card"><h2>🗺️ Topológia térkép</h2>
+   <p class="pts">Alapból a beépített, automatikusan rajzolt térkép jelenik meg a diákoknak. Ide tölthetsz fel egy saját képet (PNG, JPG, WEBP vagy SVG, max 8 MB), ami lecseréli azt mindenkinél.</p>
+   ${TOPO_ON?`<p class="ok">✅ Jelenleg egyedi térkép van beállítva.</p><img src="/api/topology/image?v=${Date.now()}" style="max-width:100%;border:1px solid var(--pu);border-radius:10px;margin:8px 0;display:block">`:'<p class="pts">Jelenleg a beépített térkép látszik.</p>'}
+   <div class="ans"><input type="file" id="topofile" accept=".png,.jpg,.jpeg,.webp,.svg"><button class="sm" id="topoup">Feltöltés</button>${TOPO_ON?'<button class="sm red" id="topoclear">Visszaállítás az alap térképre</button>':''}</div>
+   <div class="msg" id="topomsg"></div></div>`;
+  $('#topoup').onclick=()=>{
+    const f=$('#topofile').files[0],m=$('#topomsg'); if(!f){m.textContent='Válassz egy képet.';return}
+    const fd=new FormData(); fd.append('file',f);
+    const r=new XMLHttpRequest(); r.open('POST','/api/admin/topology'); m.className='msg'; m.textContent='Feltöltés…';
+    r.onload=()=>{let j={};try{j=JSON.parse(r.responseText)}catch(e){} if(r.status===200){m.className='msg ok';m.textContent='✅ Feltöltve';loadTopologyAdmin()}else m.textContent=j.error||('Hiba ('+r.status+')')};
+    r.onerror=()=>{m.textContent='Hálózati hiba'};
+    r.send(fd);
+  };
+  const cb=$('#topoclear'); if(cb) cb.onclick=async()=>{if(!confirm('Visszaállítod az alap, beépített térképre?'))return;try{await api('/api/admin/topology-clear',{});loadTopologyAdmin()}catch(e){alert(e.message)}};
+}
+
 function drawBonus(){
   const el=$('#bonusadm'); if(!el) return;
   const pend=(ADM.d.bonusEssays||[]).filter(e=>e.graded_at===null||e.graded_at===undefined);
@@ -764,7 +929,7 @@ async function loadAdmin(){
     ADM={d,at:Date.now(),map:Object.fromEntries(d.users.map(u=>[u.id,u]))};
     if(!$('#grid')) return;
     if(document.activeElement&&document.activeElement.matches('select.jump')) return;
-    drawTiles(); drawGrid(); drawHelp(); drawShared(); drawBonus(); drawAddrToggle();
+    drawTiles(); drawGrid(); drawHelp(); drawShared(); drawBonus(); drawAddrToggle(); drawShotInterval();
     if($('#audd')&&$('#audd').open) loadAudit();
   }catch(e){const g=$('#grid');if(g)g.textContent=e.message}
 }
@@ -825,8 +990,12 @@ function spook(){
 setTimeout(spook,25000);
 (function(){const e=$('#eyes');for(let i=0;i<5;i++){const d=document.createElement('i');d.textContent='👁';d.style.cssText=`left:${Math.random()<.5?Math.random()*10:90+Math.random()*8}%;top:${10+Math.random()*80}%;animation-delay:${Math.random()*20}s;animation-duration:${16+Math.random()*16}s`;e.appendChild(d)}})();
 
+function groupCard(){
+  if(!ST.group) return '';
+  return `<div class="card"><h2>👥 Csoportod: ${esc(ST.group.name)}</h2><p class="pts">Csapattársaid: ${ST.group.members.length?ST.group.members.map(m=>esc(m.name||m.username)).join(', '):'(még nincs más tag beosztva ide)'}</p></div>`;
+}
 function ref(){return `
-<details open><summary>🗺️ Térkép</summary><div class="tw">${mapSvg()}</div></details>
+<details open><summary>🗺️ Térkép</summary><div class="tw">${ST&&ST.topologyImg?`<img src="/api/topology/image?v=${ST.now}" style="max-width:100%;border-radius:8px">`:mapSvg()}</div></details>
 <details><summary>🔌 Kábelezés</summary><div class="tw"><table><tr><th>Link</th><th>A vég</th><th>B vég</th><th>Kábel</th><th>Megjegyzés</th></tr><tr><td>1</td><td>R-KASTELY1 Se0/2/0</td><td>ISP-FO Se0/2/0</td><td>serial DCE</td><td>203.0.113.0/30, elsődleges</td></tr><tr><td>2</td><td>R-KASTELY2 Se0/2/0</td><td>ISP-TARTALEK Se0/2/0</td><td>serial DCE</td><td>198.51.100.0/30, tartalék</td></tr><tr><td>3</td><td>R-KASTELY1 Gi0/0/1</td><td>SW-D1 Gi0/1</td><td>egyenes</td><td>trunk, subinterface-ek</td></tr><tr><td>4</td><td>R-KASTELY2 Gi0/0/1</td><td>SW-D2 Gi0/1</td><td>egyenes</td><td>trunk, subinterface-ek</td></tr><tr><td>5</td><td>SW-D1 Fa0/23–24</td><td>SW-D2 Fa0/23–24</td><td>crossover</td><td>Po1, LACP</td></tr><tr><td>6</td><td>SW-D1 Fa0/1–2</td><td>SW-A1 Fa0/1–2</td><td>crossover</td><td>Po2, PAgP</td></tr><tr><td>7</td><td>SW-D2 Fa0/1–2</td><td>SW-A2 Fa0/1–2</td><td>crossover</td><td>Po3, PAgP</td></tr><tr><td>8</td><td>R-KASTELY1 Gi0/0/0</td><td>R-KASTELY2 Gi0/0/0</td><td>crossover</td><td>L4</td></tr><tr><td>9</td><td>R-KASTELY1 Gi0/0/2</td><td>R-TEMETO Gi0/0/2</td><td>crossover</td><td>L1 (átlós)</td></tr><tr><td>10</td><td>R-KASTELY2 Gi0/0/2</td><td>R-KRIPTA Gi0/0/2</td><td>crossover</td><td>L2</td></tr><tr><td>11</td><td>R-TEMETO Gi0/0/1</td><td>R-KRIPTA Gi0/0/1</td><td>crossover</td><td>L3</td></tr><tr><td>12</td><td>R-TEMETO Gi0/0/0</td><td>SW-T1 Gi0/1</td><td>egyenes</td><td></td></tr><tr><td>13</td><td>R-KRIPTA Gi0/0/0</td><td>SW-K1 Gi0/1</td><td>egyenes</td><td></td></tr><tr><td>14</td><td>PC-A1 / PC-A2</td><td>SW-A1 Fa0/6 / Fa0/11</td><td>egyenes</td><td>VLAN 10 / VLAN 20</td></tr><tr><td>15</td><td>PC-A3</td><td>SW-A2 Fa0/6</td><td>egyenes</td><td>VLAN 30</td></tr><tr><td>16</td><td>PC-T1 / PC-K1</td><td>SW-T1 Fa0/24 / SW-K1 Fa0/24</td><td>egyenes</td><td></td></tr></table></div></details>
 <details><summary>📋 Címzési táblázat</summary><h3>Router interfészek</h3><div class="tw"><table><tr><th>Eszköz</th><th>Interfész</th><th>IPv4</th><th>IPv6</th><th>Megjegyzés</th></tr><tr><td>R-KASTELY1</td><td>Gi0/0/1.10</td><td>172.16.0.2/24</td><td>2001:db8:13:10::2/64</td><td>HSRP 10, vIP 172.16.0.1</td></tr><tr><td></td><td>Gi0/0/1.20</td><td>172.16.1.2/25</td><td>2001:db8:13:20::2/64</td><td>HSRP 20, vIP 172.16.1.1</td></tr><tr><td></td><td>Gi0/0/1.30</td><td>172.16.1.194/26</td><td>2001:db8:13:30::2/64</td><td>HSRP 30, vIP 172.16.1.193</td></tr><tr><td></td><td>Gi0/0/1.99</td><td>172.16.2.34/27</td><td>2001:db8:13:99::2/64</td><td>HSRP 99, vIP 172.16.2.33</td></tr><tr><td></td><td>Se0/2/0</td><td>203.0.113.2/30</td><td>2001:db8:ffff:1::2/64</td><td>ISP-FO felé</td></tr><tr><td></td><td>Gi0/0/2</td><td>172.16.2.65/30</td><td>2001:db8:13:ff01::1/64</td><td>L1 → R-TEMETO</td></tr><tr><td></td><td>Gi0/0/0</td><td>172.16.2.77/30</td><td>2001:db8:13:ff04::1/64</td><td>L4 → R-KASTELY2</td></tr><tr><td>R-KASTELY2</td><td>Gi0/0/1.10</td><td>172.16.0.3/24</td><td>2001:db8:13:10::3/64</td><td>HSRP 10</td></tr><tr><td></td><td>Gi0/0/1.20</td><td>172.16.1.3/25</td><td>2001:db8:13:20::3/64</td><td>HSRP 20</td></tr><tr><td></td><td>Gi0/0/1.30</td><td>172.16.1.195/26</td><td>2001:db8:13:30::3/64</td><td>HSRP 30</td></tr><tr><td></td><td>Gi0/0/1.99</td><td>172.16.2.35/27</td><td>2001:db8:13:99::3/64</td><td>HSRP 99</td></tr><tr><td></td><td>Se0/2/0</td><td>198.51.100.2/30</td><td>2001:db8:ffff:2::2/64</td><td>ISP-TARTALEK felé</td></tr><tr><td></td><td>Gi0/0/2</td><td>172.16.2.69/30</td><td>2001:db8:13:ff02::1/64</td><td>L2 → R-KRIPTA</td></tr><tr><td></td><td>Gi0/0/0</td><td>172.16.2.78/30</td><td>2001:db8:13:ff04::2/64</td><td>L4 → R-KASTELY1</td></tr><tr><td>R-TEMETO</td><td>Gi0/0/0</td><td>172.16.1.129/26</td><td>2001:db8:13:40::1/64</td><td>Temető LAN</td></tr><tr><td></td><td>Gi0/0/2</td><td>172.16.2.66/30</td><td>2001:db8:13:ff01::2/64</td><td>L1 → R-KASTELY1</td></tr><tr><td></td><td>Gi0/0/1</td><td>172.16.2.73/30</td><td>2001:db8:13:ff03::1/64</td><td>L3 → R-KRIPTA</td></tr><tr><td>R-KRIPTA</td><td>Gi0/0/0</td><td>172.16.2.1/27</td><td>2001:db8:13:50::1/64</td><td>Kripta LAN</td></tr><tr><td></td><td>Gi0/0/2</td><td>172.16.2.70/30</td><td>2001:db8:13:ff02::2/64</td><td>L2 → R-KASTELY2</td></tr><tr><td></td><td>Gi0/0/1</td><td>172.16.2.74/30</td><td>2001:db8:13:ff03::2/64</td><td>L3 → R-TEMETO</td></tr><tr><td>ISP-FO</td><td>Se0/2/0</td><td>203.0.113.1/30</td><td>2001:db8:ffff:1::1/64</td><td></td></tr><tr><td></td><td>Lo0</td><td>8.8.8.8/32</td><td>2001:4860:4860::8888/128</td><td>„Internet"</td></tr><tr><td>ISP-TARTALEK</td><td>Se0/2/0</td><td>198.51.100.1/30</td><td>2001:db8:ffff:2::1/64</td><td></td></tr><tr><td></td><td>Lo0</td><td>8.8.8.8/32</td><td>2001:4860:4860::8888/128</td><td>„Internet"</td></tr></table></div><h3>Switch menedzsment</h3><div class="tw"><table><tr><th>Eszköz</th><th>SVI</th><th>IPv4</th><th>Default gateway</th></tr><tr><td>SW-D1</td><td>VLAN 99</td><td>172.16.2.36/27</td><td>172.16.2.33</td></tr><tr><td>SW-D2</td><td>VLAN 99</td><td>172.16.2.37/27</td><td>172.16.2.33</td></tr><tr><td>SW-A1</td><td>VLAN 99</td><td>172.16.2.38/27</td><td>172.16.2.33</td></tr><tr><td>SW-A2</td><td>VLAN 99</td><td>172.16.2.39/27</td><td>172.16.2.33</td></tr><tr><td>SW-T1</td><td>VLAN 1</td><td>172.16.1.190/26</td><td>172.16.1.129</td></tr><tr><td>SW-K1</td><td>VLAN 1</td><td>172.16.2.30/27</td><td>172.16.2.1</td></tr></table></div><h3>Végpontok</h3><div class="tw"><table><tr><th>PC</th><th>Port</th><th>VLAN</th><th>IPv4</th><th>IPv6</th></tr><tr><td>PC-A1</td><td>SW-A1 Fa0/6</td><td>10</td><td>DHCP (R-KASTELY1)</td><td>SLAAC</td></tr><tr><td>PC-A2</td><td>SW-A1 Fa0/11</td><td>20</td><td>DHCP (R-KASTELY1)</td><td>Stateless DHCPv6</td></tr><tr><td>PC-A3</td><td>SW-A2 Fa0/6</td><td>30</td><td>DHCP (R-KASTELY1)</td><td>SLAAC</td></tr><tr><td>PC-T1</td><td>SW-T1 Fa0/24</td><td>1</td><td>DHCP (R-TEMETO)</td><td>Stateful DHCPv6</td></tr><tr><td>PC-K1</td><td>SW-K1 Fa0/24</td><td>1</td><td>DHCP (R-KRIPTA)</td><td>SLAAC</td></tr></table></div></details>`}
 

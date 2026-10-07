@@ -17,6 +17,10 @@ services:
       DATA_KEY: ${DATA_KEY:-}            # a feltöltött .pkt fájlok titkosításához (ne veszítsd el!)
       COOKIE_SECURE: ${COOKIE_SECURE:-}  # 1 = a belépés csak HTTPS-en működik
       # TRUST_PROXY: "1"
-    volumes:
-      - ./data:/data
+      DB_HOST: ${DB_HOST:?Hozz letre egy .env fajlt DB_HOST=... sorral (a NAS LAN IP-je, ne localhost)}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-netlab}
+      DB_PASSWORD: ${DB_PASSWORD:?Hozz letre egy .env fajlt DB_PASSWORD=... sorral}
+      DB_NAME: ${DB_NAME:-netlab}
+    # volumes:
       # - ./media:/app/public/media:ro    # csak akkor, ha a scare.mp4 nincs a repóban/image-ben

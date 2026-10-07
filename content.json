@@ -126,44 +126,6 @@
    "note": ""
   }
  ],
- "puzzles": [
-  {
-   "q": "A boszorkány üstjében 3 béka van. Minden órában a békák száma megkétszereződik, majd 1 béka kiugrik az üstből. Hány béka van az üstben 4 óra múlva?",
-   "a": "c6f3ac57944a531490cd39902d0f777715fd005efac9a30622d5f5205e7f6894"
-  },
-  {
-   "q": "Fejtsd meg a sorozatot: 2, 6, 12, 20, 30, ? Mi a következő szám?",
-   "a": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049"
-  },
-  {
-   "q": "Dracula, Mumus, a Boszorkány és a Mumia sorban áll. Mumus az első, a Mumia az utolsó. A Boszorkány közvetlenül Dracula előtt áll. Ki áll a második helyen?",
-   "a": "90615302a881fbbe94af95fa6a5a8111649475f67b928bf23a055932bed15283"
-  },
-  {
-   "q": "Egy szellem az első éjjel 1 láncot vesz fel, és minden következő éjjel kétszer annyit, mint az előzőn. Hányadik éjjel lesz először 100-nál több láncot a nyakában az aznapi darabszám?",
-   "a": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
-  },
-  {
-   "q": "Három dobozon ez áll: CUKOR, TRÜKK, VEGYES. Mindhárom felirat HAMIS. A VEGYES feliratú dobozból cukrot húzol. Mi van valójában a TRÜKK feliratú dobozban? (cukor / trükk / vegyes)",
-   "a": "ee5b5ce2d6ae37c8c8d0adf3b38e50662c63b8ffcf565881b4ff7ca9f036d4c6"
-  },
-  {
-   "q": "3 szellem 3 perc alatt 3 ablakot ijeszt meg. Hány perc alatt ijeszt meg 100 szellem 100 ablakot?",
-   "a": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
-  },
-  {
-   "q": "Fejtsd meg a kódot: minden betűt az angol ábécében eggyel előrébb léptettünk. A titkos szó: IBMMPXFFO",
-   "a": "9eb7ee7f551d2f0ac684981bd1f1e2fa4a37590199636753efe614d4db30e8e1"
-  },
-  {
-   "q": "Egy tök egy kilogrammból és még a saját tömegének feléből áll. Hány kilogramm a tök?",
-   "a": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
-  },
-  {
-   "q": "2 vámpírnak 2-2, 3 zombinak 2-2, egy pókszörnynek pedig 8 lába van. Hány lábuk van összesen?",
-   "a": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a"
-  }
- ],
  "bonusMath": [
   {
    "id": "bm1",
@@ -300,5 +262,2407 @@
    "Az IPv6 default route célcíme mindig ::/0, ahogy az IPv4-nél a 0.0.0.0/0.",
    "Teszteléskor ne csak a 'show ip route'-ot nézd, hanem tényleges ping vagy traceroute paranccsal is ellenőrizd az útvonalat."
   ]
- }
+ },
+ "quizPool": [
+  {
+   "id": 1,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /20-s hálózaton?",
+   "options": [
+    "4095",
+    "4096",
+    "4098",
+    "4094"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 2,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /21-s hálózaton?",
+   "options": [
+    "2050",
+    "2047",
+    "2046",
+    "2048"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 3,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /22-s hálózaton?",
+   "options": [
+    "1024",
+    "1026",
+    "1023",
+    "1022"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 4,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /23-s hálózaton?",
+   "options": [
+    "512",
+    "511",
+    "510",
+    "514"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 5,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /24-s hálózaton?",
+   "options": [
+    "256",
+    "255",
+    "258",
+    "254"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 6,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /25-s hálózaton?",
+   "options": [
+    "128",
+    "130",
+    "127",
+    "126"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 7,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /26-s hálózaton?",
+   "options": [
+    "63",
+    "64",
+    "62",
+    "66"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 8,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /27-s hálózaton?",
+   "options": [
+    "32",
+    "34",
+    "30",
+    "31"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 9,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /28-s hálózaton?",
+   "options": [
+    "14",
+    "15",
+    "16",
+    "18"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 10,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /29-s hálózaton?",
+   "options": [
+    "7",
+    "10",
+    "6",
+    "8"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 11,
+   "topic": 1,
+   "q": "Hány HASZNÁLHATÓ host-cím van egy /30-s hálózaton?",
+   "options": [
+    "3",
+    "4",
+    "6",
+    "2"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 12,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /20 prefixhez?",
+   "options": [
+    "255.255.240.0",
+    "255.255.248.0",
+    "255.255.255.128",
+    "255.255.252.0"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 13,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /21 prefixhez?",
+   "options": [
+    "255.255.254.0",
+    "255.255.240.0",
+    "255.255.252.0",
+    "255.255.248.0"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 14,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /22 prefixhez?",
+   "options": [
+    "255.255.254.0",
+    "255.255.240.0",
+    "255.255.248.0",
+    "255.255.252.0"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 15,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /23 prefixhez?",
+   "options": [
+    "255.255.254.0",
+    "255.255.252.0",
+    "255.255.248.0",
+    "255.255.255.0"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 16,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /24 prefixhez?",
+   "options": [
+    "255.255.252.0",
+    "255.255.255.0",
+    "255.255.255.128",
+    "255.255.254.0"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 17,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /25 prefixhez?",
+   "options": [
+    "255.255.255.0",
+    "255.255.254.0",
+    "255.255.255.192",
+    "255.255.255.128"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 18,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /26 prefixhez?",
+   "options": [
+    "255.255.255.128",
+    "255.255.255.0",
+    "255.255.255.192",
+    "255.255.255.224"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 19,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /27 prefixhez?",
+   "options": [
+    "255.255.255.128",
+    "255.255.255.240",
+    "255.255.255.192",
+    "255.255.255.224"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 20,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /28 prefixhez?",
+   "options": [
+    "255.255.255.240",
+    "255.255.255.224",
+    "255.255.255.248",
+    "255.255.255.192"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 21,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /29 prefixhez?",
+   "options": [
+    "255.255.255.248",
+    "255.255.255.252",
+    "255.255.255.224",
+    "255.255.255.240"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 22,
+   "topic": 1,
+   "q": "Melyik a helyes alhálózati maszk a /30 prefixhez?",
+   "options": [
+    "255.255.255.248",
+    "255.255.255.252",
+    "255.255.254.0",
+    "255.255.255.240"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 23,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /23-s alhálózatra tudsz felosztani?",
+   "options": [
+    "2",
+    "4",
+    "6",
+    "1"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 24,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /24-s alhálózatra tudsz felosztani?",
+   "options": [
+    "2",
+    "4",
+    "6",
+    "8"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 25,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /25-s alhálózatra tudsz felosztani?",
+   "options": [
+    "4",
+    "10",
+    "8",
+    "16"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 26,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /26-s alhálózatra tudsz felosztani?",
+   "options": [
+    "18",
+    "32",
+    "8",
+    "16"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 27,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /27-s alhálózatra tudsz felosztani?",
+   "options": [
+    "16",
+    "34",
+    "32",
+    "64"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 28,
+   "topic": 1,
+   "q": "Egy /22-es hálózatot hány darab /28-s alhálózatra tudsz felosztani?",
+   "options": [
+    "66",
+    "32",
+    "64",
+    "128"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 29,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /24-s hálózathoz?",
+   "options": [
+    "256",
+    "254",
+    "128",
+    "512"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 30,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /25-s hálózathoz?",
+   "options": [
+    "64",
+    "128",
+    "256",
+    "126"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 31,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /26-s hálózathoz?",
+   "options": [
+    "64",
+    "128",
+    "32",
+    "62"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 32,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /27-s hálózathoz?",
+   "options": [
+    "32",
+    "30",
+    "16",
+    "64"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 33,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /28-s hálózathoz?",
+   "options": [
+    "14",
+    "32",
+    "16",
+    "8"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 34,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /29-s hálózathoz?",
+   "options": [
+    "6",
+    "4",
+    "8",
+    "16"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 35,
+   "topic": 1,
+   "q": "Összesen (hálózati és broadcast címmel együtt) hány IP-cím tartozik egy /30-s hálózathoz?",
+   "options": [
+    "0",
+    "4",
+    "8",
+    "2"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 36,
+   "topic": 1,
+   "q": "Legalább 50 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/26",
+    "/27",
+    "/21",
+    "/30"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 37,
+   "topic": 1,
+   "q": "Legalább 100 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/20",
+    "/29",
+    "/24",
+    "/25"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 38,
+   "topic": 1,
+   "q": "Legalább 200 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/21",
+    "/26",
+    "/24",
+    "/25"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 39,
+   "topic": 1,
+   "q": "Legalább 500 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/22",
+    "/20",
+    "/25",
+    "/23"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 40,
+   "topic": 1,
+   "q": "Legalább 1000 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/29",
+    "/23",
+    "/22",
+    "/24"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 41,
+   "topic": 1,
+   "q": "Legalább 14 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/25",
+    "/30",
+    "/27",
+    "/28"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 42,
+   "topic": 1,
+   "q": "Legalább 30 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/20",
+    "/27",
+    "/23",
+    "/24"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 43,
+   "topic": 1,
+   "q": "Legalább 2 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/27",
+    "/29",
+    "/30",
+    "/21"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 44,
+   "topic": 1,
+   "q": "Legalább 6 használható host-címre van szükséged egy alhálózatban. Melyik a legkisebb méretű (legnagyobb prefixű) maszk, ami ezt még kielégíti?",
+   "options": [
+    "/28",
+    "/22",
+    "/29",
+    "/24"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 45,
+   "topic": 2,
+   "q": "Melyik SSH-verziót ajánlott ma router-hozzáféréshez használni?",
+   "options": [
+    "SSHv0",
+    "SSH verzió 1",
+    "SSH verzió 2",
+    "Telnet SSH móddal"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 46,
+   "topic": 2,
+   "q": "Mi szükséges az SSH 2-es verziójának engedélyezéséhez a kulcsgenerálás előtt?",
+   "options": [
+    "a router újraindítása",
+    "egy második VTY vonal",
+    "a DHCP kikapcsolása",
+    "domain név beállítása"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 47,
+   "topic": 2,
+   "q": "Melyik paranccsal titkosíthatók a sima szöveges jelszavak a konfigurációban?",
+   "options": [
+    "enable secret",
+    "service password-encryption",
+    "ip ssh version 2",
+    "crypto key generate"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 48,
+   "topic": 2,
+   "q": "Mi a különbség az 'enable password' és az 'enable secret' között?",
+   "options": [
+    "a secret csak Telnethez használható",
+    "nincs köztük különbség",
+    "a secret titkosítva tárolja a jelszót",
+    "a password erősebb titkosítást ad"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 49,
+   "topic": 2,
+   "q": "Melyik paranccsal tiltható le a Telnet egy VTY vonalon, csak SSH-t engedélyezve?",
+   "options": [
+    "line vty disable",
+    "transport input ssh",
+    "no telnet",
+    "ssh only"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 50,
+   "topic": 2,
+   "q": "Hány bites RSA kulcs az általános minimum ajánlás SSH-hoz Cisco eszközökön?",
+   "options": [
+    "56 bit",
+    "8192 bit kötelező",
+    "1024 bit vagy több (pl. 2048)",
+    "128 bit"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 51,
+   "topic": 2,
+   "q": "Mire szolgál a 'login block-for' parancs?",
+   "options": [
+    "letiltja a konzolportot",
+    "titkosítja a futó konfigurációt",
+    "beállítja a jelszó élettartamát",
+    "ideiglenesen letiltja a bejelentkezést sok sikertelen próbálkozás után"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 52,
+   "topic": 2,
+   "q": "Melyik parancs állítja be a minimális jelszóhosszt globálisan?",
+   "options": [
+    "ip ssh min-password",
+    "security passwords min-length",
+    "line vty password-length",
+    "enable secret min-length"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 53,
+   "topic": 2,
+   "q": "Mi a VTY vonalak szerepe egy routeren?",
+   "options": [
+    "a soros konzolportot jelentik",
+    "a DHCP-kéréseket fogadják",
+    "a távoli (pl. SSH/Telnet) bejelentkezéseket kezelik",
+    "a routing táblát tárolják"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 54,
+   "topic": 2,
+   "q": "Melyik parancs engedélyezi, hogy a VTY vonalon helyi felhasználói adatbázissal lehessen bejelentkezni?",
+   "options": [
+    "login authentication none",
+    "local-login vty",
+    "username enable",
+    "login local"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 55,
+   "topic": 2,
+   "q": "Mi történik, ha egy routeren nincs beállítva domain név az SSH bekapcsolása előtt?",
+   "options": [
+    "csak a Telnet működik tovább",
+    "az RSA kulcs generálása nem lehetséges",
+    "a router automatikusan generál egy ideiglenes domaint",
+    "az SSH simán működik domain nélkül is"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 56,
+   "topic": 2,
+   "q": "Melyik a biztonságosabb gyakorlat jelszavaknál?",
+   "options": [
+    "az alapértelmezett gyári jelszó megtartása",
+    "ugyanaz a rövid jelszó mindenhol",
+    "a jelszó kiírása egy publikus wiki oldalra",
+    "egyedi, hosszú jelszó minden eszközön"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 57,
+   "topic": 2,
+   "q": "Mire figyelmeztet, ha egy routeren a 'show running-config' sima szövegként mutatja a jelszavakat?",
+   "options": [
+    "az SSH nincs telepítve",
+    "ez mindig így van, nem lehet másként",
+    "a service password-encryption nincs bekapcsolva",
+    "a router el van romolva"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 58,
+   "topic": 2,
+   "q": "Melyik parancs hozza létre a helyi SSH-felhasználót titkosított jelszóval?",
+   "options": [
+    "ssh-user add NEV JELSZO",
+    "enable user NEV JELSZO",
+    "username NEV secret JELSZO",
+    "login create NEV JELSZO"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 59,
+   "topic": 2,
+   "q": "Miért kockázatos, ha a Telnet is engedélyezve marad az SSH mellett?",
+   "options": [
+    "a Telnet lassabb, mint az SSH",
+    "a Telnet nem támogatja a VTY vonalakat",
+    "a Telnet csak IPv6-on működik",
+    "a Telnet titkosítatlanul küldi a jelszót és az adatokat"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 60,
+   "topic": 2,
+   "q": "Mi az 'exec-timeout' parancs szerepe a VTY vonalon?",
+   "options": [
+    "inaktivitás után automatikusan kilépteti a felhasználót",
+    "beállítja a jelszó élettartamát",
+    "korlátozza az egyidejű SSH kapcsolatok számát",
+    "titkosítja a konzol kimenetét"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 61,
+   "topic": 2,
+   "q": "Melyik igaz az SSH-ra a Telnethez képest?",
+   "options": [
+    "az SSH titkosítja a kapcsolatot",
+    "a Telnet biztonságosabb nyilvános hálózaton",
+    "a Telnet gyorsabb konfigurációt igényel",
+    "az SSH csak helyi hálózaton működik"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 62,
+   "topic": 2,
+   "q": "Mi a célja a konzolport jelszavas védelmének, ha a VTY már védett?",
+   "options": [
+    "csak gyári beállításoknál kell",
+    "a fizikai hozzáférésű (kábeles) bejelentkezést is védi",
+    "ez redundáns, nincs rá szükség",
+    "csak a Telnetet érinti"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 63,
+   "topic": 2,
+   "q": "Melyik parancs listázza ki, hogy mely vonalakon engedélyezett az SSH?",
+   "options": [
+    "show crypto password",
+    "show running-config (line vty szakasz)",
+    "show telnet status",
+    "show ip ssh users"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 64,
+   "topic": 2,
+   "q": "Mi történik, ha valaki ötször egymás után rossz jelszót ír be, és a login block-for be van állítva?",
+   "options": [
+    "semmi, a block-for csak naplóz",
+    "a router azonnal újraindul",
+    "a jelszó automatikusan megváltozik",
+    "ideiglenesen zárolódik a bejelentkezés arról a forrásból"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 65,
+   "topic": 3,
+   "q": "Mire szolgál a VLAN (Virtual LAN)?",
+   "options": [
+    "egy fizikai switch logikai elkülönítésére több hálózatra",
+    "a DHCP-címek kiosztására",
+    "a routerek közötti titkosított kapcsolat létrehozására",
+    "a kábelek fizikai jelölésére"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 66,
+   "topic": 3,
+   "q": "Mi a trunk port szerepe?",
+   "options": [
+    "egyetlen VLAN-hoz köt egy végpontot",
+    "több VLAN forgalmát viszi át egyetlen linken, VLAN-címkézéssel",
+    "csak menedzsment forgalmat enged át",
+    "letiltja a forgalmat egy porton"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 67,
+   "topic": 3,
+   "q": "Melyik protokoll a legelterjedtebb VLAN-címkézési szabvány?",
+   "options": [
+    "802.11ac",
+    "802.1X",
+    "802.3af",
+    "802.1Q"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 68,
+   "topic": 3,
+   "q": "Mi a natív VLAN szerepe egy trunk porton?",
+   "options": [
+    "ez a menedzsment VLAN szinonimája",
+    "a címke nélküli (untagged) forgalmat ez a VLAN kapja",
+    "ez határozza meg a trunk sebességét",
+    "ez mindig a VLAN 1-nek kell lennie"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 69,
+   "topic": 3,
+   "q": "Mi történik, ha a trunk két végén eltér a natív VLAN beállítása?",
+   "options": [
+    "ez nem okoz semmilyen problémát",
+    "VLAN-szivárgás / inkonzisztencia léphet fel",
+    "a trunk automatikusan megjavítja magát",
+    "a trunk azonnal leáll"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 70,
+   "topic": 3,
+   "q": "Mi a router-on-a-stick lényege?",
+   "options": [
+    "ez egy VLAN nélküli megoldás",
+    "minden VLAN-hoz külön fizikai router kell",
+    "a switch végzi az összes routingot",
+    "egy fizikai interfészen több subinterfésszel kezeli a VLAN-okat egy router"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 71,
+   "topic": 3,
+   "q": "Melyik parancs hozza létre a 20-as VLAN-t egy switchen?",
+   "options": [
+    "vlan 20",
+    "create vlan 20",
+    "interface vlan create 20",
+    "switchport vlan 20"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 72,
+   "topic": 3,
+   "q": "Mi a port security 'sticky' módjának lényege?",
+   "options": [
+    "automatikusan megjegyzi az első észlelt MAC-címet",
+    "mindig ugyanazt a MAC-címet követeli meg",
+    "letiltja az új eszközök csatlakozását",
+    "csak a trunk portokon működik"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 73,
+   "topic": 3,
+   "q": "Mi történik port security szabálysértéskor 'shutdown' violation módban?",
+   "options": [
+    "a switch újraindul",
+    "csak naplóbejegyzés készül, a port tovább működik",
+    "a VLAN törlődik",
+    "a port adminisztratívan leáll"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 74,
+   "topic": 3,
+   "q": "Mire való az access port?",
+   "options": [
+    "több VLAN egyidejű átvitelére",
+    "egyetlen VLAN-hoz tartozó végpont csatlakoztatására",
+    "két switch összekötésére trunk módban",
+    "router-router linkek létrehozására"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 75,
+   "topic": 3,
+   "q": "Mi a Portfast célja?",
+   "options": [
+    "a DHCP válaszidőt csökkenti",
+    "a trunk sebességét növeli",
+    "a VLAN-ok közötti routingot gyorsítja",
+    "a végponti port gyorsabban kerüljön forwarding állapotba STP-nél"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 76,
+   "topic": 3,
+   "q": "Melyik parancs állítja be egy portot trunk módba?",
+   "options": [
+    "switchport mode trunk",
+    "switchport trunk enable",
+    "switchport mode access",
+    "vlan trunk on"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 77,
+   "topic": 3,
+   "q": "Mi a 'show vlan brief' parancs kimenete?",
+   "options": [
+    "az IP-címkiosztás",
+    "a trunk linkek sebessége",
+    "a VLAN-ok listája és a hozzájuk rendelt portok",
+    "a routing tábla"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 78,
+   "topic": 3,
+   "q": "Mit jelent, ha egy switch port 'err-disabled' állapotba kerül?",
+   "options": [
+    "a port fizikailag megsérült",
+    "ez normál, ideiglenes állapot minden portnál",
+    "egy hiba (pl. port security szabálysértés) miatt a switch automatikusan letiltotta",
+    "a port épp trunk módban van"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 79,
+   "topic": 3,
+   "q": "Mire valók a subinterfészek egy router-on-a-stick konfigurációban?",
+   "options": [
+    "a fizikai port sebességét növelik",
+    "a trunköt helyettesítik",
+    "VLAN-onként külön logikai interfészt és IP-címet biztosítanak",
+    "csak IPv6-hoz szükségesek"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 80,
+   "topic": 3,
+   "q": "Mi a 'switchport access vlan X' parancs hatása?",
+   "options": [
+    "trunk módba kapcsolja a portot",
+    "VLAN X-et létrehozza, ha még nem létezik",
+    "az adott portot az X VLAN-hoz rendeli access módban",
+    "törli a port VLAN-beállítását"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 81,
+   "topic": 3,
+   "q": "Miért érdemes a nem használt portokat külön, 'parkoló' VLAN-ba tenni és leállítani?",
+   "options": [
+    "csökkenti az illetéktelen csatlakozás kockázatát",
+    "enélkül a switch nem indul el",
+    "ez kötelező minden Cisco switchnél",
+    "ez növeli a trunk sávszélességét"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 82,
+   "topic": 3,
+   "q": "Mi a VLAN adatbázis törlésének (delete vlan.dat) tipikus célja?",
+   "options": [
+    "a jelszavak törlése",
+    "a switch firmware frissítése",
+    "a trunk linkek engedélyezése",
+    "a VLAN-konfiguráció visszaállítása gyári, összezavarodott állapot javítására"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 83,
+   "topic": 3,
+   "q": "Mi a különbség egy switch access és trunk portja között forgalomirányítás szempontjából?",
+   "options": [
+    "az access port egy VLAN-t, a trunk több VLAN-t szolgál ki egy linken",
+    "nincs érdemi különbség",
+    "a trunk mindig lassabb",
+    "az access port csak IPv6-ot enged át"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 84,
+   "topic": 3,
+   "q": "Mire szolgál a VLAN 1 alapértelmezés szerint a legtöbb Cisco eszközön?",
+   "options": [
+    "ez az alapértelmezett (natív) VLAN minden portnál, amíg át nem konfigurálják",
+    "ez mindig a menedzsment VLAN kell legyen",
+    "csak IPv6 forgalomhoz használható",
+    "ez egy tiltott, soha nem használt VLAN"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 85,
+   "topic": 3,
+   "q": "Mi történik, ha egy végponti eszközt véletlenül trunk módú portra kötünk?",
+   "options": [
+    "a forgalma VLAN-címkézett lesz, amit a legtöbb végpont nem ért",
+    "a port automatikusan access módra vált",
+    "semmi különbség, minden ugyanúgy működik",
+    "a switch letiltja a teljes VLAN-t"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 86,
+   "topic": 4,
+   "q": "Mi az EtherChannel célja?",
+   "options": [
+    "a routing tábla tömörítése",
+    "a VLAN-ok automatikus létrehozása",
+    "több fizikai link összekapcsolása egy logikai, nagyobb sávszélességű linkké",
+    "egyetlen link titkosítása"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 87,
+   "topic": 4,
+   "q": "Melyik protokoll Cisco-specifikus EtherChannel-kialakításhoz?",
+   "options": [
+    "HSRP",
+    "STP",
+    "PAgP",
+    "LACP"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 88,
+   "topic": 4,
+   "q": "Melyik protokoll iparági szabvány (nem csak Cisco) az EtherChannelhez?",
+   "options": [
+    "VTP",
+    "CDP",
+    "LACP",
+    "PAgP"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 89,
+   "topic": 4,
+   "q": "Mi a LACP 'active' módjának párja a másik oldalon, ami még létrehozza a csatornát?",
+   "options": [
+    "active vagy passive",
+    "on only",
+    "shutdown",
+    "desirable"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 90,
+   "topic": 4,
+   "q": "Mi történik, ha egy EtherChannel egyik tagja kiesik?",
+   "options": [
+    "a switch újraindul",
+    "a teljes csatorna azonnal leáll",
+    "a VLAN-ok törlődnek",
+    "a forgalom a megmaradt aktív tagokon folytatódik"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 91,
+   "topic": 4,
+   "q": "Mi feltétele annak, hogy két port egy EtherChannelbe kerülhessen?",
+   "options": [
+    "azonos sebesség és duplex beállítás",
+    "különböző VLAN tagság",
+    "eltérő fizikai port típus",
+    "az egyiknek access, a másiknak trunk módban kell lennie"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 92,
+   "topic": 4,
+   "q": "Hogyan kezeli a Spanning Tree Protocol a működő EtherChannelt?",
+   "options": [
+    "mindig letiltja az egyik tagot",
+    "egyetlen logikai portként",
+    "figyelmen kívül hagyja",
+    "minden tagportot külön-külön"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 93,
+   "topic": 4,
+   "q": "Melyik paranccsal ellenőrizhető, hogy egy EtherChannel valóban működik-e?",
+   "options": [
+    "show etherchannel summary",
+    "show vlan trunk",
+    "show ip route channel",
+    "show port-channel vlan"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 94,
+   "topic": 4,
+   "q": "Mi a Port-channel interfész szerepe?",
+   "options": [
+    "az EtherChannel tagjainak logikai, egységes interfésze",
+    "csak menedzsment hozzáférésre szolgál",
+    "egy fizikai port alternatív neve",
+    "a DHCP szerver interfésze"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 95,
+   "topic": 4,
+   "q": "Mi történik, ha a Port-channel interfész VLAN-beállítása eltér a tagportokétól?",
+   "options": [
+    "ez csak figyelmeztetést ad, hatása nincs",
+    "a Port-channel figyelmen kívül hagyja a tagportokat",
+    "ez normális, a switch automatikusan egyezteti",
+    "inkonzisztencia és hibás működés léphet fel"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 96,
+   "topic": 4,
+   "q": "Melyik PAgP mód NEM hoz létre csatornát, ha a másik oldal is passzív?",
+   "options": [
+    "desirable–desirable páros",
+    "active–active páros",
+    "on–on páros",
+    "auto–auto páros"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 97,
+   "topic": 4,
+   "q": "Mi az EtherChannel egyik fő előnye a redundancián kívül?",
+   "options": [
+    "kiváltja a routing szükségességét",
+    "a sávszélesség összeadódik a tagok között",
+    "automatikusan titkosítja a forgalmat",
+    "csökkenti a VLAN-ok számát"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 98,
+   "topic": 4,
+   "q": "Melyik beállítást kell mindkét fizikai interfészen kiadni a csatorna létrehozásához?",
+   "options": [
+    "ip address parancsot mindkettőn",
+    "spanning-tree disable parancsot",
+    "vlan trunk parancsot csak az egyiken",
+    "channel-group parancsot"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 99,
+   "topic": 4,
+   "q": "Mi jellemzi a statikus ('on' módú) EtherChannelt a dinamikushoz (LACP/PAgP) képest?",
+   "options": [
+    "automatikusan felismeri a hibákat",
+    "csak két tagport engedélyezett benne",
+    "csak trunk módban működhet",
+    "nem egyeztet protokollal, a switch feltételezi, hogy a másik oldal is 'on' módban van"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 100,
+   "topic": 4,
+   "q": "Mire figyelmeztet, ha az EtherChannel tagjai eltérő sebességgel rendelkeznek?",
+   "options": [
+    "csak a lassabb port sebességén működik tovább mindkettő, hiba nélkül",
+    "ez csak a PAgP-nél számít",
+    "ez nem probléma, automatikusan kiegyenlítődik",
+    "a csatorna nem fog megfelelően létrejönni"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 101,
+   "topic": 5,
+   "q": "Mi a DHCP fő feladata?",
+   "options": [
+    "a VLAN-ok létrehozása",
+    "a routing tábla karbantartása",
+    "a jelszavak titkosítása",
+    "automatikus IP-cím (és egyéb beállítások) kiosztása a klienseknek"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 102,
+   "topic": 5,
+   "q": "Melyik parancs zárja ki a megadott címtartományt a DHCP kiosztásból?",
+   "options": [
+    "ip dhcp excluded-address",
+    "ip dhcp reserve",
+    "no ip dhcp assign",
+    "ip dhcp pool exclude"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 103,
+   "topic": 5,
+   "q": "Mire való az 'ip helper-address' parancs?",
+   "options": [
+    "továbbítja a DHCP-kéréseket egy másik alhálózatban lévő szerverhez",
+    "titkosítja a DHCP forgalmat",
+    "beállítja a DNS szervert",
+    "letiltja a DHCP-t egy interfészen"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 104,
+   "topic": 5,
+   "q": "Mi a különbség SLAAC és a stateful DHCPv6 között?",
+   "options": [
+    "nincs köztük érdemi különbség",
+    "az SLAAC csak IPv4-nél létezik",
+    "SLAAC-nál a kliens maga építi fel a címét, DHCPv6-nál a szerver osztja ki",
+    "a stateful DHCPv6 nem ad IP-címet, csak DNS-t"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 105,
+   "topic": 5,
+   "q": "Melyik jelző (flag) jelzi a routernek, hogy stateless DHCPv6-ot kell használni (csak kiegészítő adatokhoz, pl. DNS)?",
+   "options": [
+    "other-config-flag",
+    "stateful-flag",
+    "managed-config-flag",
+    "autoconfig-flag"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 106,
+   "topic": 5,
+   "q": "Melyik jelző jelzi, hogy teljes (stateful) DHCPv6-ot kell használni?",
+   "options": [
+    "ra-flag",
+    "managed-config-flag",
+    "other-config-flag",
+    "dhcp-only-flag"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 107,
+   "topic": 5,
+   "q": "Mi történik, ha a DHCP pool alaphálózata nem egyezik a VLAN gateway címével?",
+   "options": [
+    "a DHCP automatikusan kijavítja a pool-t",
+    "csak a DNS beállítás hibázik",
+    "a kliensek hibás vagy nem megfelelő címet kaphatnak",
+    "ez nem okoz problémát"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 108,
+   "topic": 5,
+   "q": "Melyik paranccsal nézhető meg, mely címeket osztott ki ténylegesen a DHCP szerver?",
+   "options": [
+    "show ip route dhcp",
+    "show ip dhcp binding",
+    "show ip dhcp pool status",
+    "show dhcp leases active"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 109,
+   "topic": 5,
+   "q": "Mi a DHCP relay (DHCPv6-nál) szerepe?",
+   "options": [
+    "csak IPv4-nél létezik",
+    "helyettesíti a teljes DHCP szervert",
+    "titkosítja a kiosztott címeket",
+    "a kérést egy másik hálózatban lévő DHCP szerverhez továbbítja"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 110,
+   "topic": 5,
+   "q": "Miért kell a gateway címét kizárni (excluded-address) a DHCP poolból?",
+   "options": [
+    "ez csak IPv6-nál szükséges",
+    "különben a DHCP véletlenül kioszthatná egy kliensnek, ütközést okozva",
+    "enélkül a DHCP egyáltalán nem indul el",
+    "ez csak esztétikai okokból szokás"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 111,
+   "topic": 5,
+   "q": "Mi történik, ha két VLAN ugyanazt a DHCP szervert használja, de nincs külön pool mindkettőhöz?",
+   "options": [
+    "ez automatikusan megoldódik, egy pool elég mindkettőhöz",
+    "az egyik VLAN klienseinek nem lesz megfelelő címe",
+    "csak a DNS beállítás lesz hibás",
+    "a DHCP szerver hibával leáll"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 112,
+   "topic": 5,
+   "q": "Mire utal, ha egy kliens '169.254.x.x' címet kap?",
+   "options": [
+    "nem sikerült DHCP-kérést teljesítenie, automatikus (APIPA) címet generált",
+    "ez egy helyes vállalati IP-cím",
+    "ez egy VLAN menedzsment cím",
+    "ez egy IPv6 cím"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 113,
+   "topic": 5,
+   "q": "Mi az IPv6 RA (Router Advertisement) szerepe SLAAC esetén?",
+   "options": [
+    "csak DNS-információt küld",
+    "hirdeti az alhálózat prefixét, amiből a kliens felépíti saját címét",
+    "ez IPv4-specifikus funkció",
+    "kiosztja közvetlenül a teljes IP-címet"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 114,
+   "topic": 5,
+   "q": "Melyik parancs hozza létre az IPv4 DHCP pool-t egy routeren?",
+   "options": [
+    "dhcp create pool NEV",
+    "ip dhcp pool NEV",
+    "service dhcp-pool NEV",
+    "ip pool dhcp NEV"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 115,
+   "topic": 5,
+   "q": "Mire kell figyelni a DHCP pool létrehozásának sorrendjénél az excluded-address beállításhoz képest?",
+   "options": [
+    "az excluded-addresst csak a pool törlése után lehet megadni",
+    "ez csak IPv6-nál számít",
+    "az excluded-address-et érdemes a pool létrehozása ELŐTT megadni",
+    "a sorrend soha nem számít"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 116,
+   "topic": 5,
+   "q": "Mi a DNS-szerver cím szerepe a DHCP beállításában?",
+   "options": [
+    "ez határozza meg a bérleti idő hosszát",
+    "ez a DHCP szerver saját címe",
+    "megmondja a kliensnek, melyik szervert használja névfeloldásra",
+    "ez adja meg a kliens alapértelmezett átjáróját"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 117,
+   "topic": 5,
+   "q": "Mi a lízingidő (lease time) szerepe a DHCP-ben?",
+   "options": [
+    "ez a DHCP szerver válaszideje",
+    "meghatározza, meddig érvényes a kiosztott cím megújítás nélkül",
+    "ez csak IPv6-nál értelmezett fogalom",
+    "ez a kliens MAC-címének érvényessége"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 118,
+   "topic": 5,
+   "q": "Melyik igaz a stateless DHCPv6-ra?",
+   "options": [
+    "ez nem használható RA mellett",
+    "ez az IPv4 szinonimája",
+    "ez osztja ki a teljes IPv6-címet",
+    "csak kiegészítő adatokat (pl. DNS) ad, a cím SLAAC-ból jön"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 119,
+   "topic": 6,
+   "q": "Mit jelent az OSPF (nevének rövidítése)?",
+   "options": [
+    "Ordered Shortest Path First",
+    "Open System Path Finder",
+    "Open Shortest Path First",
+    "Optimal Shortest Path Forward"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 120,
+   "topic": 6,
+   "q": "Milyen algoritmus alapján számolja az OSPF a legjobb útvonalat?",
+   "options": [
+    "Dijkstra (legrövidebb út) algoritmus",
+    "Bellman-Ford algoritmus",
+    "round-robin elosztás",
+    "legkisebb hop-szám egyszerű számlálása"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 121,
+   "topic": 6,
+   "q": "Mi alapján számolja az OSPF egy link költségét alapértelmezetten?",
+   "options": [
+    "a fizikai kábel hossza alapján",
+    "a hop-szám alapján, mint a RIP",
+    "a sávszélesség alapján (referencia-sávszélesség / interfész sávszélesség)",
+    "véletlenszerűen"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 122,
+   "topic": 6,
+   "q": "Milyen állapotba kell kerülnie két OSPF routernek, hogy teljes szomszédság jöjjön létre?",
+   "options": [
+    "DOWN",
+    "INIT",
+    "ATTEMPT",
+    "FULL"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 123,
+   "topic": 6,
+   "q": "Mi szükséges ahhoz, hogy két router OSPF szomszéd legyen ugyanazon a linken?",
+   "options": [
+    "azonos interfész IP-cím",
+    "azonos area, hálózati maszk és hello/dead időzítő",
+    "azonos VLAN szám",
+    "azonos router-id"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 124,
+   "topic": 6,
+   "q": "Mire való a router-id az OSPF-ben?",
+   "options": [
+    "meghatározza az interfész sebességét",
+    "egyedi azonosítja a routert az OSPF tartományban",
+    "ez az alapértelmezett átjáró címe",
+    "csak az IPv6-nál használt mező"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 125,
+   "topic": 6,
+   "q": "Mi történik, ha nem állítasz be kézzel router-id-t?",
+   "options": [
+    "a router a legmagasabb loopback vagy interfész IP alapján választ",
+    "az OSPF egyáltalán nem indul el",
+    "mindig 0.0.0.0 lesz a router-id",
+    "a router-id automatikusan 1.1.1.1 lesz"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 126,
+   "topic": 6,
+   "q": "Mire szolgál a 'passive-interface' parancs?",
+   "options": [
+    "teljesen letiltja az OSPF-et az interfészen",
+    "növeli az interfész költségét",
+    "csak a szomszédságot bontja, a hálózat hirdetése megszűnik",
+    "megakadályozza, hogy az adott interfészen OSPF hello üzenet menjen, de a hálózatát továbbra is hirdeti"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 127,
+   "topic": 6,
+   "q": "Melyik hálózattípus ajánlott pont-pont soros linkeken a gyorsabb konvergenciához?",
+   "options": [
+    "broadcast",
+    "point-to-point",
+    "non-broadcast",
+    "point-to-multipoint csak"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 128,
+   "topic": 6,
+   "q": "Mi történik, ha két OSPF router hello/dead időzítője eltér?",
+   "options": [
+    "az alacsonyabb érték automatikusan felülírja a másikat",
+    "csak lassabban konvergálnak, de működik",
+    "nem jön létre közöttük szomszédság",
+    "ez nem befolyásolja a szomszédságot"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 129,
+   "topic": 6,
+   "q": "Melyik parancs mutatja meg, mely hálózatokat hirdeti az OSPF folyamat?",
+   "options": [
+    "show ip dhcp pool",
+    "show ip ospf neighbor",
+    "show ip protocols",
+    "show running-config vlan"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 130,
+   "topic": 6,
+   "q": "Mi az OSPFv3 szerepe az OSPFv2-höz képest?",
+   "options": [
+    "ugyanaz, csak más néven",
+    "az IPv6 hálózatok OSPF-es route-olását végzi, külön folyamatként",
+    "ez az OSPF újabb, IPv4-es verziója",
+    "csak a router-id formátumában különbözik"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 131,
+   "topic": 6,
+   "q": "Mi történik, ha egy link mindkét végén eltérő az OSPF hálózattípus-beállítás?",
+   "options": [
+    "ez kizárólag az IPv6-nál okoz gondot",
+    "csak a költség lesz eltérő, a szomszédság stabil marad",
+    "a szomszédság instabil lesz vagy nem alakul ki",
+    "ez nem számít, az OSPF automatikusan egyezteti"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 132,
+   "topic": 6,
+   "q": "Mire való az 'auto-cost reference-bandwidth' beállítás?",
+   "options": [
+    "letiltja az OSPF autentikációt",
+    "beállítja a hello-időzítőt",
+    "meghatározza a router-id-t",
+    "újraskálázza az OSPF költségszámítás alapját, nagy sebességű linkeknél fontos"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 133,
+   "topic": 6,
+   "q": "Mi a különbség a 'FULL' és az 'INIT' OSPF szomszédsági állapot között?",
+   "options": [
+    "FULL-nál már teljes az LSA-csere, INIT-nél még csak elkezdődött a kapcsolat",
+    "a FULL csak IPv6-nál létezik",
+    "INIT a végállapot, FULL csak átmeneti",
+    "nincs érdemi különbség"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 134,
+   "topic": 6,
+   "q": "Melyik igaz az OSPF terület (area) fogalmára?",
+   "options": [
+    "ez egy VLAN szinonimája",
+    "ez csak a router-id meghatározására szolgál",
+    "a routereket logikai csoportokba szervezi, csökkentve az LSA-forgalmat",
+    "minden OSPF hálózatnak kötelezően több area-ja van"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 135,
+   "topic": 6,
+   "q": "Mi az area 0 szerepe egy több area-s OSPF hálózatban?",
+   "options": [
+    "ez egy opcionális, ritkán használt terület",
+    "ez csak teszteléshez való terület",
+    "ez az IPv6-specifikus terület",
+    "ez a gerinc (backbone) terület, amelyhez minden más area kapcsolódik"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 136,
+   "topic": 6,
+   "q": "Melyik parancs indítja el az OSPFv2 folyamatot egy routeren?",
+   "options": [
+    "start ospf process",
+    "router ospf PROCESS-ID",
+    "router-ospf begin",
+    "ip ospf enable"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 137,
+   "topic": 6,
+   "q": "Mi történik, ha egy hálózatot elfelejtesz felvenni az OSPF 'network' parancsába?",
+   "options": [
+    "a teljes OSPF folyamat leáll",
+    "csak a szomszédság szűnik meg, a hálózat hirdetése megmarad",
+    "az a hálózat nem lesz hirdetve az OSPF-ben",
+    "az OSPF automatikusan felismeri és hozzáadja"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 138,
+   "topic": 6,
+   "q": "Mi jellemző az OSPF 'show ip ospf neighbor' parancs kimenetére?",
+   "options": [
+    "a teljes routing táblát listázza",
+    "megmutatja a szomszédos routereket és az aktuális szomszédsági állapotukat",
+    "csak az interfészek sebességét mutatja",
+    "csak a saját router-id-t mutatja"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 139,
+   "topic": 6,
+   "q": "Miért érdemes egységesen beállítani a referencia-sávszélességet minden OSPF routeren?",
+   "options": [
+    "hogy a költségszámítás konzisztens legyen a teljes hálózatban",
+    "mert ez kötelező elem az area 0-ban",
+    "mert enélkül az OSPF nem indul el",
+    "mert ez határozza meg a router-id-t"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 140,
+   "topic": 6,
+   "q": "Mi a legjobb út kiválasztásának alapja az OSPF-ben két lehetséges útvonal között?",
+   "options": [
+    "a régebb óta aktív útvonal",
+    "az ábécé szerint előrébb álló interfész neve",
+    "az alacsonyabb összköltségű útvonal",
+    "a kevesebb hop-ot tartalmazó útvonal mindig"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 141,
+   "topic": 7,
+   "q": "Mit jelent az HSRP rövidítése?",
+   "options": [
+    "Hot Standby Router Protocol",
+    "High Speed Router Protocol",
+    "Host Standby Routing Process",
+    "Hierarchical Standby Router Protocol"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 142,
+   "topic": 7,
+   "q": "Mi az HSRP fő célja?",
+   "options": [
+    "a DHCP-kiosztást helyettesíti",
+    "redundáns, magas rendelkezésre állású alapértelmezett átjárót biztosít",
+    "titkosítja a routerek közötti forgalmat",
+    "a VLAN-ok közötti routingot gyorsítja"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 143,
+   "topic": 7,
+   "q": "Mi a virtuális IP szerepe HSRP-ben?",
+   "options": [
+    "ez egy DNS-szerver címe",
+    "ez a DHCP pool kezdőcíme",
+    "ez a standby router saját fizikai címe",
+    "ez a kliensek alapértelmezett átjárója, amit az aktív router szolgál ki"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 144,
+   "topic": 7,
+   "q": "Mi történik az aktív HSRP router kiesésekor preempt nélkül?",
+   "options": [
+    "a hálózat teljesen leáll",
+    "a standby router automatikusan átveszi, majd visszaadja, amint az aktív visszatér",
+    "az IP-címek automatikusan megváltoznak",
+    "a standby veszi át a szerepet, és az eredeti visszatérésekor sem veszi vissza automatikusan"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 145,
+   "topic": 7,
+   "q": "Mire való a 'preempt' beállítás?",
+   "options": [
+    "csökkenti a priority értéket",
+    "lehetővé teszi, hogy a magasabb priority-jú router visszavegye az aktív szerepet",
+    "ez kizárólag IPv6-nál értelmezett",
+    "letiltja a standby router működését"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 146,
+   "topic": 7,
+   "q": "Mi az alapértelmezett HSRP priority érték?",
+   "options": [
+    "1",
+    "255",
+    "0",
+    "100"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 147,
+   "topic": 7,
+   "q": "Melyik router lesz aktív, ha egyik oldalon sincs priority kézzel beállítva?",
+   "options": [
+    "mindig az alacsonyabb IP-című router",
+    "az, amelyik korábban indult el",
+    "véletlenszerűen dől el",
+    "a magasabb IP-című router"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 148,
+   "topic": 7,
+   "q": "Mi a csoportszám (group) szerepe HSRP-ben?",
+   "options": [
+    "ez a virtuális IP utolsó oktettje mindig",
+    "csak dokumentációs célú, funkcionálisan nincs hatása",
+    "elkülöníti az egyes HSRP-példányokat, pl. VLAN-onként",
+    "ez határozza meg a priority-t"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 149,
+   "topic": 7,
+   "q": "Mit mutat a 'show standby brief' parancs?",
+   "options": [
+    "a VLAN-ok listáját",
+    "a routing táblát",
+    "a DHCP-kiosztásokat",
+    "az aktív és standby szerepeket csoportonként"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 150,
+   "topic": 7,
+   "q": "Mi a HSRP 2-es verziójának egyik különbsége az 1-es verzióhoz képest?",
+   "options": [
+    "nem létezik priority beállítás benne",
+    "nem támogatja az IPv4-et",
+    "csak egyetlen csoportot enged routerenként",
+    "más multicast címet és nagyobb csoportszám-tartományt használ"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 151,
+   "topic": 7,
+   "q": "Mi történik, ha két routeren eltér az HSRP csoportszáma ugyanazon a VLAN-on?",
+   "options": [
+    "ez nem számít, automatikusan egyeztetik egymást",
+    "nem jön létre közöttük HSRP-kapcsolat, mindkettő külön csoportban marad",
+    "a VLAN leáll",
+    "a magasabb csoportszám felülírja az alacsonyabbat"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 152,
+   "topic": 7,
+   "q": "Mire használható az interfész-követés (tracking) HSRP-ben?",
+   "options": [
+    "csökkenti a priority-t, ha egy figyelt interfész leesik, átadva az aktív szerepet",
+    "ez csak HSRPv1-ben érhető el",
+    "növeli a virtuális IP számát",
+    "titkosítja az HSRP üzeneteket"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 153,
+   "topic": 7,
+   "q": "Mi a különbség az aktív és a standby router szerepe között?",
+   "options": [
+    "az aktív kezeli ténylegesen a forgalmat, a standby készenlétben vár",
+    "nincs érdemi különbség",
+    "a standby router teljesen ki van kapcsolva",
+    "mindkettő egyszerre kezeli a forgalmat terheléselosztással"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 154,
+   "topic": 7,
+   "q": "Miért érdemes a két routert különböző VLAN-okon különböző aktív szereppel beállítani?",
+   "options": [
+    "ez csökkenti a redundanciát",
+    "ez egyfajta terheléselosztást eredményez a két router között",
+    "ez csak HSRPv2-nél lehetséges",
+    "ez kötelező HSRP-nél, másként nem működik"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 155,
+   "topic": 7,
+   "q": "Mi a virtuális MAC-cím szerepe HSRP-ben?",
+   "options": [
+    "ez csak diagnosztikai célú, nincs valódi szerepe",
+    "ez a fizikai router saját MAC-címe",
+    "a csoporthoz tartozó egységes MAC-cím, amit a kliensek ARP-ban megkapnak",
+    "ez minden csomagnál véletlenszerűen változik"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 156,
+   "topic": 7,
+   "q": "Mi történik HSRP állapotváltáskor (pl. aktív router kiesésekor)?",
+   "options": [
+    "a kliens gépeknek új alapértelmezett átjárót kell kézzel beállítani",
+    "rövid, néhány másodperces kapcsolatkimaradás érzékelhető lehet",
+    "a kapcsolat azonnal, észrevehetetlenül folytatódik mindig",
+    "a VLAN teljesen újraindul"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 157,
+   "topic": 7,
+   "q": "Mire figyelmeztet, ha a virtuális IP már egy másik eszköz által használt cím?",
+   "options": [
+    "ez csak figyelmeztetést ad, működésre nincs hatása",
+    "IP-cím ütközés és hibás működés léphet fel",
+    "ez csak akkor probléma, ha az eszköz is router",
+    "ez nem okoz gondot, az HSRP felülírja automatikusan"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 158,
+   "topic": 7,
+   "q": "Mi az FHRP általános fogalma, amelynek az HSRP egy konkrét megvalósítása?",
+   "options": [
+    "First Hop Redundancy Protocol – az alapértelmezett átjáró redundanciájának általános kategóriája",
+    "a DHCP egyik üzemmódja",
+    "a Spanning Tree Protocol szinonimája",
+    "egy IPv6-specifikus routing protokoll"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 159,
+   "topic": 7,
+   "q": "Melyik másik gyártófüggetlen (szabványos) FHRP létezik az HSRP mellett?",
+   "options": [
+    "RIPng",
+    "OSPFv4",
+    "EIGRP Classic",
+    "VRRP (Virtual Router Redundancy Protocol)"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 160,
+   "topic": 8,
+   "q": "Mi az adminisztratív távolság (AD) szerepe?",
+   "options": [
+    "a sávszélességet jelöli egy linken",
+    "megmondja, melyik útvonalforrást részesítse előnyben a router azonos célnál",
+    "a router processzorterhelését mutatja",
+    "az útvonal fizikai hosszát méri"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 161,
+   "topic": 8,
+   "q": "Mi az alapértelmezett AD-je egy közvetlenül csatlakozó hálózatnak?",
+   "options": [
+    "1",
+    "110",
+    "0",
+    "255"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 162,
+   "topic": 8,
+   "q": "Mi az alapértelmezett AD-je egy statikus route-nak?",
+   "options": [
+    "90",
+    "1",
+    "0",
+    "120"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 163,
+   "topic": 8,
+   "q": "Mi az alapértelmezett AD-je az OSPF-nek?",
+   "options": [
+    "100",
+    "1",
+    "110",
+    "90"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 164,
+   "topic": 8,
+   "q": "Minél KISEBB egy útvonalforrás AD értéke, annál...",
+   "options": [
+    "megbízhatóbbnak tekinti a router",
+    "lassabbnak számít",
+    "megbízhatatlanabbnak tekinti a router",
+    "ritkábban frissül"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 165,
+   "topic": 8,
+   "q": "Mi a floating static route lényege?",
+   "options": [
+    "csak akkor kerül be a routing táblába, ha nincs jobb (kisebb AD-jű) útvonal ugyanarra a célra",
+    "kizárólag IPv6-nál használható fogalom",
+    "automatikusan törlődik 24 óra után",
+    "mindig az elsődleges útvonal, függetlenül a többitől"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 166,
+   "topic": 8,
+   "q": "Hogyan tehető egy statikus route 'floating'-gá?",
+   "options": [
+    "a next-hop törlésével",
+    "a route IPv6-ra cserélésével",
+    "a 'floating' kulcsszó hozzáadásával",
+    "magasabb AD-érték megadásával a parancs végén"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 167,
+   "topic": 8,
+   "q": "Mit jelez a csillag (*) a 'show ip route' kimenetében egy útvonal mellett?",
+   "options": [
+    "az útvonal ideiglenesen le van tiltva",
+    "az útvonal csak IPv6-ra vonatkozik",
+    "az útvonal hibás",
+    "ez az aktívan használt (pl. alapértelmezett) útvonal"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 168,
+   "topic": 8,
+   "q": "Mi az IPv4 alapértelmezett route célcíme?",
+   "options": [
+    "255.255.255.255/32",
+    "0.0.0.0/0",
+    "127.0.0.1/8",
+    "192.168.0.0/16"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 169,
+   "topic": 8,
+   "q": "Mi az IPv6 alapértelmezett route célcíme?",
+   "options": [
+    "::/0",
+    "fe80::/10",
+    "::1/128",
+    "ff00::/8"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 170,
+   "topic": 8,
+   "q": "Mire figyelmeztet, ha két router egymás felé mutató default route-tal rendelkezik ugyanarra a célra?",
+   "options": [
+    "ez mindig biztonságos és szándékos megoldás",
+    "ez automatikusan kiküszöböli önmagát",
+    "ez csak IPv6-nál okoz problémát",
+    "routing hurok (loop) alakulhat ki"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 171,
+   "topic": 8,
+   "q": "Melyik parancs ellenőrzi ténylegesen, végig az úton, hogy egy csomag hova jut el?",
+   "options": [
+    "ping -a",
+    "show ip route csak önmagában",
+    "show interfaces status",
+    "traceroute"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 172,
+   "topic": 8,
+   "q": "Mi a 'default-information originate' parancs OSPF-ben való szerepe?",
+   "options": [
+    "letiltja az alapértelmezett route-ot",
+    "ez egy HSRP-specifikus parancs",
+    "a router OSPF-ben is hirdeti a saját alapértelmezett route-ját",
+    "csak statikus route-oknál használható"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 173,
+   "topic": 8,
+   "q": "Mi történik, ha egy floating static route AD-je tévedésből alacsonyabb, mint a elsődleges útvonalé?",
+   "options": [
+    "csak figyelmeztető üzenet jelenik meg, működés nem változik",
+    "nincs hatása, a router felismeri a hibát",
+    "a floating route válik elsődlegessé, felborítva a tervezett sorrendet",
+    "a route érvénytelenné válik automatikusan"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 174,
+   "topic": 8,
+   "q": "Mire való a link-local cím megadása IPv6 statikus route next-hopként?",
+   "options": [
+    "csak OSPFv3-nál engedélyezett",
+    "ilyenkor meg kell adni a kimenő interfészt is, mert a link-local cím önmagában nem egyértelmű",
+    "ez tiltott konfiguráció, soha nem működik",
+    "ez helyettesíti a teljes route konfigurációt"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 175,
+   "topic": 8,
+   "q": "Mi különbözteti meg a 'fully specified' statikus route-ot egy csak next-hopos változattól?",
+   "options": [
+    "a kimenő interfészt és a next-hop címet is megadja",
+    "nincs érdemi különbség a kettő között",
+    "csak IPv6-nál létezik ez a fogalom",
+    "a fully specified route mindig floating"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 176,
+   "topic": 8,
+   "q": "Mit tesz az IP SLA egy útvonal-felügyeletben?",
+   "options": [
+    "statikus route-ot generál automatikusan",
+    "csak a sávszélességet méri",
+    "titkosítja az útvonalat",
+    "rendszeresen teszteli (pl. ping-geli) egy cél elérhetőségét, és ez alapján kapcsol útvonalat"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 177,
+   "topic": 8,
+   "q": "Melyik AD-érték magasabb, tehát kevésbé megbízható forrás?",
+   "options": [
+    "1 (statikus route)",
+    "200 (pl. egy jellemző EBGP-n kívüli külső forrás)",
+    "110 (OSPF)",
+    "0 (közvetlen kapcsolat)"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 178,
+   "topic": 8,
+   "q": "Mi történik, ha egy célhálózathoz egyszerre van OSPF-es és statikus (nem floating, alacsonyabb AD-jű) útvonal is?",
+   "options": [
+    "mindig az OSPF-es győz, függetlenül az AD-től",
+    "hiba lép fel, és egyik sem kerül be",
+    "a statikus útvonal kerül be a routing táblába, mert alacsonyabb az AD-je",
+    "mindkettő bekerül és terheléselosztás történik"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 179,
+   "topic": 8,
+   "q": "Mire jó a 'show ip route' parancsban az AD és a metrika zárójeles párosa (pl. [110/65])?",
+   "options": [
+    "mindkettő ugyanazt az értéket jelenti kétszer",
+    "ezek a csomagok száma és mérete",
+    "az első szám az AD, a második a metrika (költség)",
+    "az első a metrika, a második az AD"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 180,
+   "topic": 8,
+   "q": "Mi a célja a redundáns (tartalék) internetkapcsolat floating route-os beállításának?",
+   "options": [
+    "csak teszteléshez használt, élesben nem ajánlott",
+    "helyettesíti a BGP-t minden esetben",
+    "csökkenti az elsődleges kapcsolat sávszélességét",
+    "az elsődleges kapcsolat kiesésekor automatikusan átveszi a szerepet a tartalék"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 181,
+   "topic": 0,
+   "q": "Az OSI-modell melyik rétege foglalkozik az IP-címzéssel és routolással?",
+   "options": [
+    "alkalmazási réteg (7. réteg)",
+    "adatkapcsolati réteg (2. réteg)",
+    "hálózati réteg (3. réteg)",
+    "fizikai réteg (1. réteg)"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 182,
+   "topic": 0,
+   "q": "Melyik protokoll fordítja le a domain neveket IP-címekre?",
+   "options": [
+    "ARP",
+    "DNS",
+    "DHCP",
+    "ICMP"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 183,
+   "topic": 0,
+   "q": "Mi az ARP protokoll szerepe?",
+   "options": [
+    "domain nevek feloldása",
+    "titkosított kapcsolat létrehozása",
+    "IP-címek automatikus kiosztása",
+    "egy IP-címhez tartozó MAC-cím megkeresése a helyi hálózaton"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 184,
+   "topic": 0,
+   "q": "Melyik protokollt használja a 'ping' parancs?",
+   "options": [
+    "ARP",
+    "TCP",
+    "SNMP",
+    "ICMP"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 185,
+   "topic": 0,
+   "q": "Mi a MAC-cím hossza bitben?",
+   "options": [
+    "32 bit",
+    "64 bit",
+    "128 bit",
+    "48 bit"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 186,
+   "topic": 0,
+   "q": "Melyik réteg felelős a megbízható, kapcsolat-orientált adatátvitelért (pl. TCP)?",
+   "options": [
+    "szállítási réteg (4. réteg)",
+    "hálózati réteg (3. réteg)",
+    "bemutatási réteg (6. réteg)",
+    "fizikai réteg (1. réteg)"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 187,
+   "topic": 0,
+   "q": "Mi a különbség a TCP és az UDP között?",
+   "options": [
+    "a TCP kapcsolat-orientált és megbízható, az UDP nem",
+    "a TCP nem használ portokat, az UDP igen",
+    "nincs érdemi különbség köztük",
+    "az UDP mindig gyorsabb mint a TCP minden körülmények között"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 188,
+   "topic": 0,
+   "q": "Hány bit hosszú egy IPv4-cím?",
+   "options": [
+    "32 bit",
+    "128 bit",
+    "16 bit",
+    "64 bit"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 189,
+   "topic": 0,
+   "q": "Hány bit hosszú egy IPv6-cím?",
+   "options": [
+    "64 bit",
+    "256 bit",
+    "32 bit",
+    "128 bit"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 190,
+   "topic": 0,
+   "q": "Melyik címtartomány privát (nem internetre routolható) IPv4-nél?",
+   "options": [
+    "8.8.8.0/24",
+    "1.1.1.0/24",
+    "203.0.113.0/24",
+    "192.168.0.0/16"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 191,
+   "topic": 0,
+   "q": "Mi a broadcast cím szerepe egy IPv4 hálózatban?",
+   "options": [
+    "ez mindig a hálózat első címe",
+    "egyetlen konkrét hosztot céloz meg",
+    "minden hoszthoz eljuttatja az üzenetet az adott alhálózaton belül",
+    "csak routerek közötti kommunikációra szolgál"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 192,
+   "topic": 0,
+   "q": "Melyik parancs mutatja meg egy Windows gépen a saját IP-konfigurációt?",
+   "options": [
+    "netsh show only",
+    "traceroute",
+    "nslookup only",
+    "ipconfig"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 193,
+   "topic": 0,
+   "q": "Mi a gateway (átjáró) szerepe egy végponti eszköznél?",
+   "options": [
+    "ezen keresztül éri el a más hálózatban lévő eszközöket",
+    "ez adja ki a saját IP-címét",
+    "ez a helyi hálózat broadcast címe",
+    "ez egy DNS-szerver szinonimája"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 194,
+   "topic": 0,
+   "q": "Mi a VLSM (Variable Length Subnet Masking) lényege?",
+   "options": [
+    "minden alhálózat egyforma méretű kell legyen",
+    "különböző méretű alhálózatok kialakítása egy nagyobb blokkból, az igények szerint",
+    "a MAC-címek rövidítése",
+    "csak IPv6-nál alkalmazható technika"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 195,
+   "topic": 0,
+   "q": "Mi a switch fő feladata az OSI-modell 2. rétegén?",
+   "options": [
+    "domain neveket old fel",
+    "a MAC-címek alapján továbbítja a kereteket a megfelelő porton",
+    "titkosítja a hálózati forgalmat",
+    "IP-címek alapján útvonalakat választ"
+   ],
+   "correct": 1
+  },
+  {
+   "id": 196,
+   "topic": 0,
+   "q": "Mi a router fő feladata?",
+   "options": [
+    "különböző hálózatok közötti forgalom irányítása IP-cím alapján",
+    "a DNS-nevek gyorsítótárazása",
+    "a fizikai kábelezés ellenőrzése",
+    "a helyi hálózaton belüli keretek továbbítása MAC-cím alapján"
+   ],
+   "correct": 0
+  },
+  {
+   "id": 197,
+   "topic": 0,
+   "q": "Mi az NTP protokoll szerepe?",
+   "options": [
+    "névfeloldás",
+    "IP-cím kiosztás",
+    "titkosított távoli elérés",
+    "hálózati eszközök óráinak szinkronizálása"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 198,
+   "topic": 0,
+   "q": "Mi a loopback interfész (pl. 127.0.0.1) tipikus célja?",
+   "options": [
+    "ez mindig a router alapértelmezett átjárója",
+    "fizikai hálózati kártya helyettesítése",
+    "DHCP szerver azonosítása",
+    "az eszköz önmagával való tesztelése, illetve stabil, mindig elérhető logikai cím"
+   ],
+   "correct": 3
+  },
+  {
+   "id": 199,
+   "topic": 0,
+   "q": "Mi a különbség a unicast és a multicast forgalom között?",
+   "options": [
+    "nincs érdemi különbség köztük",
+    "a multicast mindig titkosított",
+    "a unicast egyetlen, a multicast egy csoport célállomásnak szól",
+    "a unicast csak IPv6-nál létezik"
+   ],
+   "correct": 2
+  },
+  {
+   "id": 200,
+   "topic": 0,
+   "q": "Mi a 'show interfaces' parancs egyik tipikus célja hibakeresésnél?",
+   "options": [
+    "a DHCP pool módosítása",
+    "a VLAN adatbázis törlése",
+    "a jelszavak listázása",
+    "az interfész állapotának (up/down), hibaszámlálóinak és sebességének ellenőrzése"
+   ],
+   "correct": 3
+  }
+ ]
 }

@@ -7,10 +7,11 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": ">=22.5"
+    "node": ">=18"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "mysql2": "^3.11.0"
   }
 }
