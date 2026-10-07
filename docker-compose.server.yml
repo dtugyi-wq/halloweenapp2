@@ -1,7 +1,7 @@
 # Ezt a fájlt másold a szerverre docker-compose.yml néven (a forráskód nem kell hozzá).
 services:
   halloween:
-    image: ghcr.io/FELHASZNALO/halloween-app:latest   # a GitHub felhasználóneved és a repó neve, kisbetűvel
+    image: ghcr.io/dtugyi-wq/halloweenapp2:latest   # a GitHub felhasználóneved és a repó neve, kisbetűvel
     container_name: halloween
     restart: unless-stopped
     ports:
